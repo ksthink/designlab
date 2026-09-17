@@ -1,0 +1,260 @@
+---
+import Base from '../layouts/Base.astro';
+import fonts from '../data/fonts.json';
+import { abs, url } from '../lib/docs';
+
+const brand: any = (fonts as any).brand ?? {};
+const archive: any = (fonts as any).archive ?? { families: [] };
+const license = brand.license ?? {};
+const rules: string[] = brand.rules ?? [];
+
+const roles = [
+  { key: 'hero', label: '히어로', text: '여백을 담습니다' },
+  { key: 'title', label: '제목', text: '리듬' },
+  { key: 'heading', label: '분류 제목', text: '라이프스타일' },
+  { key: 'body', label: '본문', text: '하루를 아침·낮·저녁·밤 네 칸으로 나눕니다. 할 일을 적는 대신, 지나간 칸에 무엇을 했는지만 남깁니다.' },
+  { key: 'meta', label: '메타', text: 'iOS · Android · 준비 중' },
+];
+
+const charset = [
+  { label: '한글', text: '가나다라마바사아자차카타파하 여백을 담습니다' },
+  { label: '자모', text: 'ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎ ㅏㅑㅓㅕㅗㅛㅜㅠㅡㅣ' },
+  { label: '라틴', text: 'ABCDEFGHIJKLM abcdefghijklm metaphr' },
+  { label: '숫자', text: '0123456789 · v1 · 40×40 · 1180px' },
+  { label: '기호', text: '■ □ · : + - < > ↓ # @ / _ ( ) ! ?' },
+];
+
+const importLine = `@import url("${abs('/v1/fonts.css')}");`;
+const fontFace = `@font-face {
+  font-family: "Mulmaru";
+  src: url("${abs('/v1/fonts/mulmaru.woff2')}") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}`;
+---
+
+<Base title="폰트" description="Mulmaru 하나. 굵기 400만, 위계는 크기·자간·투명도로" slug="fonts">
+  <p class="kicker">fonts · {brand.family ?? 'Mulmaru'}</p>
+  <h1>{brand.family ?? 'Mulmaru'}</h1>
+  <p class="tagline">서체는 {brand.name ?? '물마루'} 하나입니다. 굵기 400만 쓰고, 굵게·기울임 없이 크기·자간·투명도로 위계를 만듭니다.</p>
+
+  <div class="thumb detail specimen" aria-hidden="true">
+    <span>가a■</span>
+  </div>
+
+  <div class="meta file-meta">
+    <span class="badge">weight 400</span>
+    <span class="badge">woff2 · {brand.bytes ? `${Math.round(brand.bytes / 1024)}KB` : '약 98KB'}</span>
+    <span class="badge">{license.spdx ?? 'OFL-1.1'}</span>
+    <span class="badge">display swap</span>
+  </div>
+
+  <section class="section" aria-labelledby="f-roles">
+    <div class="section-head">
+      <h2 id="f-roles">역할별 견본</h2>
+      <span>같은 서체, 다른 크기와 자간</span>
+    </div>
+    <ol class="roles" role="list">
+      {roles.map((r) => (
+        <li>
+          <div class="spec-meta">
+            <span class="role">{r.label}</span>
+            <code>--mp-size-{r.key}</code>
+            <code>--mp-tracking-{r.key}</code>
+          </div>
+          <p class:list={['sample', r.key]} style={`font-size:var(--mp-size-${r.key});letter-spacing:var(--mp-tracking-${r.key})`}>{r.text}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section" aria-labelledby="f-chars">
+    <div class="section-head">
+      <h2 id="f-chars">글자</h2>
+      <span>{brand.coverage ?? '한글 완성형 전 음절 + 라틴 기본 + 기호'}</span>
+    </div>
+    <dl class="chars">
+      {charset.map((c) => (
+        <div>
+          <dt>{c.label}</dt>
+          <dd>{c.text}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <section class="section" aria-labelledby="f-hier">
+    <div class="section-head">
+      <h2 id="f-hier">굵기 없이 위계 만들기</h2>
+      <span>metaphr.dev 상세 화면의 구조</span>
+    </div>
+    <div class="hier">
+      <p class="kicker">라이프스타일</p>
+      <p class="h-title">리듬</p>
+      <p class="h-tag">하루를 네 칸으로 나눠 기록하는 습관 앱</p>
+      <p class="h-body">하루를 아침·낮·저녁·밤 네 칸으로 나눕니다. 할 일을 적는 대신, 지나간 칸에 무엇을 했는지만 남깁니다.</p>
+      <div class="meta"><span class="badge">iOS</span><span class="badge soon">준비 중</span></div>
+    </div>
+    <p class="note">kicker .45 → 제목 1 → tagline .7 → 본문 .85 → 배지 .55. 크기가 커질수록 자간은 좁히고, 작아질수록 넓힙니다.</p>
+  </section>
+
+  <section class="section" aria-labelledby="f-use">
+    <div class="section-head">
+      <h2 id="f-use">불러오기</h2>
+      <span>자기 호스팅 woff2 한 파일</span>
+    </div>
+    <pre id="font-import">{importLine}</pre>
+    <div class="actions">
+      <button type="button" class="btn" data-copy="font-import">import 복사</button>
+      <a class="btn" href={url('/v1/fonts.css')}>fonts.css</a>
+      <a class="btn" href={url('/v1/fonts/mulmaru.woff2')} download>mulmaru.woff2</a>
+    </div>
+    <p class="note">직접 선언할 때:</p>
+    <pre>{fontFace}</pre>
+
+    {rules.length > 0 && (
+      <>
+        <h3 class="sub-h">규칙</h3>
+        <ul class="rules" role="list">
+          {rules.map((r) => <li>{r}</li>)}
+        </ul>
+      </>
+    )}
+  </section>
+
+  <section class="section" aria-labelledby="f-license">
+    <div class="section-head">
+      <h2 id="f-license">라이선스</h2>
+    </div>
+    <p class="body-text">
+      {license.name ?? 'SIL Open Font License 1.1'} · {license.copyright ?? '© 2025 Mushsooni'}.
+      자유롭게 쓰고 함께 배포할 수 있으며, 서체 파일 자체를 단독으로 판매할 수는 없습니다.
+    </p>
+    <a class="btn" href={license.source ?? 'https://github.com/mushsooni/mulmaru'} rel="noopener">원본 저장소 &gt;</a>
+  </section>
+
+  {archive.families?.length > 0 && (
+    <section class="section archive" aria-labelledby="f-archive">
+      <div class="section-head">
+        <h2 id="f-archive">보관: fontcdn 라이브러리</h2>
+        <span class="badge soon">미사용</span>
+      </div>
+      <p class="note">{archive.note}</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>family</th><th>이름</th><th>라이선스</th><th>상태</th></tr></thead>
+          <tbody>
+            {archive.families.map((f: any) => (
+              <tr><td><code>{f.family}</code></td><td>{f.name}</td><td>{f.license}</td><td>미사용</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )}
+</Base>
+
+<style>
+  .specimen {
+    aspect-ratio: 16 / 9;
+    margin-bottom: clamp(1.5rem, 4vh, 2.2rem);
+    font-size: clamp(4rem, 16vw, 8rem);
+    letter-spacing: var(--mp-tracking-hero);
+  }
+  .file-meta { margin-bottom: 0; }
+
+  .h-title, .sub-h { margin: 0; }
+  .sub-h {
+    margin: var(--mp-section) 0 1em;
+    font-size: var(--mp-size-subheading);
+    letter-spacing: var(--mp-tracking-subheading);
+  }
+
+  .spec-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3em 1em;
+    margin-bottom: 0.6em;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+  }
+  .spec-meta code { font-size: 1em; }
+  .spec-meta .role { opacity: var(--mp-opacity-meta); }
+
+  .roles { list-style: none; margin: 0; padding: 0; border-top: var(--mp-border) solid var(--mp-line); }
+  .roles li { padding: 1.2em 0 1.4em; border-bottom: var(--mp-border) solid var(--mp-line); }
+  .sample { margin: 0; line-height: 1.45; overflow-wrap: anywhere; }
+  .sample.body { line-height: var(--mp-leading-body); opacity: var(--mp-opacity-body); max-width: var(--mp-width-para); }
+  .sample.meta { opacity: var(--mp-opacity-meta); }
+
+  .chars { margin: 0; border-top: var(--mp-border) solid var(--mp-line); }
+  .chars div {
+    display: grid;
+    grid-template-columns: 4em minmax(0, 1fr);
+    gap: 1em;
+    align-items: baseline;
+    padding: 0.9em 0;
+    border-bottom: var(--mp-border) solid var(--mp-line);
+  }
+  .chars dt { font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); }
+  .chars dd {
+    margin: 0;
+    font-size: var(--mp-size-heading);
+    letter-spacing: var(--mp-tracking-lead);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+  }
+
+  .hier {
+    padding: clamp(1.4rem, 4vw, 2.4rem);
+    border: var(--mp-border) solid var(--mp-line);
+  }
+  .h-title {
+    margin: 0 0 0.5em;
+    font-size: var(--mp-size-title);
+    letter-spacing: var(--mp-tracking-title);
+    line-height: var(--mp-leading-title);
+  }
+  .h-tag {
+    margin: 0 0 1.4em;
+    font-size: var(--mp-size-lead);
+    line-height: 1.9;
+    opacity: var(--mp-opacity-secondary);
+  }
+  .h-body {
+    margin: 0 0 1.6em;
+    font-size: var(--mp-size-body);
+    line-height: var(--mp-leading-body);
+    letter-spacing: var(--mp-tracking-body);
+    opacity: var(--mp-opacity-body);
+  }
+
+  .rules { list-style: none; margin: 0; padding: 0; }
+  .rules li {
+    position: relative;
+    padding-left: 1.3em;
+    margin-bottom: 0.4em;
+    font-size: var(--mp-size-body);
+    line-height: var(--mp-leading-body);
+    letter-spacing: var(--mp-tracking-body);
+    opacity: var(--mp-opacity-body);
+  }
+  .rules li::before {
+    content: "■";
+    position: absolute;
+    left: 0;
+    font-size: 0.55em;
+    top: 0.1em;
+    line-height: calc(var(--mp-leading-body) * 1em / 0.55);
+    opacity: var(--mp-opacity-kicker);
+  }
+
+  .archive .section-head .badge {
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+  .archive .table-wrap { margin-top: 1.2em; }
+</style>

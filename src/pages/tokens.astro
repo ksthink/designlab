@@ -1,0 +1,465 @@
+---
+import Base from '../layouts/Base.astro';
+import FxFill from '../components/FxFill.astro';
+import { abs, url } from '../lib/docs';
+import { contrastPairs, palette, themeColors, tokenList } from '../lib/tokens';
+
+const by = (group: string) => tokenList.filter((t) => t.group === group);
+const tail = (name: string, prefix: string) => name.replace(prefix, '');
+
+// 팔레트 원색 — tokens.json 의 color.palette 에 색이 늘면 견본·대비표가 저절로 늘어난다
+const swatches = palette();
+const themes = themeColors();
+const pairs = contrastPairs();
+const short = (name: string) => name.replace('--mp-palette-', '');
+const statusLabel = (st?: string) => (st === 'candidate' ? '후보' : '확정');
+// 테마 미리보기 패널 — 그 테마의 시맨틱 값을 인라인 변수로 덮어 한 화면에 나란히 보인다
+const themeVars = (mode: 'light' | 'dark') => themes.map((t) => `${t.name}:${t[mode].value}`).join(';');
+const sizes = by('size').map((t) => {
+  const key = tail(t.name, '--mp-size-');
+  const tracking = tokenList.find((x) => x.name === `--mp-tracking-${key}`);
+  return { ...t, key, tracking };
+});
+const leading = by('leading');
+const opacity = by('opacity');
+const layout = by('layout');
+const pixel = by('pixel');
+const motion = by('motion');
+const font = by('font');
+
+// 크기 견본 문장 — 역할마다 실제로 쓰일 법한 말
+const sample: Record<string, string> = {
+  hero: '여백을 담습니다',
+  title: '디자인 토큰',
+  heading: '라이프스타일',
+  subheading: '리듬',
+  lead: '빼고 덜어내는 미학을 고민합니다.',
+  body: '하루를 아침·낮·저녁·밤 네 칸으로 나눕니다.',
+  small: 'ksthink@metaphr.dev',
+  kicker: '라이프스타일',
+  meta: 'iOS · Android · 준비 중',
+  fine: '© metaphr',
+};
+---
+
+<Base title="디자인 토큰" description="색, 글자 크기와 자간, 투명도 단계, 폭과 여백, 픽셀, 움직임 — 모든 값은 --mp-* CSS 변수" slug="tokens">
+  <p class="kicker">tokens · {tokenList.length}개</p>
+  <h1>디자인 토큰</h1>
+  <p class="tagline">모든 값은 <code>--mp-*</code> CSS 변수로 씁니다. 여기에 없는 값은 새로 만들지 않습니다.</p>
+  <pre>@import url("{abs('/v1/tokens.css')}");
+@import url("{abs('/v1/fonts.css')}");</pre>
+  <div class="actions">
+    <a class="btn" href={url('/v1/tokens.css')}>tokens.css</a>
+    <a class="btn" href={url('/v1/tokens.json')}>tokens.json</a>
+  </div>
+
+  <!-- 색 -->
+  <section class="section" aria-labelledby="t-color">
+    <div class="section-head">
+      <h2 id="t-color">레트로 컬러</h2>
+      <span>네 가지 색. 라이트와 다크는 같은 이름, 다른 값</span>
+    </div>
+
+    <ul class="swatches" role="list">
+      {swatches.map((t) => (
+        <li>
+          <div class="chip" style={`--c:var(${t.name})`}></div>
+          <div class="sw-head">
+            <span class="sw-name">{short(t.name)}</span>
+            <span class:list={['badge', { soon: t.status === 'candidate' }]}>{statusLabel(t.status)}</span>
+          </div>
+          <code>{t.name}</code>
+          <span class="val">{t.resolved}{t.role ? ` · ${t.role}` : ''}</span>
+          <span class="val">{[t.contrastOnLight !== 1 && `라이트 배경 ${t.contrastOnLight}:1`, t.contrastOnDark !== 1 && `다크 배경 ${t.contrastOnDark}:1`].filter(Boolean).join(' · ')}</span>
+        </li>
+      ))}
+    </ul>
+
+    <h3 class="sub-h">라이트와 다크</h3>
+    <div class="theme-pair">
+      {(['light', 'dark'] as const).map((mode) => (
+        <div class="theme-panel" style={themeVars(mode)}>
+          <p class="tp-label">{mode === 'light' ? '[ 라이트 ]' : '[ 다크 ]'}</p>
+          <p class="tp-title">여백을 담습니다</p>
+          <p class="tp-body">본문은 ink 하나에 투명도만. 선은 1px.<span class="tp-caret" /></p>
+          <div class="tp-row">
+            <span class="tp-nav"><span class="tp-dot" />현재 위치</span>
+            <span class="tp-nav dim">다른 곳</span>
+          </div>
+          <div class="tp-row">
+            <span class="badge">배지</span>
+            <span class="tp-btn">버튼</span>
+            <span class="tp-btn on">호버</span>
+          </div>
+          <div class="thumb tp-thumb">■</div>
+        </div>
+      ))}
+    </div>
+    <p class="note">■ 커서가 강조(orange) 한 곳, 현재 위치 표시가 보조(teal) 면입니다. 둘은 떨어져 있습니다.</p>
+
+    <h3 class="sub-h">대비</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>색</th><th>색</th><th>대비</th><th>판정</th></tr></thead>
+        <tbody>
+          {pairs.map((p) => (
+            <tr>
+              <td><span class="mini" style={`--c:var(${p.a})`} /> {short(p.a)}</td>
+              <td><span class="mini" style={`--c:var(${p.b})`} /> {short(p.b)}</td>
+              <td>{p.ratio}:1</td>
+              <td>{p.ratio >= 4.5 ? '글자 가능' : p.ratio >= 3 ? '24px(--mp-size-title) 이상 글자만' : p.ratio >= 1.5 ? '면·기호만, 글자 금지' : '맞붙이지 않음'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="sub-h">쓰는 법</h3>
+    <div class="usage-grid">
+      <figure>
+        <div class="thumb stage"><span class="u-caret"><span>cursor</span><span class="u-mark" /></span></div>
+        <figcaption><span class="badge">좋은 예</span> 강조는 ■ 마크 한 곳</figcaption>
+      </figure>
+      <figure>
+        <div class="thumb stage"><span class="u-sel"><span class="u-face" />선택됨</span></div>
+        <figcaption><span class="badge">좋은 예</span> 보조는 선택 상태의 작은 면</figcaption>
+      </figure>
+      <figure>
+        <div class="thumb stage bad"><span class="u-text">본문을 강조색 글자로 쓰지 않습니다</span></div>
+        <figcaption><span class="badge soon">나쁜 예</span> 라이트에서 orange·teal 글자</figcaption>
+      </figure>
+      <figure>
+        <div class="thumb stage bad"><span class="u-touch"><span class="t" /><span class="o" /></span></div>
+        <figcaption><span class="badge soon">나쁜 예</span> teal과 orange를 맞붙이기 (1.24:1)</figcaption>
+      </figure>
+    </div>
+
+    <h3 class="sub-h">테마별 값</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>라이트</th><th>다크</th><th>용도</th></tr></thead>
+        <tbody>
+          {themes.map((t) => (
+            <tr>
+              <td><code>{t.name}</code></td>
+              <td><span class="mini" style={`--c:${t.light.value}`} /> {t.light.value.replace(/^var\(--mp-palette-(.+)\)$/, '$1')}</td>
+              <td><span class="mini" style={`--c:${t.dark.value}`} /> {t.dark.value.replace(/^var\(--mp-palette-(.+)\)$/, '$1')}</td>
+              <td>{t.description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 글자 크기 -->
+  <section class="section" aria-labelledby="t-size">
+    <div class="section-head">
+      <h2 id="t-size">글자 크기와 자간</h2>
+      <span>굵기 대신 크기·자간으로. 모두 clamp 유동값</span>
+    </div>
+    <ol class="scale" role="list">
+      {sizes.map((t) => (
+        <li>
+          <div class="spec-meta">
+            <code>{t.name}</code>
+            <span>{t.value}</span>
+            {t.tracking && <code>{t.tracking.name}</code>}
+            {t.tracking && <span>{t.tracking.value}</span>}
+          </div>
+          <p
+            class="spec-sample"
+            style={`font-size:var(${t.name});${t.tracking ? `letter-spacing:var(${t.tracking.name});` : ''}`}
+          >
+            {sample[t.key] ?? '여백을 담습니다'}
+          </p>
+        </li>
+      ))}
+    </ol>
+
+    <h3 class="sub-h">행간</h3>
+    <div class="leading">
+      {leading.map((t) => (
+        <div>
+          <div class="spec-meta"><code>{t.name}</code><span>{t.value}</span></div>
+          <p style={`line-height:var(${t.name})`}>
+            모두가 더 많은 기능을 다툴 때, 빼고 덜어내는 미학을 고민합니다. 오직 '하나'에만 온전히 집중할 수 있도록.
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- 투명도 -->
+  <section class="section" aria-labelledby="t-opacity">
+    <div class="section-head">
+      <h2 id="t-opacity">투명도 단계</h2>
+      <span>색을 바꾸지 않고 위계를 만든다. 호버하면 1</span>
+    </div>
+    <p class="note ladder-note">.55 이하는 보조 정보 전용 — 메타·노트·kicker·저작권처럼 읽지 않아도 되는 글자에만. 본문 크기 대비가 낮습니다.</p>
+    <ol class="ladder" role="list">
+      <li>
+        <span class="ladder-sample" style="opacity:1">여백을 담습니다</span>
+        <code>1</code>
+        <span class="role">제목 · 호버</span>
+      </li>
+      {opacity.map((t) => (
+        <li>
+          <span class="ladder-sample" style={`opacity:var(${t.name})`}>
+            {t.name.endsWith('-pixel') ? '■■■■ ■■' : '여백을 담습니다'}
+          </span>
+          <code>{t.name} · {t.value}</code>
+          <span class="role">{t.description}</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- 폭·여백 -->
+  <section class="section" aria-labelledby="t-layout">
+    <div class="section-head">
+      <h2 id="t-layout">폭과 여백</h2>
+      <span>넉넉하게 비운다</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>값</th><th>용도</th></tr></thead>
+        <tbody>
+          {[...layout, ...pixel].map((t) => (
+            <tr><td><code>{t.name}</code></td><td>{t.value}</td><td>{t.description}</td></tr>
+          ))}
+          {font.map((t) => (
+            <tr><td><code>{t.name}</code></td><td>{t.value}</td><td>{t.description}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <div class="widths" aria-hidden="true">
+      <div class="bar" style="width:100%"><span>list 1180px</span></div>
+      <div class="bar" style={`width:${(760 / 1180 * 100).toFixed(2)}%`}><span>read 760px</span></div>
+      <div class="bar" style={`width:${(30 * 16 / 1180 * 100).toFixed(2)}%`}><span>para 30em</span></div>
+    </div>
+  </section>
+
+  <!-- 움직임 -->
+  <section class="section" aria-labelledby="t-motion">
+    <div class="section-head">
+      <h2 id="t-motion">움직임</h2>
+      <span>숨쉬기와 터미널, 둘뿐. 움직임 줄이기 설정이면 멈춘다</span>
+    </div>
+
+    <div class="demos">
+      <figure>
+        <div class="thumb stage">
+          <span class="float" style="--fa:2.5px;--fd:3.4s">■</span>
+          <span class="float" style="--fa:4px;--fd:4.6s;--fdl:-1.3s">■</span>
+          <span class="float" style="--fa:5.5px;--fd:5.8s;--fdl:-2.9s">■</span>
+        </div>
+        <figcaption>숨쉬기 · ±2.5–5.5px · 3.4–5.8s ease-in-out alternate</figcaption>
+      </figure>
+      <figure>
+        <div class="thumb stage"><span class="caret demo-caret">cursor</span></div>
+        <figcaption>커서 ■ · 1.2s steps(1, end)</figcaption>
+      </figure>
+      <figure>
+        <div class="thumb stage"><span class="fx-demo"><FxFill href="#t-motion">fx-fill 8칸</FxFill></span></div>
+        <figcaption>fx-fill · 0.19s steps(4, end) · 호버</figcaption>
+      </figure>
+      <figure>
+        <div class="thumb stage"><button type="button" class="btn">버튼 반전</button></div>
+        <figcaption>버튼 · 잉크/배경 반전 0.25s · 호버</figcaption>
+      </figure>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>변수</th><th>값</th><th>용도</th></tr></thead>
+        <tbody>
+          {motion.map((t) => (
+            <tr><td><code>{t.name}</code></td><td>{t.value}</td><td>{t.description}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</Base>
+
+<style>
+  h3.sub-h {
+    margin: var(--mp-section) 0 1.2em;
+    font-size: var(--mp-size-subheading);
+    letter-spacing: var(--mp-tracking-subheading);
+  }
+
+  code { font-size: var(--mp-size-meta); }
+  :global(td) code { font-size: 1em; }
+
+  /* 색 */
+  .swatches {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
+    gap: 1.8em 1.2em;
+  }
+  .swatches li { display: flex; flex-direction: column; gap: 0.35em; }
+  .chip {
+    aspect-ratio: 2 / 1;
+    margin-bottom: 0.5em;
+    border: var(--mp-border) solid var(--mp-line);
+    background-color: var(--c);
+  }
+  .sw-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4em 0.6em; }
+  .sw-name { font-size: var(--mp-size-subheading); letter-spacing: var(--mp-tracking-subheading); }
+  .sw-head .badge { font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); }
+  .swatches code { align-self: flex-start; }
+  .swatches .val {
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    line-height: 1.8;
+    opacity: var(--mp-opacity-meta);
+  }
+  .mini { display: inline-block; width: 22px; height: 14px; background: var(--c); border: var(--mp-border) solid var(--mp-line); vertical-align: -0.1em; }
+
+  /* 라이트/다크 나란히 */
+  .theme-pair {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: 1.2em;
+  }
+  .theme-panel {
+    padding: clamp(1.1rem, 3vw, 1.6rem);
+    background: var(--mp-bg);
+    color: var(--mp-ink);
+    border: var(--mp-border) solid var(--mp-line);
+  }
+  .tp-label { margin: 0 0 1em; font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); }
+  .tp-title { margin: 0 0 0.4em; font-size: var(--mp-size-heading); letter-spacing: var(--mp-tracking-heading); }
+  .tp-body { margin: 0 0 1em; font-size: var(--mp-size-kicker); line-height: var(--mp-leading-card); opacity: var(--mp-opacity-body); }
+  .tp-caret { display: inline-block; width: 0.6em; height: 0.6em; margin-left: 0.4em; background: var(--mp-accent); }
+  .tp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6em 1.2em; margin-bottom: 1em; font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); }
+  .tp-row .badge { border-color: var(--mp-line); opacity: var(--mp-opacity-meta); }
+  .tp-nav { font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small); }
+  .tp-nav.dim { opacity: var(--mp-opacity-nav); }
+  .tp-dot { display: inline-block; width: 0.5em; height: 0.5em; margin-right: 0.45em; background: var(--mp-secondary); }
+  .tp-btn { padding: 0.45em 1em; border: var(--mp-border) solid var(--mp-line-button); }
+  .tp-btn.on { background: var(--mp-ink); color: var(--mp-bg); border-color: var(--mp-ink); }
+  .tp-thumb { height: 64px; font-size: var(--mp-size-heading); }
+
+  .usage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+    gap: 1.4em 1.2em;
+  }
+  .usage-grid figure { margin: 0; }
+  .usage-grid .stage { aspect-ratio: 2 / 1; }
+  .usage-grid figcaption {
+    margin-top: 0.7em;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    line-height: 1.9;
+  }
+  .usage-grid figcaption .badge { margin-right: 0.4em; opacity: var(--mp-opacity-meta); }
+  .u-caret { font-size: var(--mp-size-lead); }
+  .u-caret > span:first-child { opacity: var(--mp-opacity-body); }
+  .u-mark { display: inline-block; width: 0.7em; height: 0.7em; margin-left: 0.35em; background: var(--mp-accent); animation: caret var(--mp-duration-caret) steps(1, end) infinite; }
+  .u-sel { font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small); }
+  .u-face { display: inline-block; width: 0.55em; height: 0.55em; margin-right: 0.45em; background: var(--mp-secondary); }
+  .u-text { padding: 0 1em; font-size: var(--mp-size-meta); line-height: 1.8; text-align: center; color: var(--mp-palette-orange); }
+  .u-touch { display: flex; }
+  .u-touch span { display: block; width: 40px; height: 40px; }
+  .u-touch .t { background: var(--mp-palette-teal); }
+  .u-touch .o { background: var(--mp-palette-orange); }
+  .bad { position: relative; }
+  .bad::after { content: "x"; position: absolute; top: 0.4em; right: 0.6em; font-size: var(--mp-size-small); opacity: var(--mp-opacity-meta); }
+
+  /* 크기 */
+  .scale { list-style: none; margin: 0; padding: 0; border-top: var(--mp-border) solid var(--mp-line); }
+  .scale li { padding: 1.2em 0 1.3em; border-bottom: var(--mp-border) solid var(--mp-line); }
+  .spec-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.3em 1em;
+    margin-bottom: 0.6em;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+  }
+  .spec-meta span { opacity: var(--mp-opacity-meta); }
+  .spec-sample {
+    margin: 0;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  .leading { display: grid; gap: 1.6em; }
+  .leading p {
+    margin: 0;
+    max-width: var(--mp-width-para);
+    font-size: var(--mp-size-body);
+    letter-spacing: var(--mp-tracking-body);
+    opacity: var(--mp-opacity-body);
+  }
+
+  /* 투명도 */
+  .ladder-note { margin: 0 0 1.2em; }
+  .ladder { list-style: none; margin: 0; padding: 0; border-top: var(--mp-border) solid var(--mp-line); }
+  .ladder li {
+    display: grid;
+    grid-template-columns: minmax(0, 11em) minmax(0, 13em) minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.3em 1.2em;
+    padding: 0.9em 0;
+    border-bottom: var(--mp-border) solid var(--mp-line);
+  }
+  .ladder-sample { font-size: var(--mp-size-lead); letter-spacing: var(--mp-tracking-lead); white-space: nowrap; }
+  .ladder code { justify-self: start; }
+  .ladder .role {
+    font-size: var(--mp-size-meta);
+    line-height: var(--mp-leading-card);
+    opacity: var(--mp-opacity-secondary);
+  }
+  @media (max-width: 640px) {
+    .ladder li { grid-template-columns: 1fr; }
+  }
+
+  /* 폭 */
+  .widths { display: grid; gap: 0.6em; margin-top: 0.4em; }
+  .bar {
+    border: var(--mp-border) solid var(--mp-line);
+    background: var(--mp-grid-bg);
+    padding: 0.35em 0.6em;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    white-space: nowrap;
+  }
+  .bar span { opacity: var(--mp-opacity-meta); }
+
+  /* 움직임 */
+  .demos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+    gap: 1.4em 1.2em;
+    margin-bottom: 2em;
+  }
+  .demos figure { margin: 0; }
+  .stage {
+    aspect-ratio: 4 / 3;
+    gap: 1.2em;
+    font-size: var(--mp-size-heading);
+    color: var(--mp-ink);
+  }
+  .stage > .float { color: var(--mp-glyph); }
+  .demo-caret { font-size: var(--mp-size-lead); opacity: var(--mp-opacity-body); }
+  .fx-demo { font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small); }
+  .fx-demo :global(a) { text-decoration: none; border-bottom: var(--mp-border) solid var(--mp-line); padding-bottom: 0.15em; opacity: var(--mp-opacity-link); }
+  .fx-demo :global(a:hover) { opacity: 1; }
+  .demos figcaption {
+    margin-top: 0.7em;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    line-height: 1.8;
+    opacity: var(--mp-opacity-meta);
+  }
+</style>

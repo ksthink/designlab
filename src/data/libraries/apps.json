@@ -1,0 +1,66 @@
+{
+  "$description": "앱(네이티브) 제작용 디자인 참고 라이브러리. 항목 하나 추가 = /libraries, /libraries.md, /v1/libraries*.json, llms-full.txt, manifest에 자동 반영. 스키마: /v1/libraries.schema.json",
+  "kind": "apps",
+  "items": [
+    {
+      "id": "aseprite",
+      "name": "Aseprite",
+      "url": "https://www.aseprite.org",
+      "repo": "https://github.com/aseprite/aseprite",
+      "category": "tooling",
+      "platforms": [
+        "desktop"
+      ],
+      "license": "유료 / 소스 공개(EULA)",
+      "status": "recommended",
+      "pillars": [
+        "pixel-art",
+        "retro-color"
+      ],
+      "why": "픽셀아트·스프라이트 전용 편집기라 앱 아이콘과 스프라이트를 정수 픽셀 단위로 만든다.",
+      "howToUse": "앱 아이콘·스프라이트 제작에 쓴다. 인덱스 컬러 모드로 팔레트를 등록된 4색으로 고정하고, 정수 배율로만 내보낸다.",
+      "caveats": "유료 소프트웨어이며 소스는 EULA 조건으로 공개된다(오픈소스 라이선스 아님).",
+      "addedAt": "2026-09-17"
+    },
+    {
+      "id": "libresprite",
+      "name": "LibreSprite",
+      "url": "https://libresprite.github.io",
+      "repo": "https://github.com/LibreSprite/LibreSprite",
+      "category": "tooling",
+      "platforms": [
+        "desktop"
+      ],
+      "license": "GPL-2.0",
+      "status": "candidate",
+      "pillars": [
+        "pixel-art"
+      ],
+      "why": "Aseprite의 무료 포크라 같은 방식으로 픽셀아트를 만들 수 있다.",
+      "howToUse": "Aseprite와 같이 팔레트를 4색으로 제한하고 정수 배율로 내보낸다.",
+      "caveats": "GPL-2.0. Aseprite 최신 기능과 다를 수 있다.",
+      "addedAt": "2026-09-17"
+    },
+    {
+      "id": "pixelarticons-app",
+      "name": "Pixelarticons (앱용)",
+      "url": "https://pixelarticons.com",
+      "repo": "https://github.com/halfmage/pixelarticons",
+      "category": "icons",
+      "platforms": [
+        "ios",
+        "android"
+      ],
+      "license": "MIT",
+      "status": "recommended",
+      "pillars": [
+        "pixel-art",
+        "minimalism"
+      ],
+      "why": "24×24 격자에 안티에일리어싱 없이 그린 픽셀 아이콘이라 픽셀아트 기둥과 맞고, fill=\"currentColor\"라 색을 토큰으로 지정할 수 있다.",
+      "howToUse": "SVG를 iOS는 PDF 벡터 에셋, Android는 VectorDrawable로 변환해 선명도를 유지한다(비트맵 확대 보간에 의존하지 않는다). 크기는 24의 정수배, 색은 테마 ink 토큰.",
+      "caveats": "40×40 1비트 앱 아이콘 규칙과 격자가 다르다. 보조 UI 아이콘 용도. 무료 세트 외 아이콘은 유료 라이선스가 필요하다.",
+      "addedAt": "2026-09-17"
+    }
+  ]
+}

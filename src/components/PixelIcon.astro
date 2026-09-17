@@ -1,0 +1,31 @@
+---
+// 1비트 아이콘 — 파일의 모양만 빌려 현재 테마의 글자색(--mp-ink)으로 찍는다.
+// 검은 PNG를 그대로 두면 다크 배경에서 사라지기 때문. 크기는 40의 정수배만.
+interface Props {
+  src: string;
+  scale?: 1 | 3 | 5;
+  alt?: string;
+  class?: string;
+}
+const { src, scale = 3, alt = '', class: cls } = Astro.props;
+const size = 40 * scale;
+---
+
+<span
+  class:list={['pixel', 'pixel-icon', cls]}
+  role={alt ? 'img' : undefined}
+  aria-label={alt || undefined}
+  aria-hidden={alt ? undefined : 'true'}
+  style={`--icon:url("${src}");width:${size}px;height:${size}px`}
+></span>
+
+<style is:global>
+  .pixel-icon {
+    display: inline-block;
+    flex: none;
+    background: var(--mp-ink);
+    -webkit-mask: var(--icon) 0 0 / 100% 100% no-repeat;
+    mask: var(--icon) 0 0 / 100% 100% no-repeat;
+    image-rendering: pixelated;
+  }
+</style>

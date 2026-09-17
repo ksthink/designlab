@@ -1,0 +1,92 @@
+{
+  "$description": "metaphr 공식 로고 파일. 파일은 public/v1/logos/ 에 있고 file은 /v1/ 기준 상대 경로다. 여기에 등록되지 않은 로고는 공식 로고가 아니다. 로고를 새로 그리거나 추측하지 않는다.",
+  "rules": [
+    "워드마크(metaphr.svg)는 명암(글자·그림자)이 있는 비트맵이라 칠하지 않는다. 테마별 파일을 쓴다: 라이트 테마 → metaphr.svg, 다크 테마 → metaphr-dark.svg. CSS filter·mix-blend-mode·mask로 색을 바꾸지 않는다.",
+    "예외(공식): 1비트 단색 이미지(down.svg, 40×40 아이콘 PNG)는 CSS mask로 --mp-ink를 칠해도 된다(아래 maskCss). --mp-ink 외의 색(teal·orange 포함)으로는 칠하지 않는다.",
+    "배경은 --mp-bg(라이트 paper, 다크 slate) 위에서만 쓴다. 로고를 별도 패널·박스(다른 배경색 면) 위에 올리지 않는다. 사진·패턴·강조색 면 위에도 올리지 않는다. 예외: 디자인 문서의 견본 표시(각 변형을 자기 테마 배경 위에 보여 주는 경우)는 허용. 실제 제품 화면에서는 판 없이 --mp-bg 위에 바로 둔다.",
+    "효과 금지: 그림자, 그라데이션, 외곽선, 흐림, 회전, 기울임, 둥근 모서리 틀.",
+    "비율을 바꾸지 않는다. width만 지정하고 height: auto.",
+    "픽셀이 뭉개지지 않게 image-rendering: pixelated 를 준다. 비트맵 SVG는 정수 배율이 아닌 크기로 늘릴 때도 보간(흐림) 없이 표시되어야 한다.",
+    "애니메이션을 넣지 않는다. 예외는 metaphr.dev에서 이어받은 down.svg 스크롤 힌트의 세로 5px 왕복(2.6s ease-in-out infinite) 하나뿐이며 prefers-reduced-motion이면 멈춘다."
+  ],
+  "logos": [
+    {
+      "id": "metaphr",
+      "name": "워드마크 META. PHR",
+      "file": "logos/metaphr.svg",
+      "format": "svg (비트맵 PNG를 `<image>`로 담은 SVG)",
+      "viewBox": "0 0 1024 585",
+      "intrinsic": {
+        "width": 350,
+        "height": 200
+      },
+      "use": "푸터 로고. 페이지 맨 아래, 가로 가운데 정렬.",
+      "display": {
+        "width": "clamp(120px, 20vw, 168px)",
+        "height": "auto",
+        "align": "center",
+        "margin": "clamp(2.5rem, 7vh, 4rem) auto 0",
+        "css": ".foot-logo { display: block; width: clamp(120px, 20vw, 168px); height: auto; margin: clamp(2.5rem, 7vh, 4rem) auto 0; user-select: none; image-rendering: pixelated; }"
+      },
+      "alt": "metaphr",
+      "html": "<img class=\"foot-logo\" src=\"/v1/logos/metaphr.svg\" alt=\"metaphr\" width=\"350\" height=\"200\" loading=\"lazy\" decoding=\"async\">",
+      "pairsWith": "바로 아래 `<small>© metaphr</small>` (--mp-size-fine, --mp-tracking-fine, --mp-opacity-fine, margin-top 1.4rem, 가운데)",
+      "theme": "light",
+      "variants": {
+        "light": "logos/metaphr.svg",
+        "dark": "logos/metaphr-dark.svg"
+      },
+      "themeSwitch": {
+        "css": ".foot-logo--dark { display: none; } @media (prefers-color-scheme: dark) { :root:not([data-theme=\"light\"]) .foot-logo--light { display: none; } :root:not([data-theme=\"light\"]) .foot-logo--dark { display: block; } } :root[data-theme=\"dark\"] .foot-logo--light { display: none; } :root[data-theme=\"dark\"] .foot-logo--dark { display: block; }",
+        "html": "<img class=\"foot-logo foot-logo--light\" src=\"/v1/logos/metaphr.svg\" alt=\"metaphr\" width=\"350\" height=\"200\" loading=\"lazy\" decoding=\"async\"><img class=\"foot-logo foot-logo--dark\" src=\"/v1/logos/metaphr-dark.svg\" alt=\"metaphr\" width=\"350\" height=\"200\" loading=\"lazy\" decoding=\"async\">",
+        "picture": "<picture><source srcset=\"/v1/logos/metaphr-dark.svg\" media=\"(prefers-color-scheme: dark)\"><img class=\"foot-logo\" src=\"/v1/logos/metaphr.svg\" alt=\"metaphr\" width=\"350\" height=\"200\"></picture>",
+        "note": "`<picture>`는 OS 설정(prefers-color-scheme)만 따르고 [data-theme] 수동 지정은 반영하지 못한다. 수동 테마 전환이 있으면 html + css(두 img 토글) 방식을 쓴다."
+      }
+    },
+    {
+      "id": "metaphr-dark",
+      "name": "워드마크 META. PHR (다크 테마용)",
+      "file": "logos/metaphr-dark.svg",
+      "format": "svg (64색 비트맵 PNG를 `<image>`로 담은 SVG, 글자 #F5F5F5, 그림자는 어두운 톤, 약 15KB)",
+      "viewBox": "0 0 1024 585",
+      "intrinsic": {
+        "width": 350,
+        "height": 200
+      },
+      "use": "다크 테마의 푸터 로고. 라이트 테마에서는 쓰지 않는다. 배치 규칙은 metaphr.svg와 같다.",
+      "display": {
+        "width": "clamp(120px, 20vw, 168px)",
+        "height": "auto",
+        "align": "center",
+        "margin": "clamp(2.5rem, 7vh, 4rem) auto 0",
+        "css": ".foot-logo { display: block; width: clamp(120px, 20vw, 168px); height: auto; margin: clamp(2.5rem, 7vh, 4rem) auto 0; user-select: none; image-rendering: pixelated; }"
+      },
+      "alt": "metaphr",
+      "html": "<img class=\"foot-logo\" src=\"/v1/logos/metaphr-dark.svg\" alt=\"metaphr\" width=\"350\" height=\"200\" loading=\"lazy\" decoding=\"async\">",
+      "pairsWith": "바로 아래 `<small>© metaphr</small>` (--mp-size-fine, --mp-tracking-fine, --mp-opacity-fine, margin-top 1.4rem, 가운데)",
+      "theme": "dark",
+      "variantOf": "metaphr"
+    },
+    {
+      "id": "down",
+      "name": "스크롤 힌트 ▼",
+      "file": "logos/down.svg",
+      "format": "svg (12×6 픽셀 경로, shape-rendering=crispEdges, 1비트 단색, 파일 fill #303841(slate). 화면에서는 mask로 --mp-ink를 칠한다)",
+      "viewBox": "0 0 12 6",
+      "intrinsic": {
+        "width": 12,
+        "height": 6
+      },
+      "use": "히어로 하단 가운데의 아래로 스크롤 링크 안 아이콘.",
+      "display": {
+        "width": "clamp(16px, 2.2vw, 22px)",
+        "height": "auto",
+        "opacity": "0.75, 호버 시 1",
+        "animation": "@keyframes hint { 0%,100% { transform: translate(-50%,0) } 50% { transform: translate(-50%,5px) } } 2.6s ease-in-out infinite"
+      },
+      "alt": "",
+      "html": "<a class=\"scroll-hint\" href=\"#main\" aria-label=\"아래로 스크롤\"><span class=\"mp-mask\" style=\"--src:url(/v1/logos/down.svg); width: clamp(16px, 2.2vw, 22px); aspect-ratio: 12/6\"></span></a>"
+    }
+  ],
+  "maskCss": ".mp-mask { display: block; background: var(--mp-ink); -webkit-mask: var(--src) center / 100% 100% no-repeat; mask: var(--src) center / 100% 100% no-repeat; } /* 1비트 단색 이미지(down.svg, 아이콘 PNG) 전용. 워드마크에는 쓰지 않는다. */"
+}

@@ -1,0 +1,16 @@
+---
+// metaphr.dev 푸터 메일 링크의 hover — 8칸이 steps()로 차오르며 잉크/배경 반전
+interface Props {
+  href: string;
+  class?: string;
+  [key: string]: unknown;
+}
+const { href, class: cls, ...rest } = Astro.props;
+const delays = [0, 90, 30, 160, 60, 220, 120, 280];
+---
+
+<a href={href} class:list={['fx-fill', cls]} {...rest}
+  ><span class="label"><slot /></span><span class="fill" aria-hidden="true"
+    >{delays.map((d) => <span style={`--d:${d}ms`} />)}</span
+  ></a
+>

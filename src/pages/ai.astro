@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import { marked } from 'marked';
+import { pageMarkdown } from '../lib/docs';
+
+// AI 가이드는 마크다운 원본을 그대로 렌더링해 사람용과 AI용 내용이 완전히 같다.
+let html = await marked.parse(pageMarkdown('ai'));
+
+// 표는 좁은 화면에서 가로로만 넘기고, 첫 코드 블록(지시문)에는 복사 버튼을 붙인다
+html = html
+  .replace(/<table>/g, '<div class="table-wrap"><table>')
+  .replace(/<\/table>/g, '</table></div>')
+  .replace(
+    /<pre>([\s\S]*?)<\/pre>/,
+    '<pre id="ai-prompt">$1</pre><div class="actions copy-row"><button type="button" class="btn" data-copy="ai-prompt">지시문 복사</button></div>',
+  );
+---
+
+<Base title="AI로 만들 때" description="AI 코딩 도구에 붙여넣는 지시문과 적용 순서" slug="ai">
+  <p class="kicker">ai · 사람과 AI가 같은 문서를 읽는다</p>
+  <article class="prose" set:html={html} />
+</Base>
+
+<style>
+  .prose :global(.copy-row) { margin: -0.4em 0 2em; }
+</style>

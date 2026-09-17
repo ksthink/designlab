@@ -1,0 +1,318 @@
+---
+import Base from '../layouts/Base.astro';
+import PixelIcon from '../components/PixelIcon.astro';
+import logos from '../data/logos.json';
+import icons from '../data/icons.json';
+import { url } from '../lib/docs';
+import { themeColors } from '../lib/tokens';
+
+// 테마 패널 — 페이지 테마와 상관없이 그 테마의 값으로 칠한다
+const themeVars = (mode: 'light' | 'dark') => themeColors().map((t) => `${t.name}:${t[mode].value}`).join(';');
+const variants = [
+  { mode: 'light' as const, label: '[ 라이트 ]', file: 'metaphr.svg' },
+  { mode: 'dark' as const, label: '[ 다크 ]', file: 'metaphr-dark.svg' },
+];
+
+const L: any = logos;
+const I: any = icons;
+const rules: string[] = Array.isArray(L.rules) ? L.rules : [];
+const byId = (id: string) => (L.logos ?? []).find((l: any) => l.id === id);
+const wordmark = byId('metaphr');
+const down = byId('down');
+const iconList: any[] = I.icons ?? [];
+const iconRules: string[] = I.spec?.rules ?? [];
+const scales = [1, 3, 5];
+const wordmarkDark = byId('metaphr-dark');
+const iconSpec: any = I.spec ?? {};
+const maskCss: string | undefined = L.maskCss;
+
+// logos.md 와 같은 항목을 사람용 표로 — 데이터에 있는 값은 빠짐없이 보인다
+const specRows = (l: any): [string, string][] => {
+  if (!l) return [];
+  const rows: [string, string][] = [
+    ['파일', `/v1/${l.file}`],
+    ['형식', l.format],
+    ['viewBox', l.viewBox],
+    ['고유 크기', l.intrinsic ? `${l.intrinsic.width}×${l.intrinsic.height}` : undefined],
+    ['용도', l.use],
+    ...Object.entries(l.display ?? {}).map(([k, v]) => [`표시 ${k}`, String(v)] as [string, string]),
+    ['alt', l.alt === '' ? '"" (장식)' : l.alt],
+    ['함께 쓰는 요소', l.pairsWith],
+    ['테마', l.theme],
+    ['원본', l.variantOf ? `${l.variantOf} 의 테마 변형` : undefined],
+  ];
+  return rows.filter((r): r is [string, string] => typeof r[1] === 'string' && r[1] !== '');
+};
+---
+
+<Base title="로고" description="metaphr 워드마크, 스크롤 힌트, 40×40 픽셀 아이콘과 사용 규칙" slug="logos">
+  <p class="kicker">logos · 공식 파일 {(L.logos ?? []).length}개</p>
+  <h1>로고</h1>
+  <p class="tagline">등록된 파일만 공식 로고입니다. 새로 그리거나 색을 바꾸지 않습니다.</p>
+
+  <section aria-labelledby="l-mark">
+    <h2 id="l-mark" class="visually-hidden">워드마크</h2>
+    <div class="variants">
+      {variants.map((v) => (
+        <figure class="variant" style={themeVars(v.mode)}>
+          <div class="thumb detail panel">
+            <img class="mark" src={url(`/v1/logos/${v.file}`)} alt={`metaphr — ${v.mode === 'light' ? '라이트' : '다크'} 테마용`} width="350" height="200" />
+          </div>
+          <figcaption>{v.label} {v.file}</figcaption>
+        </figure>
+      ))}
+    </div>
+    <p class="item-title">{wordmark?.name ?? '워드마크 META. PHR'}</p>
+    <p class="item-desc">{wordmark?.use}</p>
+    <div class="actions dl">
+      {variants.map((v) => <a class="btn" href={url(`/v1/logos/${v.file}`)} download>{v.file} 내려받기</a>)}
+    </div>
+
+    {[wordmark, wordmarkDark].filter(Boolean).map((l: any) => (
+      <div class="spec">
+        <p class="kicker">{l.file.split('/').pop()}</p>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              {specRows(l).map(([k, v]) => <tr><th scope="row">{k}</th><td>{v}</td></tr>)}
+            </tbody>
+          </table>
+        </div>
+        {l.html && <pre>{l.html}</pre>}
+      </div>
+    ))}
+
+    {wordmark?.themeSwitch && (
+      <div class="spec">
+        <h3 class="sub-h">테마에 따라 파일 바꾸기</h3>
+        <p class="item-desc">라이트 테마는 metaphr.svg, 다크 테마는 metaphr-dark.svg. 시스템 설정과 [data-theme] 수동 지정을 모두 따릅니다.</p>
+        <pre>{wordmark.themeSwitch.html}</pre>
+        <pre>{wordmark.themeSwitch.css}</pre>
+        {wordmark.themeSwitch.note && <p class="note">{wordmark.themeSwitch.note}</p>}
+        {wordmark.themeSwitch.picture && <pre>{wordmark.themeSwitch.picture}</pre>}
+      </div>
+    )}
+  </section>
+
+  <section class="section" aria-labelledby="l-down">
+    <div class="section-head">
+      <h2 id="l-down">스크롤 힌트</h2>
+      <span>12×6 픽셀 삼각형</span>
+    </div>
+    <div class="thumb detail panel short">
+      <span class="down down-big" style={`--down:url("${url('/v1/logos/down.svg')}")`} aria-hidden="true"></span>
+      <span class="down down-real" style={`--down:url("${url('/v1/logos/down.svg')}")`} aria-hidden="true"></span>
+    </div>
+    <p class="item-desc">{down?.use} 왼쪽은 10배, 오른쪽은 실제 크기입니다.</p>
+    <div class="actions dl">
+      <a class="btn" href={url('/v1/logos/down.svg')} download>down.svg 내려받기</a>
+    </div>
+    <div class="spec">
+      <div class="table-wrap">
+        <table>
+          <tbody>
+            {specRows(down).map(([k, v]) => <tr><th scope="row">{k}</th><td>{v}</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+      {down?.html && <pre>{down.html}</pre>}
+      {maskCss && (
+        <>
+          <p class="note">1비트 단색 이미지(down.svg, 아이콘 PNG)용 mask CSS — 워드마크에는 쓰지 않습니다.</p>
+          <pre>{maskCss}</pre>
+        </>
+      )}
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="l-icons">
+    <div class="section-head">
+      <h2 id="l-icons">픽셀 아이콘</h2>
+      <span>40×40 1비트, 정수 배율만</span>
+    </div>
+
+    {iconList[0] && (
+      <div class="scales">
+        {scales.map((s) => (
+          <figure>
+            <div class="thumb" style={`background-size:${s === 5 ? 'var(--mp-grid-cell-detail) var(--mp-grid-cell-detail)' : ''}`}>
+              <PixelIcon src={url(`/v1/${iconList[0].file}`)} scale={s as 1 | 3 | 5} />
+            </div>
+            <figcaption>{s}× · {40 * s}px{s === 3 ? ' · 카드' : s === 5 ? ' · 상세' : ' · 원본'}</figcaption>
+          </figure>
+        ))}
+      </div>
+    )}
+
+    {iconSpec.scale?.length > 0 && (
+      <div class="spec">
+        <p class="item-desc">원본 {iconSpec.size?.width}×{iconSpec.size?.height} {iconSpec.format}. {iconSpec.colors}</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>쓰는 곳</th><th>배율</th><th>표시 크기</th><th>CSS 변수</th><th>모눈 칸</th></tr></thead>
+            <tbody>
+              {iconSpec.scale.map((r: any) => (
+                <tr><td>{r.context}</td><td>{r.factor}×</td><td>{r.size}</td><td><code>{r.cssVariable}</code></td><td>{r.gridCell}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {iconSpec.css && <pre>{iconSpec.css}</pre>}
+      </div>
+    )}
+
+    <ul class="icons" role="list">
+      {iconList.map((ic) => (
+        <li>
+          <a href={url(`/v1/${ic.file}`)} download>
+            <div class="thumb"><PixelIcon src={url(`/v1/${ic.file}`)} scale={3} /></div>
+            <span class="ic-name">{ic.app}</span>
+            <span class="ic-file">{ic.file.split('/').pop()} ↓</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    {iconRules.length > 0 && (
+      <ul class="rules" role="list">
+        {iconRules.map((r) => <li>{r}</li>)}
+      </ul>
+    )}
+  </section>
+
+  {rules.length > 0 && (
+    <section class="section" aria-labelledby="l-rules">
+      <div class="section-head">
+        <h2 id="l-rules">사용 규칙</h2>
+        <span>하지 않는 것이 더 많다</span>
+      </div>
+      <ul class="rules" role="list">
+        {rules.map((r) => <li>{r}</li>)}
+      </ul>
+    </section>
+  )}
+</Base>
+
+<style>
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .panel {
+    aspect-ratio: 16 / 9;
+    margin-bottom: clamp(1.2rem, 3vh, 1.8rem);
+  }
+  .variants {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+    gap: 1em;
+    margin-bottom: clamp(1.2rem, 3vh, 1.8rem);
+  }
+  .variant { margin: 0; background: var(--mp-bg); color: var(--mp-ink); border: var(--mp-border) solid var(--mp-line); }
+  .variant .panel { margin: 0; aspect-ratio: 4 / 3; }
+  .variant figcaption {
+    padding: 0.7em 0.9em;
+    border-top: var(--mp-border) solid var(--mp-line);
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+
+  .panel.short { aspect-ratio: 16 / 6; gap: clamp(2rem, 8vw, 5rem); }
+
+  .mark {
+    width: clamp(140px, 60%, 260px);
+    height: auto;
+    image-rendering: pixelated;
+    user-select: none;
+  }
+
+  /* 모양만 빌려 글자색으로 — 다크에서도 보이게 */
+  .down { display: block; background: var(--mp-ink); -webkit-mask: var(--down) 0 0 / 100% 100% no-repeat; mask: var(--down) 0 0 / 100% 100% no-repeat; }
+  .down-big { width: 120px; height: 60px; }
+  .down-real { width: 12px; height: 6px; }
+
+  .item-title {
+    margin: 0 0 0.5em;
+    font-size: var(--mp-size-subheading);
+    letter-spacing: var(--mp-tracking-subheading);
+  }
+
+  .item-desc {
+    margin: 0 0 1.2em;
+    max-width: var(--mp-width-para);
+    font-size: var(--mp-size-body);
+    line-height: var(--mp-leading-card);
+    opacity: var(--mp-opacity-secondary);
+  }
+
+  .dl { margin: 1.6em 0; }
+
+  .spec { margin-top: 2em; }
+  .spec .kicker { margin-bottom: 0.7em; }
+  .spec th[scope='row'] { width: 9em; white-space: nowrap; }
+  .spec td { overflow-wrap: anywhere; }
+  .sub-h {
+    margin: var(--mp-section) 0 0.8em;
+    font-size: var(--mp-size-subheading);
+    letter-spacing: var(--mp-tracking-subheading);
+  }
+
+  .scales {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 2fr;
+    gap: 1em;
+    align-items: end;
+    margin-bottom: 2.4em;
+  }
+  .scales figure { margin: 0; min-width: 0; }
+  .scales .thumb { padding: 1.2em 0; overflow: hidden; }
+  .scales .pixel { max-width: none; flex: none; }
+  .scales figcaption, .ic-file {
+    margin-top: 0.7em;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+  @media (max-width: 560px) {
+    .scales { grid-template-columns: 1fr 1fr; }
+    .scales figure:last-child { grid-column: 1 / -1; }
+  }
+
+  .icons {
+    list-style: none;
+    margin: 0 0 2.4em;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
+    gap: 1.2em;
+  }
+  .icons a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    padding: 0.8em;
+    border: var(--mp-border) solid var(--mp-line);
+    text-decoration: none;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+  .icons a:hover { border-color: var(--mp-line-strong); transform: translateY(-3px); }
+  .icons .thumb { aspect-ratio: 1; margin-bottom: 0.6em; }
+  .ic-name { font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small); }
+  .ic-file { margin-top: 0; }
+
+  .rules { list-style: none; margin: 0; padding: 0; border-top: var(--mp-border) solid var(--mp-line); }
+  .rules li {
+    padding: 0.8em 0;
+    border-bottom: var(--mp-border) solid var(--mp-line);
+    font-size: var(--mp-size-body);
+    line-height: var(--mp-leading-card);
+    letter-spacing: var(--mp-tracking-body);
+    opacity: var(--mp-opacity-body);
+  }
+</style>

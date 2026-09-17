@@ -1,0 +1,87 @@
+{
+  "$description": "metaphr.dev 앱 카드에 쓰이는 40×40 1비트 픽셀 아트 아이콘 예시. file은 /v1/ 기준 상대 경로다.",
+  "spec": {
+    "size": {
+      "width": 40,
+      "height": 40
+    },
+    "format": "PNG",
+    "colors": "1비트: 잉크 픽셀 + 투명. 중간 톤·안티에일리어싱 없음. 1비트 단색이므로 CSS mask로 --mp-ink를 칠하는 것이 공식 허용된다(두 테마 모두 같은 방식).",
+    "scale": [
+      {
+        "context": "card",
+        "factor": 3,
+        "size": "120px",
+        "cssVariable": "--mp-pixel-card",
+        "gridCell": "--mp-grid-cell-card (12px)"
+      },
+      {
+        "context": "detail",
+        "factor": 5,
+        "size": "200px",
+        "cssVariable": "--mp-pixel-detail",
+        "gridCell": "--mp-grid-cell-detail (16px)"
+      }
+    ],
+    "rules": [
+      "정수 배율(3×, 5×)로만 확대한다. 100px, 150px처럼 40의 정수배가 아닌 크기 금지.",
+      "image-rendering: pixelated; image-rendering: crisp-edges; 를 둘 다 준다.",
+      "opacity: var(--mp-opacity-pixel) (0.72).",
+      "색: 1비트 단색 아이콘은 mask로 --mp-ink를 칠해도 된다(공식 예외). 워드마크처럼 명암이 있는 이미지는 칠하지 않고 테마별 파일을 쓴다. --mp-ink 외의 색으로 칠하지 않는다. `.pixel-mask { width: var(--mp-pixel-card); height: var(--mp-pixel-card); background: var(--mp-ink); opacity: var(--mp-opacity-pixel); -webkit-mask: var(--src) 0 0 / 100% 100% no-repeat; mask: var(--src) 0 0 / 100% 100% no-repeat; }` (정수 배율 크기 유지)",
+      "모눈 썸네일(.thumb) 가운데에 놓는다.",
+      "이미지가 없거나 로드 실패 시 앱 이름 첫 글자(glyph)를 --mp-glyph 색으로 표시한다."
+    ],
+    "css": ".pixel { width: var(--mp-pixel-card); height: var(--mp-pixel-card); image-rendering: pixelated; image-rendering: crisp-edges; opacity: var(--mp-opacity-pixel); }"
+  },
+  "icons": [
+    {
+      "id": "rhythm",
+      "file": "icons/rhythm.png",
+      "app": "리듬",
+      "glyph": "리",
+      "tagline": "하루를 네 칸으로 나눠 기록하는 습관 앱"
+    },
+    {
+      "id": "pantry",
+      "file": "icons/pantry.png",
+      "app": "팬트리",
+      "glyph": "팬",
+      "tagline": "냉장고에 남은 것으로 오늘 저녁을 정하는 앱"
+    },
+    {
+      "id": "inbox",
+      "file": "icons/inbox.png",
+      "app": "인박스",
+      "glyph": "인",
+      "tagline": "흩어진 업무 알림을 한 줄로 모으는 대시보드"
+    },
+    {
+      "id": "minute",
+      "file": "icons/minute.png",
+      "app": "미닛",
+      "glyph": "미",
+      "tagline": "회의가 끝나면 회의록이 끝나 있는 도구"
+    },
+    {
+      "id": "internal",
+      "file": "icons/internal.png",
+      "app": "사내 업무 도구",
+      "glyph": "사",
+      "tagline": "엑셀과 메신저로 굴러가던 업무를 앱 하나로"
+    },
+    {
+      "id": "brand",
+      "file": "icons/brand.png",
+      "app": "브랜드 앱",
+      "glyph": "브",
+      "tagline": "고객이 계속 열어 보는 자리를 만드는 앱"
+    },
+    {
+      "id": "mvp",
+      "file": "icons/mvp.png",
+      "app": "아이디어 검증 MVP",
+      "glyph": "엠",
+      "tagline": "되는지 확인할 만큼만, 빠르게"
+    }
+  ]
+}

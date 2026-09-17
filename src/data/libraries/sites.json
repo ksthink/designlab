@@ -1,0 +1,84 @@
+{
+  "$description": "사이트(웹) 제작용 디자인 참고 라이브러리. 항목 하나 추가 = /libraries, /libraries.md, /v1/libraries*.json, llms-full.txt, manifest에 자동 반영. 스키마: /v1/libraries.schema.json",
+  "kind": "sites",
+  "items": [
+    {
+      "id": "pixelarticons",
+      "name": "Pixelarticons",
+      "url": "https://pixelarticons.com",
+      "repo": "https://github.com/halfmage/pixelarticons",
+      "category": "icons",
+      "platforms": [
+        "web"
+      ],
+      "license": "MIT",
+      "status": "recommended",
+      "pillars": [
+        "pixel-art",
+        "minimalism"
+      ],
+      "why": "24×24 격자에 안티에일리어싱 없이 그린 픽셀 아이콘이라 픽셀아트 기둥과 맞고, fill=\"currentColor\"라 색을 토큰으로 지정할 수 있다.",
+      "howToUse": "SVG를 인라인으로 넣고 color: var(--mp-ink)(강조 한 곳만 var(--mp-accent))로 currentColor를 채운다. 크기는 24의 정수배(24px, 48px, 72px)로만 표시한다.",
+      "caveats": "격자가 24×24라 40×40 1비트 앱 아이콘 규칙과 다르다. 보조 UI 아이콘 용도로만 쓴다. 무료 세트 외 아이콘은 유료(Pro) 라이선스가 필요하다.",
+      "addedAt": "2026-09-17"
+    },
+    {
+      "id": "nes-css",
+      "name": "NES.css",
+      "url": "https://nostalgic-css.github.io/NES.css/",
+      "repo": "https://github.com/nostalgic-css/NES.css",
+      "category": "ui",
+      "platforms": [
+        "web"
+      ],
+      "license": "MIT",
+      "status": "candidate",
+      "pillars": [
+        "pixel-art"
+      ],
+      "why": "CSS만으로 픽셀 테두리를 그리는 기법을 참고할 수 있다.",
+      "howToUse": "라이브러리를 통째로 불러오지 않는다. 픽셀 테두리 기법만 참고해 1px/정수 단위, radius 0, 그림자 없음, --mp-* 색으로 다시 만든다.",
+      "caveats": "자체 색, 두꺼운 픽셀 테두리, 권장 서체 Press Start 2P가 metaphr 규칙(Mulmaru 하나, 4색 팔레트, 1px 헤어라인)과 충돌한다.",
+      "addedAt": "2026-09-17"
+    },
+    {
+      "id": "pixel-icon-library",
+      "name": "HackerNoon Pixel Icon Library",
+      "url": "https://pixeliconlibrary.com",
+      "repo": "https://github.com/hackernoon/pixel-icon-library",
+      "category": "icons",
+      "platforms": [
+        "web"
+      ],
+      "license": "아이콘(.svg/.png) CC BY 4.0, 그 밖의 파일 MIT",
+      "status": "candidate",
+      "pillars": [
+        "pixel-art"
+      ],
+      "why": "픽셀 격자 아이콘 세트라 픽셀아트 기둥과 맞는다.",
+      "howToUse": "SVG를 쓰고 색은 --mp-ink로 지정한다. 표시 크기는 원본 격자의 정수배로만 한다.",
+      "caveats": "아이콘은 CC BY 4.0이라 출처 표기·라이선스 링크·변경 여부 표시가 필요하다(표기를 원하지 않으면 유료 라이선스). 40×40 앱 아이콘 규칙과 격자가 다를 수 있어 보조 UI 아이콘 용도로만 쓴다.",
+      "addedAt": "2026-09-17"
+    },
+    {
+      "id": "piskel",
+      "name": "Piskel",
+      "url": "https://www.piskelapp.com",
+      "repo": "https://github.com/piskelapp/piskel",
+      "category": "tooling",
+      "platforms": [
+        "web"
+      ],
+      "license": "Apache-2.0",
+      "status": "recommended",
+      "pillars": [
+        "pixel-art",
+        "retro-color"
+      ],
+      "why": "웹에서 픽셀아트와 스프라이트 애니메이션을 만들 수 있어 40×40 아이콘 제작에 맞는다.",
+      "howToUse": "캔버스를 40×40으로 만들고 팔레트를 4색(#F5F5F5, #303841, #76ABAE, #FF5722)으로 제한한다. PNG를 1× 크기로 내보내고 화면에서는 3×/5× 정수 배율 + image-rendering: pixelated로 키운다.",
+      "caveats": "앱 아이콘은 1비트(잉크 + 투명) 규칙을 따른다. 내보낼 때 확대 옵션을 쓰지 않는다.",
+      "addedAt": "2026-09-17"
+    }
+  ]
+}

@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F7F2E9">
+<title>metaphr</title>
+<style>
+  /* 본문 전체용 — 한글 전 음절 포함 (약 98KB). 나중에 선언된 히어로 서브셋이
+     겹치는 글자에 대해 우선하므로, 첫 화면은 1.5KB 파일만으로 그려진다. */
+  @font-face {
+    font-family: "Mulmaru";
+    src: url("/mulmaru.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* 히어로(슬로건·브랜드·blog)에 필요한 글자만 담은 경량 서브셋 */
+  @font-face {
+    font-family: "Mulmaru";
+    src: url("/mulmaru.subset.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0020,U+002E,U+0030,U+0031,U+0032,U+0033,U+0034,U+0035,U+0036,U+0037,U+0038,U+0039,U+003E,U+0061,U+0062,U+0064,U+0065,U+0067,U+0068,U+006C,U+006D,U+006F,U+0070,U+0072,U+0074,U+0076,U+2193,U+3131,U+3134,U+3137,U+3139,U+3141,U+3142,U+3145,U+3147,U+3148,U+314A,U+314B,U+314C,U+314D,U+314E,U+314F,U+3150,U+3151,U+3153,U+3154,U+3155,U+3157,U+315B,U+315C,U+3160,U+3161,U+3163,U+B2C8,U+B2E4,U+B2F4,U+BC31,U+C2B5,U+C5EC,U+C744;
+  }
+
+  :root {
+    --bg: #F7F2E9;
+    --ink: #3A3A38;
+    --line: rgba(58, 58, 56, 0.16);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100svh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Mulmaru", sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 5vw, 3rem) clamp(1.25rem, 5vw, 3rem) clamp(4rem, 12vh, 8rem);
+  }
+
+  .back {
+    display: inline-block;
+    margin-bottom: clamp(3rem, 10vh, 6rem);
+    font-size: clamp(0.75rem, 2vw, 0.95rem);
+    letter-spacing: 0.08em;
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.55;
+  }
+
+  .back:hover { opacity: 1; }
+
+  .kicker {
+    margin: 0 0 0.9em;
+    font-size: clamp(0.75rem, 2vw, 0.9rem);
+    letter-spacing: 0.14em;
+    opacity: 0.45;
+  }
+
+  h1 {
+    margin: 0 0 0.5em;
+    font-size: clamp(1.8rem, 6vw, 3rem);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    line-height: 1.35;
+  }
+
+  .tagline {
+    margin: 0 0 clamp(2rem, 6vh, 3rem);
+    font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+    line-height: 1.9;
+    opacity: 0.7;
+  }
+
+  .hero-thumb {
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: clamp(2.5rem, 7vh, 4rem);
+    font-size: clamp(4rem, 16vw, 8rem);
+    color: rgba(58, 58, 56, 0.5);
+    background-color: rgba(58, 58, 56, 0.035);
+    background-image:
+      linear-gradient(rgba(58, 58, 56, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(58, 58, 56, 0.07) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  /* 40px 원본을 정수 배율(5x)로만 키운다 */
+  .pixel {
+    width: 200px;
+    height: 200px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    opacity: 0.72;
+  }
+
+  .body p {
+    margin: 0 0 1.6em;
+    font-size: clamp(0.92rem, 2.2vw, 1.05rem);
+    line-height: 2.1;
+    letter-spacing: 0.01em;
+    opacity: 0.85;
+  }
+
+  .meta {
+    display: flex;
+    gap: 0.5em;
+    flex-wrap: wrap;
+    margin: clamp(2.5rem, 7vh, 4rem) 0 clamp(2rem, 6vh, 3rem);
+    font-size: clamp(0.7rem, 1.8vw, 0.78rem);
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+  }
+
+  .badge {
+    border: 1px solid var(--line);
+    padding: 0.3em 0.7em;
+  }
+
+  .badge.soon { border-style: dashed; }
+
+  .actions {
+    display: flex;
+    gap: 0.8em;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.75em 1.5em;
+    border: 1px solid rgba(58, 58, 56, 0.4);
+    color: inherit;
+    text-decoration: none;
+    font-size: clamp(0.82rem, 2vw, 0.95rem);
+    letter-spacing: 0.06em;
+    transition: background 0.25s ease, color 0.25s ease;
+  }
+
+  .btn:hover {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .note {
+    margin-top: clamp(2rem, 6vh, 3rem);
+    font-size: clamp(0.78rem, 2vw, 0.88rem);
+    line-height: 1.9;
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+
+<script src="/apps.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var M = window.METAPHR;
+  var root = document.getElementById('root');
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  function back() {
+    var a = el('a', 'back', '‹ metaphr');
+    a.href = '/';
+    return a;
+  }
+
+  // 콘텐츠는 content/*.json 에서 오므로 준비된 뒤에 그린다
+  M.ready(function () {
+    var id = new URLSearchParams(location.search).get('id');
+    var app = id ? M.byId(id) : null;
+
+    if (!app) {
+      document.title = '찾을 수 없는 페이지 — metaphr';
+      root.appendChild(back());
+      root.appendChild(el('h1', null, '없는 페이지입니다'));
+      root.appendChild(el('p', 'tagline', '주소를 다시 확인해 주세요.'));
+      return;
+    }
+
+    var cat = M.categories.filter(function (c) { return c.key === app.category; })[0];
+    document.title = app.name + ' — metaphr';
+
+    root.appendChild(back());
+    if (cat) root.appendChild(el('p', 'kicker', cat.label));
+    root.appendChild(el('h1', null, app.name));
+    root.appendChild(el('p', 'tagline', app.tagline));
+
+    var th = el('div', 'hero-thumb');
+    th.setAttribute('aria-hidden', 'true');
+    var ch = app.glyph || app.name.charAt(0);
+    if (app.icon) {
+      // 아이콘을 못 불러오면 기존 한 글자로 되돌아간다
+      var img = new Image(40, 40);
+      img.className = 'pixel';
+      img.src = app.icon;
+      img.alt = '';
+      img.decoding = 'async';
+      img.onerror = function () {
+        th.textContent = ch;
+      };
+      th.appendChild(img);
+    } else {
+      th.textContent = ch;
+    }
+    root.appendChild(th);
+
+    var body = el('div', 'body');
+    (app.body || []).forEach(function (t) { body.appendChild(el('p', null, t)); });
+    root.appendChild(body);
+
+    var meta = el('div', 'meta');
+    (app.platforms || []).forEach(function (p) {
+      meta.appendChild(el('span', 'badge', p));
+    });
+    if (app.status === 'soon') meta.appendChild(el('span', 'badge soon', '준비 중'));
+    root.appendChild(meta);
+
+    var actions = el('div', 'actions');
+
+    if (app.contact) {
+      // 주문 제작은 다운로드가 아니라 문의로 이어진다
+      var mail = el('a', 'btn', '제작 문의하기');
+      mail.href = 'mailto:' + M.contactEmail +
+        '?subject=' + encodeURIComponent('[제작 문의] ' + app.name);
+      actions.appendChild(mail);
+    } else {
+      ['web', 'ios', 'android'].forEach(function (k) {
+        var url = app.links && app.links[k];
+        if (!url) return;
+        var a = el('a', 'btn', M.linkLabel[k]);
+        a.href = url;
+        if (k !== 'web') a.rel = 'noopener';
+        actions.appendChild(a);
+      });
+    }
+
+    if (actions.children.length) {
+      root.appendChild(actions);
+    } else {
+      root.appendChild(el('p', 'note',
+        '아직 출시 전입니다. 소식은 ' + M.contactEmail + ' 또는 blog.metaphr.dev 에서 전해 드립니다.'));
+    }
+  }, function (err) {
+    if (window.console) console.error('[metaphr] 콘텐츠를 불러오지 못했습니다', err);
+    root.appendChild(back());
+    root.appendChild(el('h1', null, '불러오지 못했습니다'));
+    root.appendChild(el('p', 'tagline', '잠시 후 다시 시도해 주세요.'));
+  });
+
+})();
+</script>
+</body>
+</html>

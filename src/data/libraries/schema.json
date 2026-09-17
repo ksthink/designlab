@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://design.metaphr.dev/v1/libraries.schema.json",
+  "title": "metaphr 참고 라이브러리 목록",
+  "description": "AI가 사이트·앱을 만들 때 어떤 라이브러리를 쓸지 참고하는 목록. sites.json과 apps.json이 이 스키마를 따른다.",
+  "type": "object",
+  "required": [
+    "kind",
+    "items"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "$description": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "sites",
+        "apps"
+      ]
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/library"
+      }
+    }
+  },
+  "$defs": {
+    "library": {
+      "type": "object",
+      "required": [
+        "id",
+        "name",
+        "url",
+        "category",
+        "status",
+        "why"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "description": "목록 안에서 고유한 소문자 식별자"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://",
+          "description": "공식 사이트 또는 문서"
+        },
+        "repo": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "category": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$",
+          "description": "자유 입력(소문자·하이픈). 예: icons, ui, pixel-art, tooling, animation, fonts, palette"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "web",
+              "ios",
+              "android",
+              "desktop",
+              "pwa"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "license": {
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "adopted",
+            "recommended",
+            "candidate",
+            "avoid"
+          ],
+          "description": "adopted: metaphr 프로젝트에서 이미 사용 / recommended: 권장 / candidate: 검토 중 / avoid: 쓰지 않음"
+        },
+        "pillars": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "minimalism",
+              "pixel-art",
+              "retro-color"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "why": {
+          "type": "string",
+          "minLength": 1,
+          "description": "metaphr 원칙에 왜 맞는지(avoid면 왜 안 맞는지), 한 문장"
+        },
+        "howToUse": {
+          "type": "string",
+          "description": "metaphr 스타일로 쓰는 법: 끌 기본 스타일, 연결할 --mp-* 변수 등"
+        },
+        "caveats": {
+          "type": "string",
+          "description": "주의·충돌 (예: 기본 radius/shadow 제거 필요)"
+        },
+        "usedIn": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "uniqueItems": true,
+          "description": "사용 중인 ksthink 저장소 이름"
+        },
+        "addedAt": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        }
+      }
+    }
+  }
+}

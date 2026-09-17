@@ -1,0 +1,683 @@
+---
+import FxFill from '../components/FxFill.astro';
+import ThemeLogo from '../components/ThemeLogo.astro';
+import { pages, STATUS, url, abs } from '../lib/docs';
+import { tokensCss } from '../lib/tokens';
+
+interface Props {
+  title: string;
+  description: string;
+  slug?: string;
+  /** 'list' = 1180px(목록), 'read' = 760px(읽기) — metaphr.dev index/app.html 과 같다 */
+  width?: 'list' | 'read';
+}
+const { title, description, slug, width = 'read' } = Astro.props;
+const mdPath = slug ? `/${slug}.md` : '/llms.txt';
+
+const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mulmaru.woff2')}") format("woff2");font-weight:400;font-style:normal;font-display:swap}`;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#F5F5F5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#303841" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{slug ? `${title} — metaphr/design_lab` : title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href={url('/favicon.svg')} type="image/svg+xml" />
+    <link rel="preload" href={url('/v1/fonts/mulmaru.woff2')} as="font" type="font/woff2" crossorigin />
+    <!-- AI 에이전트용: 이 페이지와 같은 내용의 마크다운, 사이트 전체 색인 -->
+    <link rel="alternate" type="text/markdown" href={abs(mdPath)} title="Markdown" />
+    <link rel="help" type="text/plain" href={abs('/llms.txt')} title="llms.txt" />
+    <style is:inline set:html={fontFace + tokensCss()}></style>
+    <script is:inline>
+      // 저장한 테마를 첫 페인트 전에 — 기본은 시스템 설정
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('js');
+        try {
+          var t = localStorage.getItem('mp-theme');
+          if (t === 'light' || t === 'dark') {
+            d.setAttribute('data-theme', t);
+            document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+              m.dataset.media = m.getAttribute('media') || '';
+              m.setAttribute('media', m.dataset.media.indexOf(t) !== -1 ? 'all' : 'not all');
+            });
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">본문으로 건너뛰기</a>
+
+    <header class:list={['wrap', 'top', width]}>
+      <div class="top-row">
+        <a class="back" href="https://metaphr.dev">&lt; metaphr</a>
+        <button type="button" class="theme-toggle" data-theme-toggle aria-label="화면 테마 바꾸기">[ 시스템 ]</button>
+      </div>
+      <div class="top-main">
+        <a class="brand" href={url('/')} aria-current={!slug ? 'page' : undefined}>metaphr/design_lab</a>
+        <nav aria-label="문서">
+          {pages.map((p) => (
+            <a href={url(`/${p.slug}`)} aria-current={p.slug === slug ? 'page' : undefined}>{p.title}</a>
+          ))}
+        </nav>
+      </div>
+      <p class="ai-note" role="note">
+        AI · {slug ? '이 페이지의 마크다운' : '사이트 색인'} <a href={url(mdPath)}>{mdPath}</a> · 전체 <a href={url('/llms-full.txt')}>/llms-full.txt</a>
+      </p>
+    </header>
+
+    <main id="main" class:list={['wrap', 'page', width]}>
+      <slot />
+    </main>
+
+    <footer class:list={['wrap', 'foot', width]}>
+      <div class="foot-links">
+        <FxFill href="mailto:ksthink@metaphr.dev">ksthink@metaphr.dev</FxFill>
+        <a href={url('/llms.txt')}>llms.txt</a>
+        <a href={url('/v1/manifest.json')}>manifest.json</a>
+      </div>
+      <ThemeLogo class="foot-logo" />
+      <small>© metaphr · design_lab {STATUS}</small>
+    </footer>
+
+    <script is:inline>
+      (function () {
+        // 스크롤 진입 시 페이드인 — metaphr.dev 와 같은 0.9s opacity + 14px
+        var els = document.querySelectorAll('.reveal');
+        if (!('IntersectionObserver' in window)) {
+          els.forEach(function (n) { n.classList.add('in'); });
+          return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+          });
+        }, { rootMargin: '0px 0px -8% 0px' });
+        els.forEach(function (n) { io.observe(n); });
+
+        // 테마 전환 — 시스템 → 라이트 → 다크 순환, 저장은 되면 하고 안 되면 이번 화면만
+        var LABEL = { system: '[ 시스템 ]', light: '[ 라이트 ]', dark: '[ 다크 ]' };
+        var NEXT = { system: 'light', light: 'dark', dark: 'system' };
+        var root = document.documentElement;
+        var toggle = document.querySelector('[data-theme-toggle]');
+        function current() { return root.getAttribute('data-theme') || 'system'; }
+        function paint() {
+          if (!toggle) return;
+          var c = current();
+          toggle.textContent = LABEL[c];
+          toggle.setAttribute('aria-label', '화면 테마: ' + LABEL[c].replace(/[\[\] ]/g, '') + ' — 눌러서 바꾸기');
+        }
+        if (toggle) {
+          paint();
+          toggle.addEventListener('click', function () {
+            var n = NEXT[current()];
+            if (n === 'system') root.removeAttribute('data-theme');
+            else root.setAttribute('data-theme', n);
+            try {
+              if (n === 'system') localStorage.removeItem('mp-theme');
+              else localStorage.setItem('mp-theme', n);
+            } catch (e) {}
+            // 브라우저 크롬 색도 같이 — 시스템이면 media 조건에 맡긴다
+            document.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+              if (!m.dataset.media) m.dataset.media = m.getAttribute('media') || '';
+              if (n === 'system') m.setAttribute('media', m.dataset.media);
+              else m.setAttribute('media', m.dataset.media.indexOf(n) !== -1 ? 'all' : 'not all');
+            });
+            paint();
+          });
+        }
+
+        // 복사 버튼 — [data-copy]가 가리키는 요소의 텍스트
+        document.querySelectorAll('[data-copy]').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var src = document.getElementById(btn.getAttribute('data-copy'));
+            if (!src || !navigator.clipboard) return;
+            navigator.clipboard.writeText(src.textContent.trim()).then(function () {
+              var label = btn.textContent;
+              btn.textContent = '복사했습니다';
+              setTimeout(function () { btn.textContent = label; }, 1400);
+            });
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; color-scheme: light; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme='light']) { color-scheme: dark; } }
+  :root[data-theme='dark'] { color-scheme: dark; }
+
+  body {
+    margin: 0;
+    background: var(--mp-bg);
+    color: var(--mp-ink);
+    font-family: var(--mp-font);
+    font-weight: 400;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  h1, h2, h3, h4, strong, b, th { font-weight: 400; }
+  em, i { font-style: normal; }
+
+  a { color: inherit; }
+  img { max-width: 100%; }
+
+  :focus-visible {
+    outline: var(--mp-border) solid var(--mp-ink);
+    outline-offset: 3px;
+  }
+
+  ::selection { background: var(--mp-ink); color: var(--mp-bg); }
+
+  .skip {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 10;
+    padding: 0.6em 1em;
+    background: var(--mp-ink);
+    color: var(--mp-bg);
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    text-decoration: none;
+  }
+  .skip:focus { left: var(--mp-gutter); top: 0.75rem; }
+
+  /* ---------- 폭 ---------- */
+
+  .wrap {
+    margin: 0 auto;
+    padding-left: var(--mp-gutter);
+    padding-right: var(--mp-gutter);
+  }
+  .wrap.list { max-width: var(--mp-width-list); }
+  .wrap.read { max-width: var(--mp-width-read); }
+
+  /* ---------- 머리 — 막대 없이, 글자만 ---------- */
+
+  .top {
+    padding-top: clamp(1.5rem, 5vw, 3rem);
+  }
+
+  .top-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1em;
+  }
+
+  .theme-toggle {
+    padding: 0.2em 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--mp-size-kicker);
+    letter-spacing: var(--mp-tracking-meta);
+    white-space: nowrap;
+    cursor: pointer;
+    opacity: var(--mp-opacity-meta);
+    transition: opacity var(--mp-duration-hover) ease;
+  }
+  .theme-toggle:hover { opacity: 1; }
+
+  .back {
+    display: inline-block;
+    font-size: var(--mp-size-kicker);
+    letter-spacing: var(--mp-tracking-meta);
+    text-decoration: none;
+    opacity: var(--mp-opacity-meta);
+    transition: opacity var(--mp-duration-hover) ease;
+  }
+  .back:hover { opacity: 1; }
+
+  .top-main {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.9em 2em;
+    margin-top: clamp(1.6rem, 5vh, 2.6rem);
+  }
+
+  .brand {
+    font-size: var(--mp-size-subheading);
+    letter-spacing: var(--mp-tracking-subheading);
+    text-decoration: none;
+    opacity: var(--mp-opacity-brand);
+    transition: opacity var(--mp-duration-hover) ease;
+  }
+  .brand:hover { opacity: 1; }
+
+  .top nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em 1.4em;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+  }
+
+  .top nav a {
+    text-decoration: none;
+    opacity: var(--mp-opacity-nav);
+    padding-bottom: 0.15em;
+    border-bottom: var(--mp-border) solid transparent;
+    transition: opacity var(--mp-duration-hover) ease;
+  }
+  .top nav a:hover { opacity: 1; }
+  .top nav a[aria-current='page'] {
+    opacity: 1;
+    border-bottom-color: var(--mp-line-strong);
+  }
+
+  /* 현재 위치 — 보조색 teal의 작은 면 하나 */
+  .top nav a[aria-current='page']::before {
+    content: "";
+    display: inline-block;
+    width: 0.5em;
+    height: 0.5em;
+    margin-right: 0.45em;
+    vertical-align: 0.12em;
+    background: var(--mp-secondary);
+  }
+
+  .ai-note {
+    margin: clamp(1.1rem, 3vh, 1.6rem) 0 0;
+    padding-top: 0.8em;
+    border-top: var(--mp-border) solid var(--mp-line);
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    line-height: 1.9;
+    opacity: var(--mp-opacity-muted);
+    overflow-wrap: anywhere;
+  }
+  .ai-note a {
+    text-decoration: none;
+    border-bottom: var(--mp-border) solid var(--mp-line-strong);
+  }
+  .ai-note a:hover { background: var(--mp-ink); color: var(--mp-bg); }
+
+  .page {
+    padding-top: var(--mp-section-lg);
+    padding-bottom: var(--mp-section);
+  }
+
+  /* ---------- 발 — metaphr.dev .foot 그대로 ---------- */
+
+  .foot {
+    padding-top: clamp(4rem, 12vh, 8rem);
+    padding-bottom: clamp(3rem, 8vh, 5rem);
+    border-top: var(--mp-border) solid var(--mp-line);
+    margin-top: var(--mp-section);
+  }
+
+  .foot-links {
+    display: flex;
+    gap: 0.8em 1.6em;
+    flex-wrap: wrap;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+  }
+
+  .foot-links a {
+    text-decoration: none;
+    opacity: var(--mp-opacity-link);
+    border-bottom: var(--mp-border) solid var(--mp-line);
+    padding-bottom: 0.15em;
+  }
+  .foot-links a:hover,
+  .foot-links a:focus-visible { opacity: 1; }
+
+  .foot-logo {
+    display: block;
+    width: clamp(120px, 20vw, 168px);
+    height: auto;
+    margin: clamp(2.5rem, 7vh, 4rem) auto 0;
+    user-select: none;
+  }
+
+  .foot small {
+    display: block;
+    margin-top: 1.4rem;
+    text-align: center;
+    font-size: var(--mp-size-fine);
+    letter-spacing: var(--mp-tracking-fine);
+    opacity: var(--mp-opacity-fine);
+  }
+
+  /* ---------- fx-fill — 8칸 steps 반전 ---------- */
+
+  .fx-fill { position: relative; }
+
+  .fx-fill .label {
+    position: relative;
+    z-index: 1;
+    transition: color var(--mp-duration-fill) step-end;
+  }
+
+  .fx-fill .fill {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    pointer-events: none;
+  }
+
+  .fx-fill .fill span {
+    background: var(--mp-ink);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform var(--mp-duration-fill) var(--mp-steps-fill) var(--d, 0ms);
+  }
+  .fx-fill .fill span:nth-child(even) { transform-origin: top; }
+
+  .fx-fill:hover .fill span,
+  .fx-fill:focus-visible .fill span { transform: scaleY(1); }
+
+  .fx-fill:hover .label,
+  .fx-fill:focus-visible .label { color: var(--mp-bg); }
+
+  /* ---------- 공통 글자 역할 ---------- */
+
+  .kicker {
+    margin: 0 0 0.9em;
+    font-size: var(--mp-size-kicker);
+    letter-spacing: var(--mp-tracking-kicker);
+    opacity: var(--mp-opacity-kicker);
+  }
+
+  .page h1 {
+    margin: 0 0 0.5em;
+    font-size: var(--mp-size-title);
+    letter-spacing: var(--mp-tracking-title);
+    line-height: var(--mp-leading-title);
+  }
+
+  .tagline {
+    margin: 0 0 clamp(2rem, 6vh, 3rem);
+    font-size: var(--mp-size-lead);
+    letter-spacing: var(--mp-tracking-lead);
+    line-height: 1.9;
+    opacity: var(--mp-opacity-secondary);
+  }
+
+  .section { padding-top: var(--mp-section); }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3em 1.2em;
+    flex-wrap: wrap;
+    margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+  }
+
+  .section-head h2 {
+    margin: 0;
+    font-size: var(--mp-size-heading);
+    letter-spacing: var(--mp-tracking-heading);
+  }
+
+  .section-head span {
+    font-size: clamp(0.78rem, 2vw, 0.95rem);
+    letter-spacing: 0.04em;
+    opacity: var(--mp-opacity-muted);
+  }
+
+  .body-text {
+    margin: 0 0 1.6em;
+    max-width: var(--mp-width-para);
+    font-size: var(--mp-size-body);
+    line-height: var(--mp-leading-body);
+    letter-spacing: var(--mp-tracking-body);
+    opacity: var(--mp-opacity-body);
+  }
+
+  .note {
+    margin: 1.2em 0 0;
+    font-size: clamp(0.78rem, 2vw, 0.88rem);
+    line-height: 1.9;
+    opacity: var(--mp-opacity-muted);
+  }
+
+  /* 문단 끝의 터미널 커서 */
+  .caret::after {
+    content: "■";
+    margin-left: 0.35em;
+    font-size: 0.85em;
+    opacity: var(--mp-opacity-kicker);
+    animation: caret var(--mp-duration-caret) steps(1, end) infinite;
+  }
+  @keyframes caret { 50% { opacity: 0; } }
+
+  /* ---------- 장치 ---------- */
+
+  .btn {
+    display: inline-block;
+    padding: 0.75em 1.5em;
+    border: var(--mp-border) solid var(--mp-line-button);
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--mp-duration-hover) ease, color var(--mp-duration-hover) ease;
+  }
+  .btn:hover,
+  .btn:focus-visible {
+    background: var(--mp-ink);
+    color: var(--mp-bg);
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.8em;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    flex-wrap: wrap;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+
+  .badge {
+    border: var(--mp-border) solid var(--mp-line);
+    padding: 0.25em 0.6em;
+  }
+  .badge.soon { border-style: dashed; }
+
+  .thumb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mp-glyph);
+    background-color: var(--mp-grid-bg);
+    background-image:
+      linear-gradient(var(--mp-grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--mp-grid-line) 1px, transparent 1px);
+    background-size: var(--mp-grid-cell-card) var(--mp-grid-cell-card);
+  }
+  .thumb.detail { background-size: var(--mp-grid-cell-detail) var(--mp-grid-cell-detail); }
+
+  .pixel {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    opacity: var(--mp-opacity-pixel);
+  }
+
+  /* 둥둥 — 진폭·주기·위상은 요소마다 style 로 */
+  .float {
+    animation: float var(--fd, 4s) var(--mp-ease-float) var(--fdl, 0s) infinite alternate;
+  }
+  @keyframes float {
+    from { transform: translateY(var(--fa, 3px)); }
+    to   { transform: translateY(calc(var(--fa, 3px) * -1)); }
+  }
+
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity var(--mp-duration-reveal) ease, transform var(--mp-duration-reveal) ease;
+  }
+  .js .reveal.in { opacity: 1; transform: none; }
+
+  /* ---------- 표·코드 — 헤어라인 + 모눈 틴트, 서체는 Mulmaru 하나 ---------- */
+
+  code, pre, kbd { font-family: var(--mp-font); }
+
+  :not(pre) > code {
+    padding: 0.05em 0.35em;
+    background: var(--mp-grid-bg);
+    border: var(--mp-border) solid var(--mp-line);
+    font-size: 0.9em;
+    overflow-wrap: anywhere;
+  }
+
+  pre {
+    margin: 0 0 1.6em;
+    padding: 1.1em 1.3em;
+    border: var(--mp-border) solid var(--mp-line);
+    background: var(--mp-grid-bg);
+    font-size: var(--mp-size-kicker);
+    letter-spacing: var(--mp-tracking-body);
+    line-height: 1.9;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    margin: 0 0 1.8em;
+    border: var(--mp-border) solid var(--mp-line);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--mp-size-kicker);
+    letter-spacing: var(--mp-tracking-body);
+    line-height: 1.8;
+  }
+
+  th, td {
+    text-align: left;
+    vertical-align: top;
+    padding: 0.7em 0.9em;
+    border-bottom: var(--mp-border) solid var(--mp-line);
+  }
+  tr:last-child td { border-bottom: 0; }
+
+  th {
+    background: var(--mp-grid-bg);
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    font-weight: 400;
+    opacity: 1;
+    color: var(--mp-glyph);
+  }
+
+  td code { white-space: nowrap; }
+
+  /* ---------- 읽기 본문 (마크다운) ---------- */
+
+  .prose { font-size: var(--mp-size-body); }
+
+  .prose h1 {
+    margin: 0 0 0.9em;
+    font-size: var(--mp-size-title);
+    letter-spacing: var(--mp-tracking-title);
+    line-height: var(--mp-leading-title);
+  }
+
+  .prose h2 {
+    margin: var(--mp-section) 0 1em;
+    font-size: var(--mp-size-heading);
+    letter-spacing: var(--mp-tracking-heading);
+    line-height: 1.5;
+  }
+
+  .prose h3 {
+    margin: 2.4em 0 0.6em;
+    font-size: var(--mp-size-subheading);
+    letter-spacing: var(--mp-tracking-subheading);
+    line-height: 1.5;
+  }
+
+  .prose p,
+  .prose li {
+    font-size: var(--mp-size-body);
+    line-height: var(--mp-leading-body);
+    letter-spacing: var(--mp-tracking-body);
+    opacity: var(--mp-opacity-body);
+  }
+
+  .prose p { margin: 0 0 1.6em; }
+  .prose li p { margin: 0; opacity: 1; }
+
+  .prose ul, .prose ol { margin: 0 0 1.6em; padding-left: 1.3em; }
+  .prose ul { list-style: none; padding-left: 0; }
+  .prose ul > li { position: relative; padding-left: 1.3em; }
+  .prose ul > li::before {
+    content: "■";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 0.55em;
+    line-height: calc(var(--mp-leading-body) * 1em / 0.55);
+    opacity: var(--mp-opacity-kicker);
+  }
+  .prose li li { opacity: 1; }
+
+  .prose blockquote {
+    margin: 0 0 1.8em;
+    padding: 0.2em 0 0.2em 1.2em;
+    border-left: var(--mp-border) solid var(--mp-line-strong);
+  }
+  .prose blockquote p { margin: 0; opacity: var(--mp-opacity-secondary); }
+
+  .prose a {
+    text-decoration: none;
+    border-bottom: var(--mp-border) solid var(--mp-line-strong);
+    overflow-wrap: anywhere;
+  }
+  .prose a:hover { background: var(--mp-ink); color: var(--mp-bg); }
+
+  .prose hr {
+    border: 0;
+    border-top: var(--mp-border) solid var(--mp-line);
+    margin: var(--mp-section) 0;
+  }
+
+  .prose pre, .prose .table-wrap { opacity: 1; }
+
+  /* ---------- 움직임 줄이기 — 최종 상태만 ---------- */
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+    .js .reveal { opacity: 1; transform: none; }
+  }
+</style>

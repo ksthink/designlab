@@ -1,0 +1,26 @@
+---
+// 워드마크 — 라이트는 metaphr.svg, 다크는 metaphr-dark.svg.
+// tokens.css 와 같은 선택자(시스템 설정 + [data-theme] 강제)로 둘 중 하나만 보인다.
+// 숨은 쪽은 display:none 이라 보조기기에도 읽히지 않는다.
+import { url } from '../lib/docs';
+
+interface Props {
+  class?: string;
+}
+const { class: cls } = Astro.props;
+---
+
+<img class:list={['theme-logo', 'logo-light', cls]} src={url('/v1/logos/metaphr.svg')} alt="metaphr" width="350" height="200" decoding="async" />
+<img class:list={['theme-logo', 'logo-dark', cls]} src={url('/v1/logos/metaphr-dark.svg')} alt="metaphr" width="350" height="200" decoding="async" />
+
+<style is:global>
+  .theme-logo { image-rendering: pixelated; user-select: none; }
+  .logo-dark { display: none !important; }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light']) .logo-light { display: none !important; }
+    :root:not([data-theme='light']) .logo-dark { display: block !important; }
+  }
+  :root[data-theme='dark'] .logo-light { display: none !important; }
+  :root[data-theme='dark'] .logo-dark { display: block !important; }
+</style>

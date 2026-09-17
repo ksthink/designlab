@@ -1,0 +1,381 @@
+---
+import Base from '../layouts/Base.astro';
+import PixelIcon from '../components/PixelIcon.astro';
+import { aiPrompt, endpoints, pages, PILLARS, STATUS, url } from '../lib/docs';
+
+// 서버에서 정해 두는 결정적 난수 — 새로고침마다 레이아웃이 튀지 않게
+const rand = (i: number, k: number) => {
+  const x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+// 슬로건 자모와 같은 결의 흔들림 — 글자마다 진폭·주기·위상을 달리한다
+const bob = (text: string, seed: number) =>
+  [...text].map((c, i) => ({
+    c,
+    style: `--a:${(1 + rand(i, seed) * 1.5).toFixed(2)}px;--d:${(2 + rand(i, seed + 1) * 1.8).toFixed(2)}s;--dl:${(-rand(i, seed + 2) * 4).toFixed(2)}s`,
+  }));
+
+const floatStyle = (i: number, seed: number, amp = 2.5 + rand(i, seed) * 3) =>
+  `--fa:${amp.toFixed(2)}px;--fd:${(3.4 + rand(i, seed + 1) * 2.4).toFixed(2)}s;--fdl:${(-rand(i, seed + 2) * 5).toFixed(2)}s`;
+
+// 히어로 배경 — 드문드문 점멸하는 글리프 셀. 캔버스 없이 span 몇 개로만.
+const GLYPHS = ['·', '·', '·', ':', '+', '·'];
+const field = Array.from({ length: 64 }, (_, i) => {
+  let x = rand(i, 11) * 100;
+  const y = rand(i, 12) * 100;
+  // 가운데 글자 영역은 비워 둔다
+  if (y > 30 && y < 72 && x > 18 && x < 82) x = x < 50 ? x * 0.28 : 82 + (x - 50) * 0.36;
+  return {
+    g: GLYPHS[Math.floor(rand(i, 13) * GLYPHS.length)],
+    style: `left:${x.toFixed(2)}%;top:${y.toFixed(2)}%;--tw:${(5 + rand(i, 14) * 4).toFixed(2)}s;--twd:${(-rand(i, 15) * 9).toFixed(2)}s`,
+  };
+});
+
+const marks: Record<string, string> = {
+  philosophy: '여',
+  tokens: '■',
+  fonts: '가a',
+  logos: 'M.',
+  ai: '>_',
+};
+
+const resources = [
+  { path: '/llms.txt', desc: 'AI가 가장 먼저 읽는 색인' },
+  { path: '/llms-full.txt', desc: '모든 문서를 한 파일로' },
+  ...endpoints,
+];
+---
+
+<Base
+  title="metaphr/design_lab"
+  description="metaphr의 디자인 철학, 토큰, 폰트, 로고를 담은 참조 사이트. 사람과 AI가 같은 규칙을 읽습니다."
+  width="list"
+>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="field" aria-hidden="true">
+      {field.map((f) => <span style={f.style}>{f.g}</span>)}
+    </div>
+    <h1 id="hero-title" class="slogan" aria-label="여백을 담습니다">
+      {bob('여백을 담습니다', 1).map((ch) => (ch.c === ' ' ? <span aria-hidden="true">&nbsp;</span> : <span class="ch" style={ch.style} aria-hidden="true">{ch.c}</span>))}
+    </h1>
+    <p class="sub" aria-label="metaphr/design_lab">
+      {bob('design_lab', 7).map((ch) => <span class="ch" style={ch.style} aria-hidden="true">{ch.c}</span>)}
+    </p>
+    <a class="scroll-hint" href="#lead" aria-label="아래로 스크롤">
+      <span class="hint-mark" style={`--hint:url("${url('/v1/logos/down.svg')}")`}></span>
+    </a>
+  </section>
+
+  <section id="lead" class="lead reveal">
+    <p>design_lab은 metaphr.dev의 모습을 규칙으로 옮겨 둔 곳입니다. 미니멀리즘, 픽셀아트, 레트로 컬러. 더하지 않고 덜어낸 결정들을 사람과 AI가 같은 문장으로 읽습니다.</p>
+    <p class="caret">새 화면을 만들 때 이 규칙에 없는 것을 더하고 싶어진다면, 먼저 무엇을 뺄 수 있는지 묻습니다.</p>
+  </section>
+
+  <section class="section reveal" aria-labelledby="pillars-title">
+    <div class="section-head">
+      <h2 id="pillars-title" class="float" style={floatStyle(2, 21, 2.2)}>세 기둥</h2>
+      <span class="float" style={floatStyle(3, 21, 1.6)}>모든 규칙은 이 셋 중 하나에 속합니다</span>
+    </div>
+    <ul class="cards" role="list">
+      {PILLARS.map((p, i) => (
+        <li class="card-float float" style={floatStyle(i, 41)}>
+          <a class="card" href={url('/philosophy')}>
+            <div class:list={['thumb', 'pillar-thumb', p.id]} aria-hidden="true">
+              {p.id === 'minimalism' && <span class="pm-glyph">여백</span>}
+              {p.id === 'pixel-art' && <PixelIcon src={url('/v1/icons/rhythm.png')} scale={3} />}
+              {p.id === 'retro-color' && (
+                <span class="retro-chips"><span class="rc paper" /><span class="rc slate" /><span class="rc teal" /><span class="rc orange" /></span>
+              )}
+            </div>
+            <h3>{p.title}</h3>
+            <p>{p.summary}</p>
+            <div class="meta">
+              <span class="badge">{p.en}</span>
+              <span class="badge">규칙 {p.rules.length}</span>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section reveal" aria-labelledby="docs-title">
+    <div class="section-head">
+      <h2 id="docs-title" class="float" style={floatStyle(0, 21, 2.6)}>문서</h2>
+      <span class="float" style={floatStyle(1, 21, 1.8)}>{STATUS} · 함께 다듬는 중</span>
+    </div>
+    <ul class="cards" role="list">
+      {pages.map((p, i) => (
+        <li class="card-float float" style={floatStyle(i, 31)}>
+          <a class="card" href={url(`/${p.slug}`)}>
+            <div class="thumb" aria-hidden="true">{marks[p.slug] ?? p.title.charAt(0)}</div>
+            <h3>{p.title}</h3>
+            <p>{p.summary}</p>
+            <div class="meta">
+              <span class="badge">/{p.slug}</span>
+              <span class="badge">.md</span>
+              <span class="badge soon">초안</span>
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section reveal read-col" aria-labelledby="ai-title">
+    <div class="section-head">
+      <h2 id="ai-title">AI 도구에서 시작하기</h2>
+      <span>Claude Code, Cursor 같은 도구에 붙여넣기</span>
+    </div>
+    <pre id="prompt">{aiPrompt()}</pre>
+    <div class="actions">
+      <button type="button" class="btn" data-copy="prompt">지시문 복사</button>
+      <a class="btn" href={url('/ai')}>AI 가이드 &gt;</a>
+    </div>
+  </section>
+
+  <section class="section reveal read-col" aria-labelledby="res-title">
+    <div class="section-head">
+      <h2 id="res-title">바로 쓰는 자원</h2>
+      <span>주소는 버전(v1)이 바뀌기 전까지 그대로</span>
+    </div>
+    <ul class="res" role="list">
+      {resources.map((r) => (
+        <li>
+          <a href={url(r.path)}>{r.path}</a>
+          <span>{r.desc}</span>
+        </li>
+      ))}
+    </ul>
+  </section>
+</Base>
+
+<style>
+  /* 목록 페이지는 머리 아래 여백을 히어로가 대신한다 */
+  :global(main.page) { padding-top: 0; }
+
+  /* ---------- 히어로 ---------- */
+
+  .hero {
+    position: relative;
+    height: clamp(380px, calc(100svh - 15rem), 820px);
+    margin: 0 calc(var(--mp-gutter) * -1);
+  }
+
+  .field {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .field span {
+    position: absolute;
+    font-size: 16px;
+    line-height: 1;
+    opacity: 0;
+    animation: twinkle var(--tw) steps(1, end) var(--twd) infinite;
+  }
+
+  /* 켜진 채 오래, 꺼진 채 잠깐 — 셀 단위로 딱딱 */
+  @keyframes twinkle {
+    0%   { opacity: 0.22; }
+    48%  { opacity: 0.3; }
+    55%  { opacity: 0; }
+    100% { opacity: 0; }
+  }
+
+  /* 움직임 줄이기 — 점멸 없이 정지 프레임 한 장 */
+  @media (prefers-reduced-motion: reduce) {
+    .field span { opacity: 0.22; }
+  }
+
+  .slogan {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-size: var(--mp-size-hero);
+    letter-spacing: var(--mp-tracking-hero);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .sub {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    margin: 0;
+    padding-top: calc(var(--mp-size-hero) * 0.85);
+    text-align: center;
+    font-size: clamp(0.8rem, 2.4vw, 1.5rem);
+    letter-spacing: 0.12em;
+    opacity: var(--mp-opacity-brand);
+  }
+
+  .ch {
+    display: inline-block;
+    animation: bob var(--d) var(--mp-ease-float) var(--dl) infinite alternate;
+  }
+
+  @keyframes bob {
+    from { transform: translateY(var(--a)); }
+    to   { transform: translateY(calc(var(--a) * -1)); }
+  }
+
+  .scroll-hint {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1.5rem, 4vh, 3rem);
+    transform: translateX(-50%);
+    padding: 0.4em 0.8em;
+    opacity: 0.75;
+    animation: hint 2.6s ease-in-out infinite;
+  }
+  .scroll-hint:hover { opacity: 1; }
+  /* down.svg 의 모양만 빌려 글자색으로 — 라이트·다크 어디서나 보이게 */
+  .hint-mark {
+    display: block;
+    width: clamp(16px, 2.2vw, 22px);
+    aspect-ratio: 2 / 1;
+    background: var(--mp-ink);
+    -webkit-mask: var(--hint) center / 100% 100% no-repeat;
+    mask: var(--hint) center / 100% 100% no-repeat;
+  }
+
+  @keyframes hint {
+    0%, 100% { transform: translate(-50%, 0); }
+    50%      { transform: translate(-50%, 5px); }
+  }
+
+  @media (max-width: 480px) {
+    .slogan { font-size: clamp(1.68rem, 7.2vw, 2.34rem); }
+    .sub { padding-top: calc(clamp(1.68rem, 7.2vw, 2.34rem) * 0.85); }
+  }
+
+  /* ---------- 리드 ---------- */
+
+  .lead {
+    padding-top: var(--mp-section-lg);
+    padding-bottom: clamp(2rem, 6vh, 4rem);
+  }
+
+  .lead p {
+    margin: 0 0 1.1em;
+    max-width: var(--mp-width-para);
+    font-size: var(--mp-size-lead);
+    line-height: var(--mp-leading-body);
+    letter-spacing: var(--mp-tracking-lead);
+    opacity: var(--mp-opacity-body);
+  }
+  .lead p:last-child { margin-bottom: 0; }
+
+  /* ---------- 카드 — metaphr.dev 앱 카드 ---------- */
+
+  .cards {
+    list-style: none;
+    margin: 0;
+    padding: 0.75rem 0 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: clamp(0.9rem, 2.2vw, 1.5rem);
+  }
+
+  /* metaphr.dev 레일 카드와 같은 폭 — 남는 줄도 가운데로 모인다 */
+  .card-float { display: flex; flex: 0 1 360px; min-width: 0; }
+  .card-float:hover { animation-play-state: paused; }
+
+  .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: var(--mp-border) solid var(--mp-line);
+    padding: clamp(1.2rem, 3vw, 1.7rem);
+    text-decoration: none;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .card:hover {
+    border-color: var(--mp-line-strong);
+    transform: translateY(-3px);
+  }
+
+  .card .thumb {
+    aspect-ratio: 4 / 3;
+    margin-bottom: clamp(0.9rem, 2vw, 1.2rem);
+    font-size: clamp(2.9rem, 8.4vw, 4.1rem);
+    letter-spacing: var(--mp-tracking-hero);
+  }
+
+  .card h3 {
+    margin: 0 0 0.55em;
+    font-size: var(--mp-size-subheading);
+    letter-spacing: var(--mp-tracking-subheading);
+  }
+
+  .card p {
+    flex: 1;
+    margin: 0 0 1.2em;
+    font-size: clamp(0.88rem, 2.4vw, 1.1rem);
+    line-height: var(--mp-leading-card);
+    opacity: var(--mp-opacity-secondary);
+  }
+
+  /* ---------- 세 기둥 썸네일 ---------- */
+
+  .pillar-thumb .pixel { width: var(--mp-pixel-card); height: var(--mp-pixel-card); }
+  .pm-glyph { font-size: var(--mp-size-heading); letter-spacing: var(--mp-tracking-kicker); }
+
+  /* 4색 견본 — teal과 orange는 붙이지 않고 한 칸(12px) 띄운다 */
+  .retro-chips { display: flex; gap: 12px; }
+  .rc { display: block; width: 36px; height: 36px; border: var(--mp-border) solid var(--mp-line); }
+  .rc.paper { background: var(--mp-palette-paper); }
+  .rc.slate { background: var(--mp-palette-slate); }
+  .rc.teal { background: var(--mp-palette-teal); }
+  /* 이 화면의 강조 한 곳 — orange는 면으로만 */
+  .rc.orange { background: var(--mp-accent); }
+
+  /* ---------- 지시문·자원 ---------- */
+
+  .read-col > * { max-width: var(--mp-width-read); }
+  .read-col pre { margin-bottom: 1.2em; }
+
+  .res {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: var(--mp-border) solid var(--mp-line);
+  }
+
+  .res li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.2em 1.4em;
+    padding: 0.95em 0;
+    border-bottom: var(--mp-border) solid var(--mp-line);
+  }
+
+  .res a {
+    flex: 0 0 13em;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    text-decoration: none;
+    opacity: var(--mp-opacity-link);
+    overflow-wrap: anywhere;
+  }
+  .res a:hover { opacity: 1; }
+  .res a::after { content: " >"; }
+
+  .res span {
+    flex: 1 1 16em;
+    font-size: clamp(0.82rem, 2vw, 0.95rem);
+    line-height: var(--mp-leading-card);
+    opacity: var(--mp-opacity-secondary);
+  }
+</style>

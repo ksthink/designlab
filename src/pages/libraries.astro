@@ -1,0 +1,220 @@
+---
+import Base from '../layouts/Base.astro';
+import { LIBRARY_KIND, LIBRARY_STATUS, libraries, url, type Library } from '../lib/docs';
+
+const PLATFORM: Record<string, string> = { web: 'Web', ios: 'iOS', android: 'Android', desktop: 'Desktop', pwa: 'PWA' };
+const statusLabel = (id: string) => LIBRARY_STATUS.find((s) => s.id === id)?.label ?? id;
+
+// 분류(category)별로 묶는다 — 목록 순서(상태 우선순위)는 그대로
+const byCategory = (list: Library[]) => {
+  const groups = new Map<string, Library[]>();
+  for (const l of list) groups.set(l.category, [...(groups.get(l.category) ?? []), l]);
+  return [...groups];
+};
+
+const sections = LIBRARY_KIND.map((k) => ({ ...k, items: libraries[k.id] ?? [] }));
+const total = sections.reduce((n, s) => n + s.items.length, 0);
+---
+
+<Base title="참고 라이브러리" description="metaphr 사이트·앱을 만들 때 고르는 라이브러리 목록 — 사용 중·권장·검토 중·쓰지 않음" slug="libraries" width="list">
+  <div class="intro">
+    <p class="kicker">libraries · {total}개</p>
+    <h1>참고 라이브러리</h1>
+    <p class="tagline">새 의존성을 넣기 전에 먼저 여기를 봅니다. 없는 것은 쓰기 전에 묻습니다.</p>
+    <nav class="jump" aria-label="분류로 이동">
+      {sections.map((s) => <a href={`#${s.id}`}>{s.title} <span>{s.items.length}</span></a>)}
+    </nav>
+    <ul class="legend" role="list">
+      {LIBRARY_STATUS.map((s) => (
+        <li><span class:list={['badge', 'st', s.id]}>{s.label}</span> {s.desc}</li>
+      ))}
+    </ul>
+  </div>
+
+  {sections.map((s) => (
+    <section id={s.id} class="section kind" aria-labelledby={`${s.id}-title`}>
+      <div class="section-head">
+        <h2 id={`${s.id}-title`}>{s.title}</h2>
+        <span>{s.summary}</span>
+      </div>
+
+      {s.items.length === 0 ? (
+        <p class="empty">아직 담아 둔 라이브러리가 없습니다.</p>
+      ) : (
+        <ul class="libs" role="list">
+              {byCategory(s.items).flatMap(([, items]) => items).map((l) => (
+                <li class:list={['lib', l.status]}>
+                  <p class="kicker lib-cat">{l.category}</p>
+                  <h3>
+                    <a href={l.url} rel="noopener">{l.name}</a>
+                  </h3>
+                  <p class="why">{l.why}</p>
+                  <div class="meta">
+                    <span class:list={['badge', 'st', l.status]}>{statusLabel(l.status)}</span>
+                    {(l.platforms ?? []).map((p) => <span class="badge">{PLATFORM[p] ?? p}</span>)}
+                    {l.license && <span class="badge">{l.license}</span>}
+                  </div>
+                  {l.howToUse && (
+                    <details>
+                      <summary>쓰는 법</summary>
+                      <p>{l.howToUse}</p>
+                    </details>
+                  )}
+                  {l.caveats && (
+                    <details>
+                      <summary>주의</summary>
+                      <p>{l.caveats}</p>
+                    </details>
+                  )}
+                  {(l.repo || l.usedIn?.length) && (
+                    <p class="foot-meta">
+                      {l.repo && <a href={l.repo} rel="noopener">저장소</a>}
+                      {l.usedIn?.length ? <span>사용처 {l.usedIn.join(', ')}</span> : null}
+                      {l.addedAt && <span>{l.addedAt}</span>}
+                    </p>
+                  )}
+                </li>
+              ))}
+        </ul>
+      )}
+
+      <p class="machine">
+        기계용 <a href={url(`/libraries/${s.id}.md`)}>/libraries/{s.id}.md</a> · <a href={url(`/v1/libraries/${s.id}.json`)}>/v1/libraries/{s.id}.json</a>
+      </p>
+    </section>
+  ))}
+</Base>
+
+<style>
+  .intro { max-width: var(--mp-width-read); }
+
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em 1.6em;
+    margin-bottom: 1.6em;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+  }
+  .jump a {
+    text-decoration: none;
+    opacity: var(--mp-opacity-link);
+    border-bottom: var(--mp-border) solid var(--mp-line);
+    padding-bottom: 0.15em;
+  }
+  .jump a:hover { opacity: 1; }
+  .jump span { opacity: var(--mp-opacity-meta); }
+
+  .legend {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5em;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    line-height: 1.9;
+  }
+  .legend li { opacity: var(--mp-opacity-secondary); }
+  .legend .badge { margin-right: 0.5em; }
+
+  .kind { scroll-margin-top: 2rem; }
+
+  .empty {
+    margin: 0;
+    padding: clamp(2rem, 6vh, 3rem) 0;
+    font-size: clamp(0.9rem, 2.1vw, 1.05rem);
+    line-height: 2;
+    opacity: var(--mp-opacity-meta);
+  }
+
+  .lib-cat { margin-bottom: 0.6em; }
+
+  .libs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    gap: clamp(0.9rem, 2.2vw, 1.5rem);
+  }
+
+  .lib {
+    display: flex;
+    flex-direction: column;
+    border: var(--mp-border) solid var(--mp-line);
+    padding: clamp(1.2rem, 3vw, 1.7rem);
+    transition: border-color 0.3s ease;
+  }
+  .lib:hover { border-color: var(--mp-line-strong); }
+
+  .lib h3 {
+    margin: 0 0 0.55em;
+    font-size: var(--mp-size-subheading);
+    letter-spacing: var(--mp-tracking-subheading);
+  }
+  .lib h3 a { text-decoration: none; }
+  .lib h3 a:hover { background: var(--mp-ink); color: var(--mp-bg); }
+  .lib.avoid h3 { text-decoration: line-through; text-decoration-thickness: 1px; opacity: var(--mp-opacity-secondary); }
+
+  .why {
+    flex: 1;
+    margin: 0 0 1.2em;
+    font-size: clamp(0.88rem, 2.4vw, 1.05rem);
+    line-height: var(--mp-leading-card);
+    opacity: var(--mp-opacity-secondary);
+  }
+
+  .st.candidate,
+  .st.avoid { border-style: dashed; }
+  .st.avoid { text-decoration: line-through; }
+
+  details {
+    border-top: var(--mp-border) solid var(--mp-line);
+    margin-top: 0.9em;
+    padding-top: 0.7em;
+  }
+  details + details { margin-top: 0.7em; }
+
+  summary {
+    list-style: none;
+    cursor: pointer;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    opacity: var(--mp-opacity-link);
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "+"; display: inline-block; width: 1.2em; }
+  details[open] summary::before { content: "-"; }
+  summary:hover { opacity: 1; }
+
+  details p {
+    margin: 0.6em 0 0.2em;
+    font-size: var(--mp-size-kicker);
+    line-height: var(--mp-leading-card);
+    letter-spacing: var(--mp-tracking-body);
+    opacity: var(--mp-opacity-body);
+  }
+
+  .foot-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3em 1em;
+    margin: 1em 0 0;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+  .foot-meta a { text-decoration: none; border-bottom: var(--mp-border) solid var(--mp-line-strong); }
+  .foot-meta a:hover { background: var(--mp-ink); color: var(--mp-bg); }
+
+  .machine {
+    margin: 1.8em 0 0;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-muted);
+    overflow-wrap: anywhere;
+  }
+  .machine a { text-decoration: none; border-bottom: var(--mp-border) solid var(--mp-line-strong); }
+  .machine a:hover { background: var(--mp-ink); color: var(--mp-bg); }
+</style>

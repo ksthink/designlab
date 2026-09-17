@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#F7F2E9">
+<title>여백을 담습니다 — metaphr</title>
+<meta name="description" content="metaphr은 라이프스타일과 업무 생산성을 위한 웹앱·네이티브 앱을 만들어 출시합니다.">
+<style>
+  /* 본문 전체용 — 한글 전 음절 포함 (약 98KB). 나중에 선언된 히어로 서브셋이
+     겹치는 글자에 대해 우선하므로, 첫 화면은 1.5KB 파일만으로 그려진다. */
+  @font-face {
+    font-family: "Mulmaru";
+    src: url("/mulmaru.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  /* 히어로(슬로건·브랜드·blog)에 필요한 글자만 담은 경량 서브셋 */
+  @font-face {
+    font-family: "Mulmaru";
+    src: url("/mulmaru.subset.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    unicode-range: U+0020,U+002E,U+0030,U+0031,U+0032,U+0033,U+0034,U+0035,U+0036,U+0037,U+0038,U+0039,U+003E,U+0061,U+0062,U+0064,U+0065,U+0067,U+0068,U+006C,U+006D,U+006F,U+0070,U+0072,U+0074,U+0076,U+2193,U+3131,U+3134,U+3137,U+3139,U+3141,U+3142,U+3145,U+3147,U+3148,U+314A,U+314B,U+314C,U+314D,U+314E,U+314F,U+3150,U+3151,U+3153,U+3154,U+3155,U+3157,U+315B,U+315C,U+3160,U+3161,U+3163,U+B2C8,U+B2E4,U+B2F4,U+BC31,U+C2B5,U+C5EC,U+C744;
+  }
+
+  :root {
+    --bg: #F7F2E9;
+    --ink: #3A3A38;
+    --line: rgba(58, 58, 56, 0.16);
+    --hero-h: 100svh;
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Mulmaru", sans-serif;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
+  /* ---------- 히어로 ---------- */
+
+  /* 터미널 글리프 캔버스 — 기존 요소 아래(z0)에 얹기만 한다 */
+  .glyphs {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    image-rendering: pixelated;
+  }
+
+  /* 캔버스 위에 놓이는 히어로 텍스트 층 */
+  .slogan, .brand, .nav-blog, .scroll-hint { z-index: 1; }
+
+  .hero {
+    position: relative;
+    height: var(--hero-h);
+    z-index: 1;
+  }
+
+  .slogan {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-weight: 400;
+    font-size: clamp(1.95rem, 7.8vw, 5.2rem);
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+
+  .slogan.on {
+    opacity: 1;
+  }
+
+  .brand {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    margin: 0;
+    padding-top: calc(clamp(1.95rem, 7.8vw, 5.2rem) * 0.85);
+    text-align: center;
+    font-weight: 400;
+    font-size: clamp(0.8rem, 2.4vw, 1.5rem);
+    letter-spacing: 0.12em;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+
+  .brand.on {
+    opacity: 0.8;
+    pointer-events: auto;   /* hover 스크램블용 — 링크는 아니다 */
+  }
+
+  /* 로고 hover 스크램블 — 활성 셀은 잉크/배경 반전뿐, 다른 색 없음 */
+  .brand .ch.gx {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .nav-blog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: 0;
+    white-space: nowrap;
+    font-weight: 400;
+    font-size: clamp(0.75rem, 2vw, 1.1rem);
+    letter-spacing: 0.08em;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .nav-blog.on {
+    opacity: 0.6;
+    pointer-events: auto;
+  }
+
+  .nav-blog:hover,
+  .nav-blog:focus-visible {
+    opacity: 1;
+    /* 반전 칠(0.19s)보다 늦게 진해지면 글자가 흐려 보인다 */
+    transition: opacity 0.12s ease;
+  }
+
+  /* 반전 칠이 글자에 딱 붙지 않도록 아주 얕은 여백만 준다 */
+  .nav-blog.fx-fill .fill { inset: -0.1em -0.15em; }
+
+  .scroll-hint {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1.5rem, 4vh, 3rem);
+    transform: translateX(-50%);
+    display: block;
+    padding: 0.4em 0.8em;
+    text-decoration: none;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .scroll-hint img {
+    display: block;
+    width: clamp(16px, 2.2vw, 22px);
+    height: auto;
+  }
+
+  .scroll-hint.on {
+    opacity: 0.75;
+    animation: hint 2.6s ease-in-out infinite;
+  }
+
+  .scroll-hint:hover { opacity: 1; }
+
+  @keyframes hint {
+    0%, 100% { transform: translate(-50%, 0); }
+    50%      { transform: translate(-50%, 5px); }
+  }
+
+  .slogan .ch,
+  .brand .ch,
+  .nav-blog .ch {
+    display: inline-block;
+    animation: bob var(--d) ease-in-out var(--dl) infinite alternate;
+  }
+
+  @keyframes bob {
+    from { transform: translateY(var(--a)); }
+    to   { transform: translateY(calc(var(--a) * -1)); }
+  }
+
+  @media (max-width: 480px) {
+    .slogan { font-size: clamp(1.68rem, 7.2vw, 2.34rem); }
+    .brand  { padding-top: calc(clamp(1.68rem, 7.2vw, 2.34rem) * 0.85); }
+  }
+
+  /* ---------- 본문 ---------- */
+
+  main {
+    position: relative;
+    z-index: 1;
+    background: var(--bg);
+  }
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(1.25rem, 5vw, 4rem);
+  }
+
+  /* .wrap의 좌우 패딩이 살아 있어야 하므로 세로 값만 지정한다 */
+  .lead {
+    padding-top: clamp(4rem, 12vh, 9rem);
+    padding-bottom: clamp(2rem, 6vh, 4rem);
+  }
+
+  .lead p {
+    margin: 0 0 1.1em;
+    max-width: 30em;
+    font-size: clamp(0.95rem, 2.2vw, 1.2rem);
+    line-height: 2.1;
+    letter-spacing: 0.02em;
+    opacity: 0.85;
+  }
+
+  .lead p:last-child { margin-bottom: 0; }
+
+  /* 히어로 아래의 유일한 상시 모션 — 문단 끝에서 깜빡이는 터미널 커서.
+     mulmaru 의 ■ 글리프, 잉크색 opacity 단계, steps 점멸만 쓴다 */
+  .lead p:last-of-type::after {
+    content: "■";
+    margin-left: 0.35em;
+    font-size: 0.85em;
+    opacity: 0.45;
+    animation: caret 1.2s steps(1, end) infinite;
+  }
+
+  @keyframes caret {
+    50% { opacity: 0; }
+  }
+
+  .cat {
+    padding-top: clamp(2.5rem, 8vh, 5rem);
+    padding-bottom: clamp(2.5rem, 8vh, 5rem);
+  }
+
+  .cat-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0 1.2em;
+    flex-wrap: wrap;
+    margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+  }
+
+  /* 카드와 같은 결로 분류 제목도 같이 떠 있게 — 진폭·주기는 JS에서 지정 */
+  .cat-head h2,
+  .cat-head span {
+    animation: cardfloat var(--fd, 4s) ease-in-out var(--fdl, 0s) infinite alternate;
+  }
+
+  .cat-head h2 {
+    margin: 0;
+    font-size: clamp(1.15rem, 3.2vw, 1.7rem);
+    font-weight: 400;
+    letter-spacing: 0.06em;
+  }
+
+  .cat-head span {
+    font-size: clamp(0.78rem, 2vw, 0.95rem);
+    letter-spacing: 0.04em;
+    opacity: 0.5;
+  }
+
+  .rail-box { position: relative; }
+
+  /* 스크롤에 따라 확대되므로, 확대분이 페이지 가로 스크롤을 만들지 않게 잘라낸다 */
+  .cat { overflow-x: clip; }
+
+  .rail-shell {
+    transform-origin: center center;
+    will-change: transform;
+  }
+
+  .rail {
+    display: flex;
+    justify-content: center;
+    justify-content: safe center;
+    gap: clamp(0.9rem, 2.2vw, 1.5rem);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    padding-top: 0.75rem;
+    padding-bottom: 1.25rem;
+  }
+
+  .rail::-webkit-scrollbar { display: none; }
+
+  .rail.dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+  }
+
+  .rail.dragging a { pointer-events: none; }
+
+  /* 카드를 감싸는 층은 둥둥 뜨는 움직임만, 안쪽 카드는 hover 반응만 맡는다 */
+  .card-float {
+    flex: 0 0 clamp(288px, 84vw, 384px);
+    scroll-snap-align: center;
+    display: flex;
+    animation: cardfloat var(--fd, 4s) ease-in-out var(--fdl, 0s) infinite alternate;
+  }
+
+  .card-float:hover { animation-play-state: paused; }
+
+  @keyframes cardfloat {
+    from { transform: translateY(var(--fa, 3px)); }
+    to   { transform: translateY(calc(var(--fa, 3px) * -1)); }
+  }
+
+  .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    padding: clamp(1.2rem, 3vw, 1.7rem);
+    color: inherit;
+    text-decoration: none;
+    background: transparent;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+
+  @media (min-width: 700px) {
+    .card-float { flex-basis: 360px; }
+  }
+
+  .card:hover {
+    border-color: rgba(58, 58, 56, 0.45);
+    transform: translateY(-3px);
+  }
+
+  .thumb {
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: clamp(0.9rem, 2vw, 1.2rem);
+    font-size: clamp(2.9rem, 8.4vw, 4.1rem);
+    letter-spacing: 0.05em;
+    color: rgba(58, 58, 56, 0.55);
+    background-color: rgba(58, 58, 56, 0.035);
+    background-image:
+      linear-gradient(rgba(58, 58, 56, 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(58, 58, 56, 0.07) 1px, transparent 1px);
+    background-size: 12px 12px;
+  }
+
+  /* 40px 원본을 정수 배율(3x)로만 키운다 — 보간이 끼면 픽셀이 뭉개진다 */
+  .pixel {
+    width: 120px;
+    height: 120px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    opacity: 0.72;
+  }
+
+  .card h3 {
+    margin: 0 0 0.55em;
+    font-size: clamp(1.1rem, 3.1vw, 1.45rem);
+    font-weight: 400;
+    letter-spacing: 0.04em;
+  }
+
+  .card p {
+    margin: 0 0 1.2em;
+    font-size: clamp(0.88rem, 2.4vw, 1.1rem);
+    line-height: 1.85;
+    opacity: 0.7;
+    flex: 1;
+  }
+
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    flex-wrap: wrap;
+    font-size: clamp(0.68rem, 1.7vw, 0.75rem);
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+  }
+
+  .badge {
+    border: 1px solid var(--line);
+    padding: 0.25em 0.6em;
+  }
+
+  .badge.soon {
+    border-style: dashed;
+  }
+
+  .rail-nav {
+    position: absolute;
+    top: 50%;
+    width: 2.4rem;
+    height: 2.4rem;
+    margin-top: -1.2rem;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: inherit;
+    font-family: inherit;
+    font-size: 0.9rem;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.25s ease;
+    z-index: 2;
+  }
+
+  .rail-nav:hover { opacity: 1; }
+  .rail-nav[hidden] { display: none !important; }
+  .rail-nav.prev { left: -1.2rem; }
+  .rail-nav.next { right: -1.2rem; }
+
+  @media (hover: hover) and (min-width: 860px) {
+    .rail-nav { display: flex; }
+  }
+
+  /* 카드가 3개를 넘을 때만 붙는다 — 배지·버튼과 같은 1px 잉크 테두리의 각진 사각형 */
+  .rail-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.55rem;
+    margin-top: clamp(1.1rem, 3vh, 1.7rem);
+  }
+
+  .rail-dot {
+    width: 8px;
+    height: 8px;
+    padding: 0;
+    border: 1px solid var(--line);
+    background: transparent;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: background 0.25s ease, border-color 0.25s ease, opacity 0.25s ease;
+  }
+
+  .rail-dot:hover { border-color: rgba(58, 58, 56, 0.45); opacity: 1; }
+
+  .rail-dot[aria-current="true"] {
+    background: var(--ink);
+    border-color: var(--ink);
+    opacity: 0.55;
+  }
+
+  .load-error {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vh, 3rem) clamp(1.25rem, 5vw, 4rem);
+    font-size: clamp(0.9rem, 2.1vw, 1.05rem);
+    line-height: 2;
+    opacity: 0.55;
+  }
+
+  .foot {
+    padding-top: clamp(4rem, 12vh, 8rem);
+    padding-bottom: clamp(3rem, 8vh, 5rem);
+    border-top: 1px solid var(--line);
+    margin-top: clamp(3rem, 8vh, 5rem);
+  }
+
+  .foot-links {
+    display: flex;
+    gap: 1.6em;
+    flex-wrap: wrap;
+    font-size: clamp(0.82rem, 2vw, 0.95rem);
+    letter-spacing: 0.06em;
+  }
+
+  .foot-links a {
+    color: inherit;
+    text-decoration: none;
+    opacity: 0.65;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.15em;
+  }
+
+  .foot-links a:hover { opacity: 1; }
+
+  /* hover — 8칸이 steps() 로 차오르며 잉크/배경 반전 */
+  #footMail { position: relative; }
+
+  .fx-fill .label {
+    position: relative;
+    z-index: 1;
+    transition: color 0.19s step-end;
+  }
+
+  .fx-fill .fill {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    pointer-events: none;
+  }
+
+  .fx-fill .fill span {
+    background: var(--ink);
+    transform: scaleY(0);
+    transform-origin: bottom;
+    transition: transform 0.19s steps(4, end) var(--d, 0ms);
+  }
+
+  .fx-fill .fill span:nth-child(even) { transform-origin: top; }
+
+  .fx-fill:hover .fill span,
+  .fx-fill:focus-visible .fill span { transform: scaleY(1); }
+
+  .fx-fill:hover .label,
+  .fx-fill:focus-visible .label { color: var(--bg); }
+
+  .foot-logo {
+    display: block;
+    width: clamp(120px, 20vw, 168px);
+    height: auto;
+    margin: clamp(2.5rem, 7vh, 4rem) auto 0;
+    user-select: none;
+  }
+
+  .foot small {
+    display: block;
+    margin-top: 1.4rem;
+    text-align: center;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    opacity: 0.35;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+
+  .reveal.in {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .scroll-hint.on { animation: none; }
+    /* hover 는 트랜지션 없이 최종 상태만, 커서는 켜진 채 정지 */
+    .fx-fill .fill span, .fx-fill .label { transition: none; }
+    .lead p:last-of-type::after { animation: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <canvas class="glyphs" id="glyphs" aria-hidden="true"></canvas>
+  <a class="nav-blog fx-fill" data-knockout href="https://blog.metaphr.dev"> blog &gt; </a>
+  <h1 class="slogan" data-knockout>여백을 담습니다</h1>
+  <p class="brand" data-knockout>metaphr.dev</p>
+  <a class="scroll-hint" data-knockout href="#apps" aria-label="아래로 스크롤"><img src="/down.svg?v=2" alt="" width="12" height="6"></a>
+</header>
+
+<main id="apps">
+  <section class="wrap lead reveal">
+    <p>metaphr는 일과 삶의 여백을 지향합니다. 모두가 더 많은 기능을 다툴 때, 빼고 덜어내는 미학을 고민합니다. 복잡한 스마트폰 속, 당신의 마음이 오직 '하나'에만 온전히 집중할 수 있도록 만듭니다.</p>
+  </section>
+
+  <div id="cats"></div>
+
+  <footer class="wrap foot reveal">
+    <div class="foot-links">
+      <a href="mailto:ksthink@metaphr.dev" id="footMail" class="fx-fill">ksthink@metaphr.dev</a>
+    </div>
+    <img class="foot-logo" src="/metaphr.svg" alt="metaphr" width="350" height="200" loading="lazy" decoding="async">
+    <small>© metaphr</small>
+  </footer>
+</main>
+
+<script src="/apps.js"></script>
+<script src="/planet-art.js?v=5"></script>
+<script>
+/* ---------- 카테고리 캐러셀 렌더링 ---------- */
+(function () {
+  'use strict';
+
+  var M = window.METAPHR;
+  var host = document.getElementById('cats');
+  var mail = document.getElementById('footMail');
+  if (mail) {
+    mail.href = 'mailto:' + M.contactEmail;
+    mail.textContent = M.contactEmail;
+  }
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  // 둥둥 뜨는 움직임의 진폭·주기·위상을 요소에 지정한다
+  function float2(node, amp) {
+    node.style.setProperty('--fa', amp.toFixed(2) + 'px');
+    node.style.setProperty('--fd', (3.4 + Math.random() * 2.4).toFixed(2) + 's');
+    node.style.setProperty('--fdl', (-Math.random() * 5).toFixed(2) + 's');
+  }
+
+  function thumbMark(app) {
+    var ch = app.glyph || app.name.charAt(0);
+    if (!app.icon) return document.createTextNode(ch);
+
+    var img = new Image(40, 40);
+    img.className = 'pixel';
+    img.src = app.icon;
+    img.alt = '';
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.onerror = function () {
+      var t = document.createTextNode(ch);
+      if (img.parentNode) img.parentNode.replaceChild(t, img);
+    };
+    return img;
+  }
+
+  function card(app) {
+    var a = el('a', 'card');
+    a.href = '/app.html?id=' + encodeURIComponent(app.id);
+
+    var th = el('div', 'thumb');
+    th.setAttribute('aria-hidden', 'true');
+    th.appendChild(thumbMark(app));
+    a.appendChild(th);
+
+    a.appendChild(el('h3', null, app.name));
+    a.appendChild(el('p', null, app.tagline));
+
+    var meta = el('div', 'meta');
+    (app.platforms || []).forEach(function (p) {
+      meta.appendChild(el('span', 'badge', p));
+    });
+    if (app.status === 'soon') {
+      meta.appendChild(el('span', 'badge soon', '준비 중'));
+    }
+    a.appendChild(meta);
+    return a;
+  }
+
+  var DOTS_MIN = 4;   // 카드가 3개를 넘어설 때부터 인디케이터를 붙인다
+
+  function rail(apps) {
+    var shell = el('div', 'rail-shell');
+    var box = el('div', 'rail-box');
+    var r = el('div', 'rail');
+    r.setAttribute('role', 'list');
+    apps.forEach(function (app, i) {
+      var f = el('div', 'card-float');
+      f.setAttribute('role', 'listitem');
+      // 슬로건 자모와 같은 결의 흔들림 — 카드마다 진폭·주기·위상을 달리한다
+      float2(f, 2.5 + Math.random() * 3);
+      f.appendChild(card(app));
+      r.appendChild(f);
+    });
+    box.appendChild(r);
+
+    ['prev', 'next'].forEach(function (dir) {
+      var b = el('button', 'rail-nav ' + dir, dir === 'prev' ? '‹' : '›');
+      b.type = 'button';
+      b.setAttribute('aria-label', dir === 'prev' ? '이전' : '다음');
+      b.addEventListener('click', function () {
+        var step = r.firstElementChild
+          ? r.firstElementChild.getBoundingClientRect().width + 20
+          : 300;
+        r.scrollBy({ left: dir === 'prev' ? -step : step, behavior: 'smooth' });
+      });
+      box.appendChild(b);
+    });
+
+    shell.appendChild(box);
+
+    var dots = null;
+    if (apps.length >= DOTS_MIN) {
+      dots = el('div', 'rail-dots');
+      dots.setAttribute('role', 'tablist');
+      dots.setAttribute('aria-label', '카드 위치');
+      apps.forEach(function (app, i) {
+        var d = el('button', 'rail-dot');
+        d.type = 'button';
+        d.setAttribute('role', 'tab');
+        d.setAttribute('aria-label', app.name);
+        d.addEventListener('click', function () {
+          var t = r.children[i];
+          if (!t) return;
+          // scrollIntoView는 세로 스크롤까지 건드리므로 레일만 직접 옮긴다
+          r.scrollTo({
+            left: t.offsetLeft - (r.clientWidth - t.offsetWidth) / 2,
+            behavior: 'smooth'
+          });
+        });
+        dots.appendChild(d);
+      });
+      shell.appendChild(dots);
+    }
+
+    // 레일 중앙에 가장 가까운 카드를 현재 위치로 본다.
+    // 양 끝에서는 중앙 기준이 어긋나므로(끝까지 밀어도 마지막 카드가 중앙에
+    // 오지 않는다) 첫/마지막 점을 그대로 켠다.
+    function activeIndex() {
+      var max = r.scrollWidth - r.clientWidth;
+      if (r.scrollLeft <= 2) return 0;
+      if (r.scrollLeft >= max - 2) return r.children.length - 1;
+      var mid = r.scrollLeft + r.clientWidth / 2;
+      var best = 0, bestD = Infinity;
+      for (var i = 0; i < r.children.length; i++) {
+        var c = r.children[i];
+        var d = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid);
+        if (d < bestD) { bestD = d; best = i; }
+      }
+      return best;
+    }
+
+    function syncNav() {
+      var max = r.scrollWidth - r.clientWidth - 2;
+      box.querySelector('.prev').hidden = r.scrollLeft <= 2;
+      box.querySelector('.next').hidden = max <= 0 || r.scrollLeft >= max;
+      if (!dots) return;
+      var cur = activeIndex();
+      for (var i = 0; i < dots.children.length; i++) {
+        dots.children[i].setAttribute('aria-current', i === cur ? 'true' : 'false');
+      }
+    }
+    r.addEventListener('scroll', syncNav, { passive: true });
+    window.addEventListener('resize', syncNav);
+    setTimeout(syncNav, 0);
+
+    enableDrag(r);
+    return shell;
+  }
+
+  // 데스크톱에서 마우스로도 좌우 스와이프 (모바일은 네이티브 스크롤)
+  function enableDrag(r) {
+    var down = false, moved = false, startX = 0, startScroll = 0;
+
+    r.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'touch') return;
+      down = true;
+      moved = false;
+      startX = e.clientX;
+      startScroll = r.scrollLeft;
+    });
+
+    r.addEventListener('pointermove', function (e) {
+      if (!down) return;
+      var dx = e.clientX - startX;
+      if (!moved && Math.abs(dx) < 4) return;
+      if (!moved) {
+        moved = true;
+        r.classList.add('dragging');
+        r.setPointerCapture(e.pointerId);
+      }
+      r.scrollLeft = startScroll - dx;
+    });
+
+    function up() {
+      down = false;
+      // 클릭 억제 해제는 다음 틱에 — 드래그 끝의 오작동 이동 방지
+      setTimeout(function () { r.classList.remove('dragging'); }, 0);
+    }
+    r.addEventListener('pointerup', up);
+    r.addEventListener('pointercancel', up);
+    r.addEventListener('dragstart', function (e) { e.preventDefault(); });
+  }
+
+  /* 스크롤 진입 시 페이드인. 카테고리 섹션은 나중에 만들어지므로
+     노드 단위로 등록한다 — 콘텐츠 로딩이 실패해도 lead/foot 은 보여야 한다 */
+  var io = ('IntersectionObserver' in window)
+    ? new IntersectionObserver(function (entries) {
+        entries.forEach(function (en) {
+          if (en.isIntersecting) {
+            en.target.classList.add('in');
+            io.unobserve(en.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -12% 0px' })
+    : null;
+
+  function reveal(node) {
+    if (io) io.observe(node);
+    else node.classList.add('in');
+  }
+
+  [].forEach.call(document.querySelectorAll('.reveal'), reveal);
+
+  // 콘텐츠는 content/*.json 에서 오므로 준비된 뒤에 그린다
+  M.ready(function () {
+    M.categories.forEach(function (cat) {
+      var apps = M.byCategory(cat.key);
+      if (!apps.length) return;
+
+      var sec = el('section', 'wrap cat reveal');
+      sec.id = cat.key;
+
+      var head = el('div', 'cat-head');
+      var h2 = el('h2', null, cat.label);
+      var desc = el('span', null, cat.desc);
+      // 제목과 설명의 위상을 어긋나게 둬야 한 덩어리로 굳어 보이지 않는다
+      float2(h2, 2 + Math.random() * 2);
+      float2(desc, 1.5 + Math.random() * 1.5);
+      head.appendChild(h2);
+      head.appendChild(desc);
+      sec.appendChild(head);
+      sec.appendChild(rail(apps));
+      host.appendChild(sec);
+      reveal(sec);
+    });
+
+    /* 화면 중앙에 놓인 캐러셀만 살짝 커진다 — 스크롤 위치에 직접 물려
+       transition 없이 그리므로 위아래 어느 쪽으로 움직여도 되돌아간다 */
+    (function railZoom() {
+      var shells = [].slice.call(document.querySelectorAll('.rail-shell'));
+      if (!shells.length) return;
+
+      var ticking = false;
+
+      function apply() {
+        ticking = false;
+        var vh = window.innerHeight;
+        var mid = vh / 2;
+        // 중앙에서 이만큼 벗어나면 원래 크기 — 화면 높이에 비례시켜
+        // 큰 모니터에서도 확대 구간이 한 화면 안에 들어오게 한다
+        var span = vh * 0.55;
+        var max = window.innerWidth < 700 ? 0.04 : 0.07;
+
+        for (var i = 0; i < shells.length; i++) {
+          var sh = shells[i];
+          var r = sh.getBoundingClientRect();
+          // 캐러셀이 화면 밖이면 계산도 변형도 하지 않는다
+          if (r.bottom < -vh || r.top > vh * 2) {
+            if (sh.style.transform) sh.style.transform = '';
+            continue;
+          }
+          var d = Math.abs(r.top + r.height / 2 - mid) / span;
+          if (d > 1) d = 1;
+          var t = 1 - d;
+          t = t * t * (3 - 2 * t);   // smoothstep — 경계에서 튀지 않게
+          sh.style.transform = 'scale(' + (1 + max * t).toFixed(4) + ')';
+        }
+      }
+
+      function onScroll() {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(apply);
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      apply();
+    })();
+
+  }, function (err) {
+    if (window.console) console.error('[metaphr] 콘텐츠를 불러오지 못했습니다', err);
+    var p = el('p', null, '앱 목록을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    p.className = 'load-error';
+    host.appendChild(p);
+  });
+
+})();
+</script>
+
+<script>
+/* ---------- 히어로: 터미널 글리프 배경 + 로고/연락 hover ----------
+   흑백(잉크 alpha 단계)만, mulmaru 글리프만, 셀 단위 "딱딱" 갱신만 쓴다.
+   자동 재생은 이 배경 캔버스 하나 — 우상단의 큰 몸체(태양) 둘레로
+   미리 구운 행성들이 점선 궤도를 따라 공전·자전한다(planet-art.js,
+   build-planet.py 생성). [data-knockout] 텍스트 영역은 비워 둔다. */
+(function () {
+  'use strict';
+
+  var REDUCE = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var hero = document.querySelector('.hero');
+  var canvas = document.getElementById('glyphs');
+  var ctx = canvas.getContext('2d');
+  var slogan = document.querySelector('.slogan');
+  var brand = document.querySelector('.brand');
+  var navBlog = document.querySelector('.nav-blog');
+  var hint = document.querySelector('.scroll-hint');
+
+  var rootCss = getComputedStyle(document.documentElement);
+  var INK = (rootCss.getPropertyValue('--ink') || '#3A3A38').trim();
+  var BG = (rootCss.getPropertyValue('--bg') || '#F7F2E9').trim();
+
+  var FS = 16;               // 본문 기본 크기와 동일한 mulmaru 크기
+  var CAP = 0.5;             // 캔버스 전체 알파 상한
+  var TICK = 83;             // 셀 단위 갱신 간격(ms) — 부드러운 트윈 금지
+
+  // 텍스트를 글자별 span으로 분리해 미세한 상하 흔들림 부여
+  function splitChars(el) {
+    var text = el.textContent;
+    el.textContent = '';
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (c === ' ') {
+        // flex 컨테이너에서 공백 텍스트 노드는 무시되므로 nbsp span으로 유지
+        var sp = document.createElement('span');
+        sp.textContent = ' ';
+        el.appendChild(sp);
+        continue;
+      }
+      var s = document.createElement('span');
+      s.className = 'ch';
+      s.textContent = c;
+      s.style.setProperty('--a', (1 + Math.random() * 1.5).toFixed(2) + 'px');
+      s.style.setProperty('--d', (2 + Math.random() * 1.8).toFixed(2) + 's');
+      s.style.setProperty('--dl', (-Math.random() * 4).toFixed(2) + 's');
+      el.appendChild(s);
+    }
+  }
+  splitChars(slogan);
+  splitChars(brand);
+  splitChars(navBlog);
+
+  /* ----- 결정적 셀 해시 (세션마다 crypto 시드) ----- */
+
+  var seed = new Uint32Array(2);
+  if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(seed);
+  else { seed[0] = (Math.random() * 4294967295) >>> 0; seed[1] = (Math.random() * 4294967295) >>> 0; }
+  var S1 = seed[0] & 0x3fff, S2 = seed[1] & 0x3fff;
+
+  function cellHash(c, r, k) {
+    var h = Math.imul(c + 17 + 11 * (k + S1), 0x165667b1) ^
+            Math.imul(r + 31 + 7 * (k + S2), 0x27d4eb2f);
+    h = Math.imul(h ^ (h >>> 13), 0x4bf19f61);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967295;
+  }
+
+  /* ----- 글리프 선별과 셀 크기 — 전부 mulmaru 실측 ----- */
+
+  var CAND = ['·', ':', '+', 'x', '#', '0', '1', '▪', '▫', '■', '□', '↗', '→', '←', '★', '☆'];
+  var avail = [];
+  var DOT, TWINKLE, STAR, BODY_A, BODY_B, FILLG, TEXA;
+  var cw = 13, chh = 20, cols = 0, rows = 0, W = 0, H = 0;
+
+  function has(g) { return avail.indexOf(g) !== -1; }
+  function firstOf(list) {
+    for (var i = 0; i < list.length; i++) if (has(list[i])) return list[i];
+    return '+';
+  }
+
+  function metrics() {
+    // mulmaru 에 없는 문자는 폴백 폰트로 렌더돼 격자가 깨진다 —
+    // 폴백 단독 측정과 폭이 같으면 폴백 렌더로 보고 제외한다
+    avail = [];
+    for (var i = 0; i < CAND.length; i++) {
+      ctx.font = FS + 'px "Mulmaru", monospace';
+      var w1 = ctx.measureText(CAND[i]).width;
+      ctx.font = FS + 'px monospace';
+      var w2 = ctx.measureText(CAND[i]).width;
+      if (Math.abs(w1 - w2) < 0.01) continue;
+      avail.push(CAND[i]);
+    }
+    DOT = firstOf(['·', ':', '+']);
+    TWINKLE = firstOf(['+', 'x']);
+    FILLG = firstOf(['#', '■', '+']);
+    TEXA = firstOf(['+', 'x']);
+    STAR = firstOf(['★', '☆', 'x', '+']);
+    BODY_A = firstOf(['·', ':']);
+    BODY_B = firstOf([':', '·']);
+
+    ctx.font = FS + 'px "Mulmaru", monospace';
+    var m = ctx.measureText(has('■') ? '■' : '0');
+    cw = Math.max(4, Math.round(m.width));
+    chh = (m.fontBoundingBoxAscent && m.fontBoundingBoxDescent)
+      ? Math.round(m.fontBoundingBoxAscent + m.fontBoundingBoxDescent)
+      : Math.round(FS * 1.25);
+  }
+
+  function layoutCanvas() {
+    W = hero.clientWidth;
+    H = hero.clientHeight;
+    // DPR 3 기기(아이폰 등)에서 픽셀 부하를 줄이기 위해 2로 캡 — 시각 차이 미미
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    metrics();
+    cols = Math.ceil(W / cw);
+    rows = Math.ceil(H / chh);
+    refreshKnockout();
+  }
+
+  /* ----- knockout: 텍스트 위에는 글리프를 그리지 않는다 ----- */
+
+  var ko = [];
+
+  // 슬로건·브랜드 컨테이너는 히어로 전폭을 덮으므로 글자 span 들의 합집합을 쓴다
+  function textRect(el) {
+    var kids = el.querySelectorAll('.ch');
+    if (!kids.length) return el.getBoundingClientRect();
+    var l = Infinity, t = Infinity, rr = -Infinity, b = -Infinity;
+    for (var i = 0; i < kids.length; i++) {
+      var r = kids[i].getBoundingClientRect();
+      if (r.left < l) l = r.left;
+      if (r.top < t) t = r.top;
+      if (r.right > rr) rr = r.right;
+      if (r.bottom > b) b = r.bottom;
+    }
+    return { left: l, top: t, right: rr, bottom: b, width: rr - l, height: b - t };
+  }
+
+  function refreshKnockout() {
+    ko = [];
+    var hr = hero.getBoundingClientRect();
+    var els = hero.querySelectorAll('[data-knockout]');
+    for (var i = 0; i < els.length; i++) {
+      var r = textRect(els[i]);
+      if (!r.width || !r.height) continue;
+      ko.push([r.left - hr.left - cw * 0.35, r.top - hr.top - chh * 0.35,
+               r.right - hr.left + cw * 0.35, r.bottom - hr.top + chh * 0.35]);
+    }
+  }
+
+  function knocked(x, y) {
+    for (var i = 0; i < ko.length; i++) {
+      var k = ko[i];
+      if (x >= k[0] && x <= k[2] && y >= k[1] && y <= k[3]) return true;
+    }
+    return false;
+  }
+
+  // knockout 경계 감쇠 — 사각형 안 0, 바깥으로 KO_FADE(px)에 걸쳐 1로.
+  // 하드 사각 경계 대신 부드러운 여백을 만든다
+  var KO_FADE = 40;
+  function koFade(x, y) {
+    var f = 1;
+    for (var i = 0; i < ko.length; i++) {
+      var k = ko[i];
+      var dx = Math.max(k[0] - x, 0, x - k[2]);
+      var dy = Math.max(k[1] - y, 0, y - k[3]);
+      if (dx === 0 && dy === 0) return 0;
+      var d = Math.sqrt(dx * dx + dy * dy) / KO_FADE;
+      if (d < 1) {
+        d = d * d * (3 - 2 * d);
+        if (d < f) f = d;
+      }
+    }
+    return f;
+  }
+
+  /* ----- 테크닉: (c, r, t초) → {g, a} | null ----- */
+
+  /* ----- 장면: 우상단의 큰 몸체(태양)와 그 둘레의 궤도 행성들 -----
+     모든 몸체는 build-planet.py 가 mulmaru 잉크 램프(실측)로 구운
+     7px 셀 아트(planet-art.js). 배경 별밭·궤도 점선은 본문 16px
+     격자, 주인공들만 잘게·알파 상한 없이 찍는다 ----- */
+
+  // 별밭 — 14% 셀이 5~9초 주기로 점멸하고, 켜지는 순간 잠깐 + 로 반짝인다
+  function tDots(c, r, t) {
+    if (cellHash(c, r, 0) > 0.1) return null;
+    var p = 5 + cellHash(c, r, 1) * 4;
+    var f = (t / p + cellHash(c, r, 2)) % 1;
+    if (f > 0.55) return null;
+    if (f < 0.05) return { g: TWINKLE, a: 0.45 };
+    return { g: DOT, a: 0.2 + cellHash(c, r, 3) * 0.1 };
+  }
+
+  // 배경 셀 — 화면 경계와 knockout 을 지키고 알파 상한을 따른다
+  function put(c, r, g, a) {
+    if (c < 0 || r < 0 || c >= cols || r >= rows) return;
+    var x = c * cw + cw / 2, y = r * chh + chh / 2;
+    var f = koFade(x, y);
+    if (f <= 0.02) return;
+    if (f < 1 && cellHash(c, r, 63) > Math.pow(f, 0.7)) return;   // 경계는 디더로 흩어진다
+    ctx.globalAlpha = Math.min(a, CAP) * (0.3 + 0.7 * f);
+    ctx.fillText(g, x, y);
+  }
+
+  // 별똥별 — 드물게 하나둘, ★ 머리에 점 꼬리
+  function starOn(lane, r, t, k) {
+    var h = cellHash(lane, 97, k);
+    if (h > 0.025) return null;
+    var len = 6 + Math.floor(cellHash(lane, 131, k) * 6);
+    var gap = rows * 2 + Math.floor(cellHash(lane, 173, k) * rows * 3);
+    var total = rows + len + gap;
+    var speed = 10 + cellHash(lane, 211, k) * 8;
+    var head = Math.floor((t * speed + h * 40 * total) % total);
+    var back = head - r;
+    if (back < 0 || back >= len) return null;
+    return { back: back, len: len };
+  }
+
+  // 미리 구운 아트 셀 크기 — build-planet.py 의 CW·CH(7px mulmaru)와 동일
+  var PW = 5.83, PH = 8.75;
+
+  // 궤도 행성들 — planet-art.js 의 bodies 순서와 짝 [반지름 배율, 공전 주기, 위상]
+  var ORBS = [
+    { orb: 0.42, T: 24, ph: 1.7 },
+    { orb: 0.6,  T: 40, ph: 2.8 },
+    { orb: 0.79, T: 62, ph: 4.6 },
+    { orb: 0.98, T: 90, ph: 2.2 }
+  ];
+
+  // 구운 아트 한 장을 (cxp, cyp) 중심에 찍는다 — knockout 은 그대로 지킨다
+  function blitArt(A, cxp, cyp, fi) {
+    var fr = A.frames[fi % A.frames.length];
+    var ox = cxp - A.cols * PW / 2;
+    var oy = cyp - A.rows * PH / 2;
+    for (var rr = 0; rr < fr.length; rr++) {
+      var y = oy + rr * PH + PH / 2;
+      if (y < 0 || y > H) continue;
+      var line = fr[rr];
+      for (var cc = 0; cc < line.length; cc++) {
+        if (line[cc] === ' ') continue;
+        var x = ox + cc * PW + PW / 2;
+        if (x < 0 || x > W) continue;
+        var f = koFade(x, y);
+        if (f <= 0.02) continue;
+        if (f < 1 && cellHash(cc, rr + 977, 64) > Math.pow(f, 0.7)) continue;
+        ctx.globalAlpha = 0.8 * (0.3 + 0.7 * f);
+        ctx.fillText(line[cc], x, y);
+      }
+    }
+  }
+
+  function drawFrame(t) {
+    ctx.fillStyle = BG;
+    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = INK;
+    ctx.font = FS + 'px "Mulmaru", monospace';
+
+    var sxp = W * 0.8, syp = H * 0.3;   // 태양 — 우측 상단 살짝 아래
+    var base = Math.min(W, H);
+
+    /* 1) 별밭 + 궤도 점선 + 별똥별 (본문 16px 격자) */
+    for (var r = 0; r < rows; r++) {
+      var yy = r * chh + chh / 2 - syp;
+      for (var c = 0; c < cols; c++) {
+        // ↘ 는 c−r, ↙ 는 c+r 이 일정한 대각선을 따라 내려간다
+        var s = starOn(c - r + rows, r, t, 4) || starOn(c + r, r, t, 5);
+        if (s) {
+          if (s.back === 0) put(c, r, STAR, 0.7);
+          else put(c, r, (s.back % 2) ? BODY_A : BODY_B, 0.7 - 0.45 * (s.back / s.len));
+          continue;
+        }
+        // 궤도 — 태양 중심의 성긴 점선 원
+        var xx = c * cw + cw / 2 - sxp;
+        var d = Math.sqrt(xx * xx + yy * yy);
+        var on = false;
+        for (var i = 0; i < ORBS.length; i++) {
+          // 띠 폭은 셀 높이 기준 — 좁으면 원주가 셀 중심을 비켜 가 점선이 끊긴다
+          if (Math.abs(d - base * ORBS[i].orb) < chh * 0.55) { on = true; break; }
+        }
+        if (on) {
+          if (cellHash(c, r, 32) < 0.75) put(c, r, DOT, 0.3);
+          continue;
+        }
+        var res = tDots(c, r, t);
+        if (res) put(c, r, res.g, res.a);
+      }
+    }
+
+    /* 2) 태양 + 궤도를 도는 행성들 — 7px 셀, 알파 상한 없이 */
+    var art = window.PLANET_ART;
+    if (art && art.sun && art.bodies) {
+      ctx.font = '7px "Mulmaru", monospace';
+      // 모바일은 궤도선·별밭만 — 태양과 행성은 PC 전용
+      var mobile = W < 700;
+      if (!mobile) {
+        blitArt(art.sun.lg, sxp, syp, Math.floor(t / 1.6));
+        for (var i = 0; i < ORBS.length; i++) {
+          var B = art.bodies[i];
+          if (!B) continue;
+          var a = ORBS[i].ph + t * 6.2832 / ORBS[i].T;
+          var Rp = base * ORBS[i].orb;
+          blitArt(B, sxp + Math.cos(a) * Rp, syp + Math.sin(a) * Rp, Math.floor(t / 2));
+        }
+      }
+    }
+
+    ctx.globalAlpha = 1;
+  }
+
+  /* ----- 구동: 히어로가 보일 때만, TICK 간격으로 ----- */
+
+  var running = false, heroSeen = true, t0 = 0, lastDraw = -1e9, koTimer = null;
+
+  function frame(ts) {
+    if (!running) return;
+    requestAnimationFrame(frame);
+    if (ts - lastDraw < TICK) return;
+    lastDraw = ts;
+    if (!t0) t0 = ts;
+    drawFrame((ts - t0) / 1000);
+  }
+
+  function resume() {
+    if (REDUCE || running || !heroSeen || document.hidden) return;
+    running = true;
+    lastDraw = -1e9;
+    requestAnimationFrame(frame);
+    if (!koTimer) koTimer = setInterval(refreshKnockout, 250);
+  }
+
+  function pause() {
+    running = false;
+    if (koTimer) { clearInterval(koTimer); koTimer = null; }
+  }
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (en) {
+      heroSeen = en[0].isIntersecting;
+      if (heroSeen) resume(); else pause();
+    }).observe(hero);
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) pause();
+    else resume();
+  });
+
+  var resizeTimer = null;
+
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      layoutCanvas();
+      positionNavBlog();
+      if (REDUCE) drawFrame(14);
+    }, 150);
+  });
+
+  function positionNavBlog() {
+    // 슬로건 컨테이너는 히어로 전체를 덮으므로 첫 글자 span의 실제 위치를 쓰되,
+    // 히어로 기준 좌표로 바꿔야 스크롤 위치와 무관하게 고정된다
+    var firstCh = slogan.querySelector('.ch') || slogan.firstElementChild;
+    var cr = (firstCh || slogan).getBoundingClientRect();
+    var hr = hero.getBoundingClientRect();
+    var nbH = navBlog.getBoundingClientRect().height || 20;
+    navBlog.style.left = (cr.left - hr.left) + 'px';
+    // 슬로건과 겹쳐 보이지 않도록 뷰포트에 비례한 간격을 둔다
+    var gap = Math.max(14, Math.min(34, window.innerWidth * 0.022));
+    navBlog.style.top  = (cr.top - hr.top - nbH - gap) + 'px';
+  }
+
+  /* ----- (b) 로고 hover: 셀 단위 스크램블 (반전 비디오) ----- */
+
+  function brandScramble() {
+    if (REDUCE) return;   // 트랜지션 없이 최종 상태(원문)만
+    var chs = [].slice.call(brand.querySelectorAll('.ch'));
+    if (!chs.length) return;
+    var SCR = ['·', ':', '+', 'x', '#', '0', '1'].filter(has);
+    if (SCR.length < 4) SCR = ['+', 'x', '0', '1'];
+    var orig = chs.map(function (s) { return s.textContent; });
+    var locked = false;
+
+    // 문자가 바뀌어도 폭이 흔들리지 않게 각 셀 폭을 실측값으로 고정
+    function lock() {
+      if (locked) return;
+      locked = true;
+      for (var i = 0; i < chs.length; i++) {
+        chs[i].style.width = chs[i].getBoundingClientRect().width.toFixed(2) + 'px';
+        chs[i].style.textAlign = 'center';
+      }
+    }
+
+    var tick = 0, timer = null, stopAt = -1;
+
+    function apply() {
+      tick++;
+      if (stopAt >= 0 && tick >= stopAt) { restore(); return; }
+      // 떠날 때는 남은 비율만큼만 셀을 활성시켜 잦아들게 한다
+      var keep = stopAt < 0 ? 12 : Math.ceil((stopAt - tick) / 42 * 12);
+      for (var i = 0; i < chs.length; i++) {
+        var d = ((tick - i) % 18 + 18) % 18;   // 위상 — 열마다 한 칸씩 밀린다
+        if (d < 8 && (i % 12) < keep) {
+          chs[i].textContent = SCR[(tick * 3 + 5 * i) % SCR.length];
+          chs[i].classList.add('gx');
+        } else {
+          if (chs[i].textContent !== orig[i]) chs[i].textContent = orig[i];
+          chs[i].classList.remove('gx');
+        }
+      }
+    }
+
+    function restore() {
+      if (timer) { clearInterval(timer); timer = null; }
+      stopAt = -1;
+      for (var i = 0; i < chs.length; i++) {
+        chs[i].textContent = orig[i];
+        chs[i].classList.remove('gx');
+      }
+    }
+
+    brand.addEventListener('pointerenter', function () {
+      lock();
+      stopAt = -1;
+      if (!timer) timer = setInterval(apply, 68);
+    });
+    brand.addEventListener('pointerleave', function () {
+      if (timer) stopAt = tick + 42;
+    });
+  }
+
+  /* ----- (c) hover 반전: 8칸 채움 마크업 주입 ----- */
+
+  function applyFill(el) {
+    if (!el || el.querySelector('.fill')) return;
+    var label = document.createElement('span');
+    label.className = 'label';
+    while (el.firstChild) label.appendChild(el.firstChild);
+    el.appendChild(label);
+    var fill = document.createElement('span');
+    fill.className = 'fill';
+    fill.setAttribute('aria-hidden', 'true');
+    var D = [0, 90, 30, 160, 60, 220, 120, 280];
+    for (var i = 0; i < 8; i++) {
+      var s = document.createElement('span');
+      s.style.setProperty('--d', D[i] + 'ms');
+      fill.appendChild(s);
+    }
+    el.appendChild(fill);
+  }
+
+  function start() {
+    layoutCanvas();
+    // 히어로 텍스트는 처음부터 제자리에 — 짧은 페이드만으로 나타난다
+    slogan.classList.add('on');
+    brand.classList.add('on');
+    navBlog.classList.add('on');
+    hint.classList.add('on');
+    positionNavBlog();
+    refreshKnockout();
+    if (REDUCE) drawFrame(14);   // 정지 프레임 1장
+    else resume();
+    brandScramble();
+  }
+
+  applyFill(document.getElementById('footMail'));
+  applyFill(navBlog);   // splitChars 이후여야 .ch 가 label 안으로 들어간다
+
+  // 폰트가 늦게 오면 실측이 폴백 기준이 되므로, 준비된 뒤 다시 잰다
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function () {
+      layoutCanvas();
+      if (REDUCE) drawFrame(14);
+    });
+  }
+
+  var fontReady = document.fonts
+    ? document.fonts.load('16px Mulmaru', '여백을 담습니다·:+x#■□↗→←01')
+    : Promise.resolve();
+  var timeout = new Promise(function (res) { setTimeout(res, 2500); });
+  Promise.race([fontReady, timeout]).then(start, start);
+})();
+</script>
+</body>
+</html>
