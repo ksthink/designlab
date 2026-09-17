@@ -10,9 +10,13 @@ interface Props {
   slug?: string;
   /** 'list' = 1180px(목록), 'read' = 760px(읽기) — metaphr.dev index/app.html 과 같다 */
   width?: 'list' | 'read';
+  /** AI용 마크다운 경로를 따로 줄 때 (예: 요소 페이지 /elements/button.md) */
+  md?: string;
+  /** 내비게이션에서 현재 위치로 표시할 문서 (기본 slug) */
+  nav?: string;
 }
-const { title, description, slug, width = 'read' } = Astro.props;
-const mdPath = slug ? `/${slug}.md` : '/llms.txt';
+const { title, description, slug, width = 'read', md, nav = slug } = Astro.props;
+const mdPath = md ?? (slug ? `/${slug}.md` : '/llms.txt');
 
 const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mulmaru.woff2')}") format("woff2");font-weight:400;font-style:normal;font-display:swap}`;
 ---
@@ -63,7 +67,7 @@ const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mul
         <a class="brand" href={url('/')} aria-current={!slug ? 'page' : undefined}>metaphr/design_lab</a>
         <nav aria-label="문서">
           {pages.map((p) => (
-            <a href={url(`/${p.slug}`)} aria-current={p.slug === slug ? 'page' : undefined}>{p.title}</a>
+            <a href={url(`/${p.slug}`)} aria-current={p.slug === nav ? (p.slug === slug ? 'page' : 'location') : undefined}>{p.title}</a>
           ))}
         </nav>
       </div>
@@ -92,14 +96,14 @@ const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mul
         var els = document.querySelectorAll('.reveal');
         if (!('IntersectionObserver' in window)) {
           els.forEach(function (n) { n.classList.add('in'); });
-          return;
+        } else {
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (en) {
+              if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
+            });
+          }, { rootMargin: '0px 0px -8% 0px' });
+          els.forEach(function (n) { io.observe(n); });
         }
-        var io = new IntersectionObserver(function (entries) {
-          entries.forEach(function (en) {
-            if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-          });
-        }, { rootMargin: '0px 0px -8% 0px' });
-        els.forEach(function (n) { io.observe(n); });
 
         // 테마 전환 — 시스템 → 라이트 → 다크 순환, 저장은 되면 하고 안 되면 이번 화면만
         var LABEL = { system: '[ 시스템 ]', light: '[ 라이트 ]', dark: '[ 다크 ]' };
@@ -132,6 +136,36 @@ const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mul
             paint();
           });
         }
+
+        // 요소 데모 썸네일 — 화면 가까이(400px) 올 때만 문서를 채운다. 그전에는 빈 모눈 틀.
+        var lazyFrames = document.querySelectorAll('iframe[data-srcdoc]');
+        function fill(fr) { fr.setAttribute('srcdoc', fr.getAttribute('data-srcdoc')); fr.removeAttribute('data-srcdoc'); }
+        if (lazyFrames.length) {
+          if ('IntersectionObserver' in window) {
+            var fio = new IntersectionObserver(function (entries) {
+              entries.forEach(function (en) { if (en.isIntersecting) { fill(en.target); fio.unobserve(en.target); } });
+            }, { rootMargin: '400px 0px' });
+            lazyFrames.forEach(function (fr) { fio.observe(fr); });
+          } else {
+            lazyFrames.forEach(fill);
+          }
+        }
+
+        // 요소 데모 썸네일(iframe)도 같은 테마로 — 강제 테마 패널은 제외
+        function frameTheme(fr) {
+          try {
+            var d = fr.contentDocument && fr.contentDocument.documentElement;
+            if (!d) return;
+            var t = root.getAttribute('data-theme');
+            if (t) d.setAttribute('data-theme', t); else d.removeAttribute('data-theme');
+          } catch (e) {}
+        }
+        document.addEventListener('load', function (e) {
+          if (e.target && e.target.matches && e.target.matches('iframe[data-follow-theme]')) frameTheme(e.target);
+        }, true);
+        new MutationObserver(function () {
+          document.querySelectorAll('iframe[data-follow-theme]').forEach(frameTheme);
+        }).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
         // 복사 버튼 — [data-copy]가 가리키는 요소의 텍스트
         document.querySelectorAll('[data-copy]').forEach(function (btn) {
@@ -276,13 +310,13 @@ const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mul
     transition: opacity var(--mp-duration-hover) ease;
   }
   .top nav a:hover { opacity: 1; }
-  .top nav a[aria-current='page'] {
+  .top nav a[aria-current] {
     opacity: 1;
     border-bottom-color: var(--mp-line-strong);
   }
 
   /* 현재 위치 — 보조색 teal의 작은 면 하나 */
-  .top nav a[aria-current='page']::before {
+  .top nav a[aria-current]::before {
     content: "";
     display: inline-block;
     width: 0.5em;

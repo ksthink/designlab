@@ -1,0 +1,75 @@
+{
+  "$description": "디자인 요소 분류. 순서가 사이트·색인·llms.txt의 순서다. order는 분류 안 요소의 기본 순서(없는 요소는 이름순으로 뒤에 붙는다). 요소 원본은 src/content/elements/<category>/<id>.md.",
+  "categories": [
+    {
+      "id": "foundations",
+      "name": "기초",
+      "nameEn": "Foundations",
+      "summary": "색·글자·여백·모눈·픽셀 아이콘·모션·테마처럼 모든 요소가 기대는 바탕 규칙",
+      "order": ["color", "typography", "spacing-layout", "grid-thumbnail", "pixel-icon", "logo", "motion", "theme", "elevation", "focus-ring"]
+    },
+    {
+      "id": "actions",
+      "name": "행동",
+      "nameEn": "Actions",
+      "summary": "누르거나 골라서 무언가를 실행하는 요소: 버튼, 링크, 터미널형 텍스트 버튼, 칩",
+      "order": ["button", "icon-button", "link", "text-action", "fab", "segmented-control", "chip"]
+    },
+    {
+      "id": "navigation",
+      "name": "이동",
+      "nameEn": "Navigation",
+      "summary": "화면과 위치 사이를 오가는 요소: 헤더, 메뉴, 탭, 페이지 이동, 인디케이터",
+      "order": ["header", "menu", "tab-bar", "tabs", "back-link", "breadcrumb", "pagination", "drawer", "dropdown-menu", "context-menu", "page-indicator", "carousel-nav", "scroll-hint", "table-of-contents"]
+    },
+    {
+      "id": "inputs",
+      "name": "입력",
+      "nameEn": "Inputs",
+      "summary": "글자·선택·값을 입력받는 요소: 입력칸, 체크박스, 스위치, 선택, 슬라이더, 검증",
+      "order": ["text-field", "textarea", "search-field", "checkbox", "radio", "switch", "select", "slider", "stepper", "date-picker", "file-upload", "form-validation"]
+    },
+    {
+      "id": "content",
+      "name": "내용 표시",
+      "nameEn": "Content",
+      "summary": "정보를 담아 보여 주는 요소: 카드, 목록, 표, 배지, 구분선, 코드, 아코디언",
+      "order": ["card", "list", "table", "badge", "tag", "avatar", "image", "divider", "code-block", "stat", "accordion", "rail", "quote", "key-value", "timeline"]
+    },
+    {
+      "id": "feedback",
+      "name": "상태 알림",
+      "nameEn": "Feedback",
+      "summary": "진행·결과·오류를 알리는 요소: 상태 점, 토스트, 배너, 진행 막대, 빈 화면, 확인 단계",
+      "order": ["status-dot", "toast", "banner", "progress-bar", "loading", "skeleton", "tooltip", "empty-state", "error-state", "confirm-step"]
+    },
+    {
+      "id": "overlays",
+      "name": "겹침",
+      "nameEn": "Overlays",
+      "summary": "화면 위에 겹쳐 뜨는 요소: 모달, 바텀 시트, 팝오버, 액션 시트",
+      "order": ["modal", "bottom-sheet", "popover", "action-sheet"]
+    },
+    {
+      "id": "effects",
+      "name": "이펙트",
+      "nameEn": "Effects",
+      "summary": "요소에 붙이는 움직임과 반응: 반전 호버, 계단 채움, 숨쉬기, 커서, 등장, 움직임 줄이기",
+      "order": ["invert-hover", "fx-fill", "float", "caret", "reveal", "glyph-field", "scramble", "press", "reduced-motion"]
+    },
+    {
+      "id": "patterns",
+      "name": "화면 패턴",
+      "nameEn": "Patterns",
+      "summary": "요소를 조합한 화면 단위: 히어로, 분류 제목, 푸터, 목록형·읽기형 페이지, 앱 화면",
+      "order": ["hero", "section-head", "footer", "page-list", "page-read", "settings", "onboarding", "splash", "app-icon", "widget", "notification", "theme-switch", "dark-images"]
+    },
+    {
+      "id": "writing",
+      "name": "문구",
+      "nameEn": "Writing",
+      "summary": "화면에 쓰는 말: 짧은 말투, 터미널 어휘, 숫자·단위 표기",
+      "order": ["microcopy", "terminal-vocabulary", "labels-numbers"]
+    }
+  ]
+}

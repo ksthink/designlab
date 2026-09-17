@@ -6,10 +6,14 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "shots": "node scripts/shoot-libraries.mjs"
   },
   "dependencies": {
     "astro": "^5.18.2",
     "marked": "^18.0.13"
+  },
+  "devDependencies": {
+    "playwright": "^1.63.0"
   }
 }

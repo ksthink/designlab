@@ -18,9 +18,8 @@ const total = sections.reduce((n, s) => n + s.items.length, 0);
 
 <Base title="참고 라이브러리" description="metaphr 사이트·앱을 만들 때 고르는 라이브러리 목록 — 사용 중·권장·검토 중·쓰지 않음" slug="libraries" width="list">
   <div class="intro">
-    <p class="kicker">libraries · {total}개</p>
+    <p class="kicker">libraries · {total}</p>
     <h1>참고 라이브러리</h1>
-    <p class="tagline">새 의존성을 넣기 전에 먼저 여기를 봅니다. 없는 것은 쓰기 전에 묻습니다.</p>
     <nav class="jump" aria-label="분류로 이동">
       {sections.map((s) => <a href={`#${s.id}`}>{s.title} <span>{s.items.length}</span></a>)}
     </nav>
@@ -42,39 +41,34 @@ const total = sections.reduce((n, s) => n + s.items.length, 0);
         <p class="empty">아직 담아 둔 라이브러리가 없습니다.</p>
       ) : (
         <ul class="libs" role="list">
-              {byCategory(s.items).flatMap(([, items]) => items).map((l) => (
-                <li class:list={['lib', l.status]}>
-                  <p class="kicker lib-cat">{l.category}</p>
-                  <h3>
-                    <a href={l.url} rel="noopener">{l.name}</a>
-                  </h3>
-                  <p class="why">{l.why}</p>
-                  <div class="meta">
-                    <span class:list={['badge', 'st', l.status]}>{statusLabel(l.status)}</span>
-                    {(l.platforms ?? []).map((p) => <span class="badge">{PLATFORM[p] ?? p}</span>)}
-                    {l.license && <span class="badge">{l.license}</span>}
-                  </div>
-                  {l.howToUse && (
-                    <details>
-                      <summary>쓰는 법</summary>
-                      <p>{l.howToUse}</p>
-                    </details>
-                  )}
-                  {l.caveats && (
-                    <details>
-                      <summary>주의</summary>
-                      <p>{l.caveats}</p>
-                    </details>
-                  )}
-                  {(l.repo || l.usedIn?.length) && (
-                    <p class="foot-meta">
-                      {l.repo && <a href={l.repo} rel="noopener">저장소</a>}
-                      {l.usedIn?.length ? <span>사용처 {l.usedIn.join(', ')}</span> : null}
-                      {l.addedAt && <span>{l.addedAt}</span>}
-                    </p>
-                  )}
-                </li>
-              ))}
+          {byCategory(s.items).flatMap(([, items]) => items).map((l) => (
+            <li class:list={['lib', l.status]}>
+              <a class="shot-link" href={l.url} rel="noopener" tabindex="-1" aria-hidden="true">
+                {l.thumbnail ? (
+                  <img class="shot" src={url(`/v1/${l.thumbnail}`)} alt="" width="960" height="600" loading="lazy" decoding="async" />
+                ) : (
+                  <span class="shot thumb">{[...l.name][0]}</span>
+                )}
+              </a>
+              <div class="lib-head">
+                <h3><a href={l.url} rel="noopener">{l.name}</a></h3>
+                <span class:list={['badge', 'st', l.status]}>{statusLabel(l.status)}</span>
+              </div>
+              <details>
+                <summary>이유 · 쓰는 법</summary>
+                <p>{l.why}</p>
+                {l.howToUse && <p><span class="label">쓰는 법</span> {l.howToUse}</p>}
+                {l.caveats && <p><span class="label">주의</span> {l.caveats}</p>}
+                <p class="foot-meta">
+                  <span>{l.category}</span>
+                  {(l.platforms ?? []).map((p) => <span>{PLATFORM[p] ?? p}</span>)}
+                  {l.license && <span>{l.license}</span>}
+                  {l.repo && <a href={l.repo} rel="noopener">저장소</a>}
+                  {l.usedIn?.length ? <span>사용처 {l.usedIn.join(', ')}</span> : null}
+                </p>
+              </details>
+            </li>
+          ))}
         </ul>
       )}
 
@@ -128,41 +122,65 @@ const total = sections.reduce((n, s) => n + s.items.length, 0);
     opacity: var(--mp-opacity-meta);
   }
 
-  .lib-cat { margin-bottom: 0.6em; }
-
   .libs {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
     gap: clamp(0.9rem, 2.2vw, 1.5rem);
   }
 
   .lib {
     display: flex;
     flex-direction: column;
+    min-width: 0;
     border: var(--mp-border) solid var(--mp-line);
-    padding: clamp(1.2rem, 3vw, 1.7rem);
     transition: border-color 0.3s ease;
   }
   .lib:hover { border-color: var(--mp-line-strong); }
 
+  /* 메인 화면 썸네일 — 16:10, 1px 선, 원래 색 그대로(바깥 사이트의 색은 이 틀 안에서만) */
+  .shot-link { display: block; border-bottom: var(--mp-border) solid var(--mp-line); }
+  .shot {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    object-position: top;
+  }
+  .shot.thumb {
+    display: flex;
+    font-size: var(--mp-size-title);
+    letter-spacing: var(--mp-tracking-title);
+  }
+  .avoid .shot { opacity: var(--mp-opacity-secondary); }
+
+  .lib-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8em;
+    padding: 0.85em 1em 0.2em;
+  }
+
   .lib h3 {
-    margin: 0 0 0.55em;
-    font-size: var(--mp-size-subheading);
-    letter-spacing: var(--mp-tracking-subheading);
+    margin: 0;
+    min-width: 0;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    overflow-wrap: anywhere;
   }
   .lib h3 a { text-decoration: none; }
   .lib h3 a:hover { background: var(--mp-ink); color: var(--mp-bg); }
   .lib.avoid h3 { text-decoration: line-through; text-decoration-thickness: 1px; opacity: var(--mp-opacity-secondary); }
 
-  .why {
-    flex: 1;
-    margin: 0 0 1.2em;
-    font-size: clamp(0.88rem, 2.4vw, 1.05rem);
-    line-height: var(--mp-leading-card);
-    opacity: var(--mp-opacity-secondary);
+  .lib-head .badge {
+    flex: none;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
   }
 
   .st.candidate,
@@ -170,11 +188,9 @@ const total = sections.reduce((n, s) => n + s.items.length, 0);
   .st.avoid { text-decoration: line-through; }
 
   details {
-    border-top: var(--mp-border) solid var(--mp-line);
-    margin-top: 0.9em;
-    padding-top: 0.7em;
+    margin: 0 1em 0.9em;
+    padding-top: 0.5em;
   }
-  details + details { margin-top: 0.7em; }
 
   summary {
     list-style: none;
@@ -196,11 +212,13 @@ const total = sections.reduce((n, s) => n + s.items.length, 0);
     opacity: var(--mp-opacity-body);
   }
 
+  .label { opacity: var(--mp-opacity-meta); margin-right: 0.3em; }
+
   .foot-meta {
     display: flex;
     flex-wrap: wrap;
     gap: 0.3em 1em;
-    margin: 1em 0 0;
+    margin: 0.9em 0 0;
     font-size: var(--mp-size-meta);
     letter-spacing: var(--mp-tracking-meta);
     opacity: var(--mp-opacity-meta);

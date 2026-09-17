@@ -1,7 +1,9 @@
 ---
 import Base from '../layouts/Base.astro';
 import PixelIcon from '../components/PixelIcon.astro';
-import { aiPrompt, endpoints, pages, PILLARS, STATUS, url } from '../lib/docs';
+import DemoFrame from '../components/DemoFrame.astro';
+import { abs, PILLARS, url, VERSION } from '../lib/docs';
+import { elementDemo, elements, elementUrl, getElement } from '../lib/elements';
 
 // 서버에서 정해 두는 결정적 난수 — 새로고침마다 레이아웃이 튀지 않게
 const rand = (i: number, k: number) => {
@@ -32,19 +34,15 @@ const field = Array.from({ length: 64 }, (_, i) => {
   };
 });
 
-const marks: Record<string, string> = {
-  philosophy: '여',
-  tokens: '■',
-  fonts: '가a',
-  logos: 'M.',
-  ai: '>_',
-};
+// 홈에서 먼저 보여 줄 대표 요소 — 있는 것만
+const PICKS = ['button', 'menu', 'switch', 'fx-fill', 'status-dot', 'modal', 'tab-bar', 'toast', 'text-field', 'segmented-control', 'progress-bar', 'badge'];
+const picks = PICKS.map((id) => getElement(id)).filter((e) => !!e);
 
-const resources = [
-  { path: '/llms.txt', desc: 'AI가 가장 먼저 읽는 색인' },
-  { path: '/llms-full.txt', desc: '모든 문서를 한 파일로' },
-  ...endpoints,
-];
+// 붙여넣는 짧은 지시문 — 전체 규칙은 /ai 와 요소 문서에 있다
+const prompt = `이 프로젝트는 metaphr 디자인 시스템(${VERSION})을 따른다.
+먼저 ${abs('/llms.txt')} 를 읽고, 요청에 맞는 요소 문서(/elements/<id>.md)만 골라 읽어 그 규칙대로 적용하라.
+전역 CSS 맨 위: @import url("${abs(`/${VERSION}/tokens.css`)}"); @import url("${abs(`/${VERSION}/fonts.css`)}");
+규칙이 요구사항과 충돌하면 임의로 정하지 말고 나에게 물어라.`;
 ---
 
 <Base
@@ -62,20 +60,37 @@ const resources = [
     <p class="sub" aria-label="metaphr/design_lab">
       {bob('design_lab', 7).map((ch) => <span class="ch" style={ch.style} aria-hidden="true">{ch.c}</span>)}
     </p>
-    <a class="scroll-hint" href="#lead" aria-label="아래로 스크롤">
+    <a class="scroll-hint" href="#elements" aria-label="아래로 스크롤">
       <span class="hint-mark" style={`--hint:url("${url('/v1/logos/down.svg')}")`}></span>
     </a>
   </section>
 
-  <section id="lead" class="lead reveal">
-    <p>design_lab은 metaphr.dev의 모습을 규칙으로 옮겨 둔 곳입니다. 미니멀리즘, 픽셀아트, 레트로 컬러. 더하지 않고 덜어낸 결정들을 사람과 AI가 같은 문장으로 읽습니다.</p>
-    <p class="caret">새 화면을 만들 때 이 규칙에 없는 것을 더하고 싶어진다면, 먼저 무엇을 뺄 수 있는지 묻습니다.</p>
+  <section id="elements" class="section elements reveal" aria-labelledby="el-title">
+    <div class="section-head">
+      <h2 id="el-title">요소</h2>
+      <span>{elements.length}</span>
+    </div>
+    <ul class="picks" role="list">
+      {picks.map((e) => (
+        <li>
+          <a class="pick" href={elementUrl(e!.id)}>
+            <div class="shot">
+              <DemoFrame html={elementDemo(e!).html} css={elementDemo(e!).css} title={`${e!.name} 예시`} />
+            </div>
+            <p>{e!.name}</p>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <div class="actions more">
+      <a class="btn" href={url('/elements')}>요소 전체 보기 &gt;</a>
+    </div>
   </section>
 
   <section class="section reveal" aria-labelledby="pillars-title">
     <div class="section-head">
-      <h2 id="pillars-title" class="float" style={floatStyle(2, 21, 2.2)}>세 기둥</h2>
-      <span class="float" style={floatStyle(3, 21, 1.6)}>모든 규칙은 이 셋 중 하나에 속합니다</span>
+      <h2 id="pillars-title">세 기둥</h2>
+      <span>minimalism · pixel art · retro color</span>
     </div>
     <ul class="cards" role="list">
       {PILLARS.map((p, i) => (
@@ -89,34 +104,6 @@ const resources = [
               )}
             </div>
             <h3>{p.title}</h3>
-            <p>{p.summary}</p>
-            <div class="meta">
-              <span class="badge">{p.en}</span>
-              <span class="badge">규칙 {p.rules.length}</span>
-            </div>
-          </a>
-        </li>
-      ))}
-    </ul>
-  </section>
-
-  <section class="section reveal" aria-labelledby="docs-title">
-    <div class="section-head">
-      <h2 id="docs-title" class="float" style={floatStyle(0, 21, 2.6)}>문서</h2>
-      <span class="float" style={floatStyle(1, 21, 1.8)}>{STATUS} · 함께 다듬는 중</span>
-    </div>
-    <ul class="cards" role="list">
-      {pages.map((p, i) => (
-        <li class="card-float float" style={floatStyle(i, 31)}>
-          <a class="card" href={url(`/${p.slug}`)}>
-            <div class="thumb" aria-hidden="true">{marks[p.slug] ?? p.title.charAt(0)}</div>
-            <h3>{p.title}</h3>
-            <p>{p.summary}</p>
-            <div class="meta">
-              <span class="badge">/{p.slug}</span>
-              <span class="badge">.md</span>
-              <span class="badge soon">초안</span>
-            </div>
           </a>
         </li>
       ))}
@@ -126,28 +113,12 @@ const resources = [
   <section class="section reveal read-col" aria-labelledby="ai-title">
     <div class="section-head">
       <h2 id="ai-title">AI 도구에서 시작하기</h2>
-      <span>Claude Code, Cursor 같은 도구에 붙여넣기</span>
-    </div>
-    <pre id="prompt">{aiPrompt()}</pre>
+          </div>
+    <pre id="prompt">{prompt}</pre>
     <div class="actions">
       <button type="button" class="btn" data-copy="prompt">지시문 복사</button>
       <a class="btn" href={url('/ai')}>AI 가이드 &gt;</a>
     </div>
-  </section>
-
-  <section class="section reveal read-col" aria-labelledby="res-title">
-    <div class="section-head">
-      <h2 id="res-title">바로 쓰는 자원</h2>
-      <span>주소는 버전(v1)이 바뀌기 전까지 그대로</span>
-    </div>
-    <ul class="res" role="list">
-      {resources.map((r) => (
-        <li>
-          <a href={url(r.path)}>{r.path}</a>
-          <span>{r.desc}</span>
-        </li>
-      ))}
-    </ul>
   </section>
 </Base>
 
@@ -257,22 +228,7 @@ const resources = [
     .sub { padding-top: calc(clamp(1.68rem, 7.2vw, 2.34rem) * 0.85); }
   }
 
-  /* ---------- 리드 ---------- */
-
-  .lead {
-    padding-top: var(--mp-section-lg);
-    padding-bottom: clamp(2rem, 6vh, 4rem);
-  }
-
-  .lead p {
-    margin: 0 0 1.1em;
-    max-width: var(--mp-width-para);
-    font-size: var(--mp-size-lead);
-    line-height: var(--mp-leading-body);
-    letter-spacing: var(--mp-tracking-lead);
-    opacity: var(--mp-opacity-body);
-  }
-  .lead p:last-child { margin-bottom: 0; }
+  .elements { padding-top: var(--mp-section-lg); scroll-margin-top: 1rem; }
 
   /* ---------- 카드 — metaphr.dev 앱 카드 ---------- */
 
@@ -313,7 +269,7 @@ const resources = [
   }
 
   .card h3 {
-    margin: 0 0 0.55em;
+    margin: 0;
     font-size: var(--mp-size-subheading);
     letter-spacing: var(--mp-tracking-subheading);
   }
@@ -345,37 +301,41 @@ const resources = [
   .read-col > * { max-width: var(--mp-width-read); }
   .read-col pre { margin-bottom: 1.2em; }
 
-  .res {
+  /* ---------- 요소 미리보기 — 썸네일 중심 ---------- */
+
+  .picks {
     list-style: none;
     margin: 0;
     padding: 0;
-    border-top: var(--mp-border) solid var(--mp-line);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(250px, 100%), 1fr));
+    gap: clamp(0.9rem, 2.2vw, 1.5rem);
   }
+  .picks li { display: flex; min-width: 0; }
 
-  .res li {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.2em 1.4em;
-    padding: 0.95em 0;
+  .pick {
+    flex: 1;
+    min-width: 0;
+    border: var(--mp-border) solid var(--mp-line);
+    text-decoration: none;
+    transition: border-color var(--mp-duration-hover) ease;
+  }
+  .pick:hover,
+  .pick:focus-visible { border-color: var(--mp-line-strong); }
+
+  .pick .shot {
+    aspect-ratio: 4 / 3;
     border-bottom: var(--mp-border) solid var(--mp-line);
+    background: var(--mp-grid-bg);
+    overflow: hidden;
   }
 
-  .res a {
-    flex: 0 0 13em;
+  .pick p {
+    margin: 0;
+    padding: 0.8em 1em;
     font-size: var(--mp-size-small);
     letter-spacing: var(--mp-tracking-small);
-    text-decoration: none;
-    opacity: var(--mp-opacity-link);
-    overflow-wrap: anywhere;
   }
-  .res a:hover { opacity: 1; }
-  .res a::after { content: " >"; }
 
-  .res span {
-    flex: 1 1 16em;
-    font-size: clamp(0.82rem, 2vw, 0.95rem);
-    line-height: var(--mp-leading-card);
-    opacity: var(--mp-opacity-secondary);
-  }
+  .more { margin-top: clamp(1.2rem, 3vh, 2rem); justify-content: center; }
 </style>

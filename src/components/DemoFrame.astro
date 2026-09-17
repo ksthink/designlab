@@ -1,0 +1,88 @@
+---
+// 요소 데모 한 장 — iframe srcdoc 안에서 렌더링한다.
+// 요소 ~95개의 CSS가 서로(그리고 이 사이트의 CSS와) 부딪히지 않게 문서를 따로 둔다.
+// - thumb: 갤러리 썸네일. 모눈 배경, 가운데 정렬, 틀에 맞게 축소, 클릭·포커스 불가(inert).
+//          테마는 부모 페이지의 data-theme 을 따른다(srcdoc 머리 스크립트 + Base 의 전환 스크립트).
+// - panel: 요소 페이지의 큰 데모. theme 으로 라이트/다크를 강제하고, 높이는 내용에 맞춘다.
+//          js 는 ```js demo 로 표시한 블록만 받는다(코드 섹션의 조각은 실행하지 않는다). 오류는 삼킨다.
+// 데모 안의 orange(--mp-accent)는 견본(specimen)이라 '화면당 강조 하나' 규칙의 예외다 — 토큰 페이지의 색 견본과 같다.
+import { OFFICIAL_URL, url } from '../lib/docs';
+
+interface Props {
+  html: string;
+  css?: string;
+  js?: string;
+  mode?: 'thumb' | 'panel';
+  theme?: 'light' | 'dark';
+  title: string;
+  class?: string;
+}
+const props = Astro.props;
+const { mode = 'thumb', theme, title, class: cls } = props;
+// 문서의 자원 주소 — 공식 절대 주소(https://design.metaphr.dev/v1/...)와 루트 경로(/v1/...)를
+// 지금 보고 있는 사이트의 base 경로로 바꾼다 (BASE_PATH 배포·로컬 미리보기에서도 보이게)
+const local = (s = '') =>
+  s
+    .split(`${OFFICIAL_URL}/`)
+    .join('/')
+    .replace(/(["'(=]\s*)\/v1\//g, `$1${url('/v1/')}`);
+const html = local(props.html);
+const css = local(props.css);
+const js = local(props.js);
+
+const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mulmaru.woff2')}") format("woff2");font-weight:400;font-style:normal;font-display:block}`;
+
+const base = `*,*::before,*::after{box-sizing:border-box}
+html{color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){color-scheme:dark}}
+:root[data-theme=dark]{color-scheme:dark}
+html,body{margin:0;height:100%}
+body{background:var(--mp-bg);color:var(--mp-ink);font-family:var(--mp-font);font-weight:400;-webkit-text-size-adjust:100%}
+h1,h2,h3,h4,strong,b,th{font-weight:400}
+a{color:inherit}
+img{max-width:100%}
+code,pre,kbd{font-family:var(--mp-font)}
+:focus-visible{outline:var(--mp-border) solid var(--mp-ink);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}`;
+
+const thumbCss = `body{overflow:hidden;background-color:var(--mp-bg);background-image:linear-gradient(var(--mp-grid-bg),var(--mp-grid-bg)),linear-gradient(var(--mp-grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--mp-grid-line) 1px,transparent 1px);background-size:auto,var(--mp-grid-cell-card) var(--mp-grid-cell-card),var(--mp-grid-cell-card) var(--mp-grid-cell-card)}
+.dl-fit{position:absolute;left:0;top:0;width:480px;transform-origin:0 0;visibility:hidden}
+.dl-fit.on{visibility:visible}`;
+
+const panelCss = `html,body{height:auto}
+body{overflow-x:hidden;background-image:linear-gradient(var(--mp-grid-bg),var(--mp-grid-bg)),linear-gradient(var(--mp-grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--mp-grid-line) 1px,transparent 1px);background-size:auto,var(--mp-grid-cell-detail) var(--mp-grid-cell-detail),var(--mp-grid-cell-detail) var(--mp-grid-cell-detail)}
+.dl-fit{display:flex;flex-direction:column;justify-content:center;min-height:clamp(180px,60vw,280px);padding:clamp(1.25rem,4vw,2.5rem)}`;
+
+// 부모 테마를 첫 페인트 전에 따른다 (thumb 만)
+const followTheme = `try{var t=parent.document.documentElement.getAttribute('data-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}`;
+
+// thumb: 틀 폭의 86%(최소 280px) 문서로 배치한 뒤, 실제로 그려진 상자(잎 요소, 글자·면·선이 있는 상자)들의 합을 재서
+//        틀 가운데(여백 14%)에 오도록 옮기고 필요하면 축소한다. 확대는 하지 않는다.
+const fitThumb = `(function(){var f=document.querySelector('.dl-fit');function fit(){f.style.width=Math.max(Math.round(innerWidth*.86),280)+'px';f.style.transform='none';var o=f.getBoundingClientRect(),L=1/0,T=1/0,R=-1/0,B=-1/0;function add(r){if(r.width<1&&r.height<1)return;L=Math.min(L,r.left);T=Math.min(T,r.top);R=Math.max(R,r.right);B=Math.max(B,r.bottom)}f.querySelectorAll('*').forEach(function(e){if(e.children.length||e.firstChild&&e.firstChild.nodeType===3){var c=getComputedStyle(e);if(c.backgroundColor==='rgba(0, 0, 0, 0)'&&c.backgroundImage==='none'&&!parseFloat(c.borderTopWidth)&&!parseFloat(c.borderLeftWidth)&&!parseFloat(c.borderBottomWidth))return}add(e.getBoundingClientRect())});var w=document.createTreeWalker(f,4),n,g=document.createRange();while(n=w.nextNode()){if(!n.nodeValue.trim())continue;g.selectNodeContents(n);add(g.getBoundingClientRect())}if(L===1/0){L=o.left;T=o.top;R=o.right;B=o.bottom}var W=Math.max(R-L,1),H=Math.max(B-T,1),s=Math.min(1,innerWidth*.86/W,innerHeight*.86/H),x=innerWidth/2-s*((L+R)/2-o.left),y=innerHeight/2-s*((T+B)/2-o.top);f.style.transform='translate('+x+'px,'+y+'px) scale('+s+')';f.classList.add('on')}fit();if(document.fonts)document.fonts.ready.then(fit);addEventListener('resize',fit)})();`;
+
+// panel: iframe 높이를 내용에 맞춘다
+const fitPanel = `(function(){var f=document.querySelector('.dl-fit');function fit(){try{var fr=frameElement;if(fr)fr.style.height=f.offsetHeight+'px'}catch(e){}}fit();if(document.fonts)document.fonts.ready.then(fit);if(window.ResizeObserver)new ResizeObserver(fit).observe(f)})();`;
+
+const esc = (s: string) => s.replace(/<\/script/gi, '<\\/script').replace(/<\/style/gi, '<\\/style');
+
+const srcdoc = `<!doctype html><html lang="ko"${theme ? ` data-theme="${theme}"` : ''}><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${mode === 'thumb' ? `<script>${followTheme}</script>` : ''}<link rel="stylesheet" href="${url('/v1/tokens.css')}"><style>${fontFace}\n${base}\n${mode === 'thumb' ? thumbCss : panelCss}\n${esc(css)}</style></head><body><div class="dl-fit">${html}</div><script>${mode === 'thumb' ? fitThumb : fitPanel}</script>${mode === 'panel' && js.trim() ? `<script>(function(){try{\n${esc(js)}\n}catch(e){}})();</script>` : ''}</body></html>`;
+---
+
+{
+  mode === 'thumb' ? (
+    <>
+      {/* 가까워질 때 Base 의 스크립트가 data-srcdoc → srcdoc 으로 옮긴다. 스크립트가 없으면 noscript 쪽이 바로 그린다. */}
+      <iframe class:list={['demo-frame', 'thumb-frame', 'js-only', cls]} data-srcdoc={srcdoc} title={title} tabindex="-1" aria-hidden="true" inert data-follow-theme />
+      <noscript><iframe class:list={['demo-frame', 'thumb-frame', cls]} srcdoc={srcdoc} loading="lazy" title={title} tabindex="-1" aria-hidden="true" inert /></noscript>
+    </>
+  ) : (
+    <iframe class:list={['demo-frame', 'panel-frame', cls]} srcdoc={srcdoc} loading="lazy" title={title} data-forced-theme={theme} />
+  )
+}
+
+<style is:global>
+  .demo-frame { display: block; width: 100%; border: 0; background: transparent; }
+  .thumb-frame { height: 100%; pointer-events: none; }
+  html:not(.js) .js-only { display: none; }
+  .panel-frame { height: 280px; }
+</style>

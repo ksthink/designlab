@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import apps from '../data/libraries/apps.json';
 import schema from '../data/libraries/schema.json';
 import sites from '../data/libraries/sites.json';
@@ -21,6 +22,8 @@ export type Library = {
   caveats?: string;
   usedIn?: string[];
   addedAt?: string;
+  /** 메인 화면 썸네일(/v1/ 기준 상대 경로). `npm run shots`로 찍은 파일이 있을 때만 채워진다. 데이터 파일에 직접 쓰지 않는다. */
+  thumbnail?: string;
 };
 
 /** 우선순위 순서. 라벨은 사람용 한국어. */
@@ -72,7 +75,10 @@ function load(file: string, data: S, kind: LibraryKind): Library[] {
   ids.filter((id: string, i: number) => ids.indexOf(id) !== i).forEach((id: string) => errors.push(`${file}: id '${id}' 중복`));
   if (errors.length) throw new Error(`참고 라이브러리 데이터 검증 실패\n- ${errors.join('\n- ')}`);
   const rank = (s: LibraryStatus) => LIBRARY_STATUS.findIndex((x) => x.id === s);
-  return [...(data.items as Library[])].sort((a, b) => rank(a.status) - rank(b.status));
+  const shot = (id: string) => `libraries/shots/${kind}-${id}.webp`;
+  return [...(data.items as Library[])]
+    .map((l) => (existsSync(`public/v1/${shot(l.id)}`) ? { ...l, thumbnail: shot(l.id) } : l))
+    .sort((a, b) => rank(a.status) - rank(b.status));
 }
 
 export const libraries: { sites: Library[]; apps: Library[] } = {

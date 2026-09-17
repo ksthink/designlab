@@ -1,0 +1,251 @@
+---
+import Base from '../../layouts/Base.astro';
+import DemoFrame from '../../components/DemoFrame.astro';
+import { url } from '../../lib/docs';
+import {
+  ELEMENT_STATUS,
+  elementDemo,
+  elementSectionsHtml,
+  elementMarkdownUrl,
+  elements,
+  elementUrl,
+  getElement,
+  getElementCategory,
+  type DesignElement,
+} from '../../lib/elements';
+
+export function getStaticPaths() {
+  return elements.map((el) => ({ params: { id: el.id } }));
+}
+
+const { id } = Astro.params;
+const el = getElement(id!) as DesignElement;
+const cat = getElementCategory(el.category)!;
+const demo = elementDemo(el);
+// 패널에서 실행하는 JS는 ```js demo 로 표시한 블록만 — 코드 섹션의 조각은 보여 주기만 한다
+const demoJs = elementSectionsHtml(el)
+  .flatMap((s) => s.code)
+  .filter((c) => (c.lang === 'js' || c.lang === 'javascript') && /\bdemo\b/.test(c.info))
+  .map((c) => c.code)
+  .join('\n\n');
+const PLATFORM: Record<string, string> = { web: 'Web', ios: 'iOS', android: 'Android' };
+const statusLabel = ELEMENT_STATUS.find((s) => s.id === el.status)?.label ?? el.status;
+
+const codes = [
+  { id: 'code-css', label: 'CSS', code: demo.css },
+  ...(demo.js ? [{ id: 'code-js', label: 'JS', code: demo.js }] : []),
+  { id: 'code-html', label: 'HTML 예시', code: demo.html },
+].filter((c) => c.code.trim());
+
+const link = (ids: string[]) => ids.map((i) => getElement(i)).filter((e): e is DesignElement => !!e);
+const effects = link(el.effects);
+const related = link(el.related);
+
+const siblings = elements.filter((e) => e.category === el.category);
+const at = siblings.findIndex((e) => e.id === el.id);
+const prev = siblings[at - 1];
+const next = siblings[at + 1];
+const mdPath = `/elements/${el.id}.md`;
+---
+
+<Base title={`${el.name} · 요소`} description={el.summary} slug={`elements/${el.id}`} nav="elements" md={mdPath} width="list">
+  <nav class="crumb" aria-label="위치">
+    <a href={url('/elements')}>&lt; 요소</a>
+    <span aria-hidden="true">/</span>
+    <a href={`${url('/elements')}#${cat.id}`}>{cat.name}</a>
+  </nav>
+
+  <header class="head">
+    <p class="kicker">{cat.nameEn.toLowerCase()} · {el.id}</p>
+    <h1>{el.name} <span class="en">{el.nameEn}</span></h1>
+    <p class="meta-line">
+      <span class:list={['badge', el.status === 'proposed' && 'soon']}>{statusLabel}</span>
+      {el.platforms.map((p) => <span class="badge">{PLATFORM[p] ?? p}</span>)}
+    </p>
+    <p class="ai-doc">AI용 문서: <a href={elementMarkdownUrl(el.id)}>{mdPath}</a></p>
+  </header>
+
+  <section class="demos" aria-label="예시">
+    <figure class="panel">
+      <figcaption>라이트</figcaption>
+      <DemoFrame mode="panel" theme="light" html={demo.html} css={demo.css} js={demoJs} title={`${el.name} 예시 — 라이트`} />
+    </figure>
+    <figure class="panel">
+      <figcaption>다크</figcaption>
+      <DemoFrame mode="panel" theme="dark" html={demo.html} css={demo.css} js={demoJs} title={`${el.name} 예시 — 다크`} />
+    </figure>
+  </section>
+
+  {(effects.length > 0 || related.length > 0) && (
+    <div class="links">
+      {effects.length > 0 && (
+        <div class="chips-group">
+          <p class="kicker">이펙트</p>
+          <ul class="chips" role="list">
+            {effects.map((e) => <li><a href={elementUrl(e.id)}>{e.name}</a></li>)}
+          </ul>
+        </div>
+      )}
+      {related.length > 0 && (
+        <div class="chips-group">
+          <p class="kicker">함께 보기</p>
+          <ul class="chips" role="list">
+            {related.map((e) => <li><a href={elementUrl(e.id)}>{e.name}</a></li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  )}
+
+  <section class="codes" aria-label="코드">
+    {codes.map((c) => (
+      <details class="code">
+        <summary>{c.label}</summary>
+        <pre id={c.id}>{c.code}</pre>
+        <button type="button" class="btn copy" data-copy={c.id}>복사</button>
+      </details>
+    ))}
+  </section>
+
+  <nav class="pager" aria-label={`${cat.name} 안에서 이동`}>
+    {prev ? <a class="prev" href={elementUrl(prev.id)}><span>이전</span>&lt; {prev.name}</a> : <span />}
+    {next ? <a class="next" href={elementUrl(next.id)}><span>다음</span>{next.name} &gt;</a> : <span />}
+  </nav>
+</Base>
+
+<style>
+  .crumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em;
+    margin-bottom: clamp(1.2rem, 3vh, 1.8rem);
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+  }
+  .crumb a { text-decoration: none; opacity: var(--mp-opacity-link); }
+  .crumb a:hover { opacity: 1; }
+  .crumb span { opacity: var(--mp-opacity-muted); }
+
+  .head h1 { margin-bottom: 0.35em; }
+  .head h1 .en {
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+
+  .meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em;
+    margin: 0;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+  }
+  .meta-line .badge { opacity: var(--mp-opacity-meta); }
+  .ai-doc {
+    margin: 0.9em 0 0;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    opacity: var(--mp-opacity-secondary);
+    overflow-wrap: anywhere;
+  }
+  .ai-doc a { text-decoration: none; border-bottom: var(--mp-border) solid var(--mp-line-strong); }
+  .ai-doc a:hover { background: var(--mp-ink); color: var(--mp-bg); }
+
+  /* ---------- 큰 데모: 라이트·다크 나란히 ---------- */
+
+  .demos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+    gap: clamp(0.9rem, 2.2vw, 1.5rem);
+    margin-top: clamp(1.6rem, 5vh, 2.6rem);
+  }
+
+  .panel {
+    margin: 0;
+    min-width: 0;
+    border: var(--mp-border) solid var(--mp-line);
+  }
+  .panel figcaption {
+    padding: 0.5em 0.9em;
+    border-bottom: var(--mp-border) solid var(--mp-line);
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+
+  /* ---------- 연결 칩 ---------- */
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2em clamp(2rem, 5vw, 4rem);
+    margin-top: clamp(1.8rem, 5vh, 2.8rem);
+  }
+  .chips-group .kicker { margin-bottom: 0.6em; }
+  .chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em;
+  }
+  .chips a {
+    display: inline-block;
+    padding: 0.35em 0.8em;
+    border: var(--mp-border) solid var(--mp-line-button);
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    text-decoration: none;
+    transition: background var(--mp-duration-hover) ease, color var(--mp-duration-hover) ease;
+  }
+  .chips a:hover,
+  .chips a:focus-visible { background: var(--mp-ink); color: var(--mp-bg); }
+
+  /* ---------- 접힌 코드 ---------- */
+
+  .codes { margin-top: clamp(1.8rem, 5vh, 2.8rem); }
+  .code {
+    border-top: var(--mp-border) solid var(--mp-line);
+    padding: 0.8em 0;
+  }
+  .code:last-child { border-bottom: var(--mp-border) solid var(--mp-line); }
+  .code summary {
+    list-style: none;
+    cursor: pointer;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    opacity: var(--mp-opacity-link);
+  }
+  .code summary::-webkit-details-marker { display: none; }
+  .code summary::before { content: "+"; display: inline-block; width: 1.2em; }
+  .code[open] summary::before { content: "-"; }
+  .code summary:hover { opacity: 1; }
+  .code pre { margin: 0.8em 0; }
+  .copy { padding: 0.5em 1.1em; }
+
+  /* ---------- 이전·다음 ---------- */
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 1em;
+    margin-top: var(--mp-section);
+    padding-top: 1.2em;
+    border-top: var(--mp-border) solid var(--mp-line);
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+  }
+  .pager a { text-decoration: none; opacity: var(--mp-opacity-link); }
+  .pager a:hover { opacity: 1; }
+  .pager .next { text-align: right; margin-left: auto; }
+  .pager a span {
+    display: block;
+    margin-bottom: 0.3em;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+</style>

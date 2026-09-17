@@ -3,11 +3,14 @@ import fonts from '../data/fonts.json';
 import icons from '../data/icons.json';
 import logos from '../data/logos.json';
 import { byStatus, LIBRARY_KIND, LIBRARY_STATUS, libraries, librarySchema, type Library, type LibraryKind } from './libraries';
+import { elementCategories, elementMarkdownUrl, elements, elementsByCategory, elementUrl, ELEMENT_STATUS, getElement, getElementCategory, type DesignElement } from './elements';
+import { abs, asset, url, VERSION } from './paths';
 import { contrastPairs, opacityContrast, palette, themeColors, tokenGroups, tokenList, tokenMap, tokenMapDark } from './tokens';
 
+export { abs, asset, url, VERSION };
+export { elementCategories, elements, type DesignElement };
 export { LIBRARY_KIND, LIBRARY_STATUS, libraries, type Library, type LibraryKind };
 
-export const VERSION = 'v1';
 export const STATUS = 'draft 0.1';
 
 /** 디자인 원본. design_lab은 이 사이트의 디자인을 문서화한다. */
@@ -16,35 +19,21 @@ export const ORIGIN = 'https://metaphr.dev';
 /** design_lab 공식 주소. 실제 URL은 SITE_URL/BASE_PATH 빌드 설정을 따른다(abs 참고). */
 export const OFFICIAL_URL = 'https://design.metaphr.dev';
 
-const trim = (s: string) => s.replace(/\/+$/, '');
-const site = () => trim(import.meta.env.SITE as string);
-const base = () => trim(import.meta.env.BASE_URL ?? '/');
-
-/** base를 반영한 내부 경로. url('/fonts') → '/design_lab/fonts' (base가 /design_lab일 때), '/fonts' (base가 /일 때). */
-export const url = (path = '/') => {
-  const p = path.startsWith('/') ? path : `/${path}`;
-  return p === '/' ? `${base()}/` : `${base()}${p}`;
-};
-
-/** site + base + path 절대 URL. */
-export const abs = (path = '/') => `${site()}${url(path)}`;
-
-/** /v1/ 아래 파일의 절대 URL. data JSON의 file 필드(/v1/ 기준 상대 경로)에 쓴다. */
-export const asset = (file: string) => abs(`/${VERSION}/${file}`);
-
 /** 사이트의 모든 문서. 사람용 페이지(/slug)와 AI용 마크다운(/slug.md)이 같은 목록에서 만들어진다. */
 export const pages = [
+  { slug: 'elements', title: '요소', summary: '버튼·메뉴·입력·카드·이펙트 등 디자인 요소를 분류별로. 요소 하나 = 문서 하나(데모·CSS·앱 적용)' },
   { slug: 'philosophy', title: '디자인 철학', summary: '미니멀리즘 · 픽셀아트 · 레트로 컬러, 세 기둥' },
   { slug: 'tokens', title: '디자인 토큰', summary: '--mp-* CSS 변수 전체: 레트로 팔레트(상태·대비), 크기, 자간, 행간, 투명도, 레이아웃, 픽셀, 모션' },
   { slug: 'fonts', title: '폰트', summary: '유일한 브랜드 서체 Mulmaru, @font-face, 히어로 서브셋 기법' },
   { slug: 'logos', title: '로고와 아이콘', summary: '워드마크 metaphr.svg, 스크롤 힌트 down.svg, 40×40 픽셀 아이콘과 정수 배율 규칙' },
-  { slug: 'ai', title: 'AI로 만들 때', summary: '세 기둥별 규칙, 붙여넣을 지시문, 적용 순서, 컴포넌트 CSS 레시피, 자주 틀리는 것' },
+  { slug: 'ai', title: 'AI로 만들 때', summary: '세 기둥별 규칙, 붙여넣을 지시문, 적용 순서, 요소 문서 찾는 법, 자주 틀리는 것' },
   { slug: 'libraries', title: '참고 라이브러리', summary: '사이트·앱을 만들 때 고를 라이브러리 목록 (사용 중·권장·검토 중·쓰지 않음)' },
 ] as const;
 
 export type Slug = (typeof pages)[number]['slug'];
 
 export const endpoints = [
+  { path: `/${VERSION}/elements.json`, desc: '디자인 요소 색인: 분류, 요소별 이름·aliases·플랫폼·상태·이펙트·관련 요소·문서 URL (= /elements.json)' },
   { path: `/${VERSION}/tokens.css`, desc: ':root에 --mp-* CSS 변수 전체를 정의. 가장 먼저 import' },
   { path: `/${VERSION}/fonts.css`, desc: 'Mulmaru @font-face (woff2, weight 400, font-display: swap)' },
   { path: `/${VERSION}/tokens.json`, desc: 'W3C DTCG 형식 원본 토큰' },
@@ -116,280 +105,125 @@ export const iconsData = () => ({
   icons: icons.icons.map((i) => ({ ...i, url: asset(i.file) })),
 });
 
-const RECIPES = `### 0. 기반
+/** ai.md의 옛 레시피 번호 → 옮겨 간 요소 문서 */
+const RECIPE_MAP: [string, string[]][] = [
+  ['0. 기반', ['theme', 'typography', 'spacing-layout']],
+  ['1. 글자 위계', ['typography']],
+  ['2. 카드', ['card']],
+  ['3. 배지', ['badge']],
+  ['4. 버튼 (잉크/배경 반전)', ['button', 'invert-hover']],
+  ['5. 헤어라인 구분선·링크', ['divider', 'link', 'back-link', 'footer']],
+  ['6. 모눈 썸네일', ['grid-thumbnail']],
+  ['7. 픽셀 아이콘', ['pixel-icon']],
+  ['8. 점 인디케이터', ['page-indicator']],
+  ['9. 깜빡이는 ■ 커서', ['caret']],
+  ['10. 숨쉬기(float)·등장', ['float', 'reveal']],
+  ['11. fx-fill 호버', ['fx-fill']],
+  ['12. 움직임 줄이기', ['reduced-motion']],
+  ['13. 강조(orange)와 보조(teal)', ['color']],
+  ['14. 테마별 이미지', ['dark-images']],
+];
+
+const IMPORTS = () => `@import url("${abs(`/${VERSION}/tokens.css`)}");
+@import url("${abs(`/${VERSION}/fonts.css`)}");`;
+
+/** 요소 문서 끝에 붙는 공통 규칙. 요소 문서 하나만 읽어도 지켜야 할 요소 간 규칙이 빠지지 않게 한다. */
+const commonRules = () => `## 공통 규칙 (모든 요소)
 
 \`\`\`css
-@import url("${abs(`/${VERSION}/tokens.css`)}");
-@import url("${abs(`/${VERSION}/fonts.css`)}");
-
-*, *::before, *::after { box-sizing: border-box; }
-html, body { margin: 0; background: var(--mp-bg); color: var(--mp-ink); }
-body {
-  font-family: var(--mp-font);
-  font-weight: 400;
-  font-size: var(--mp-size-body);
-  line-height: var(--mp-leading-body);
-  letter-spacing: var(--mp-tracking-body);
-  -webkit-text-size-adjust: 100%;
-}
-h1, h2, h3, h4, h5, h6, strong, b, th { font-weight: 400; }
-em, i { font-style: normal; }
-a { color: inherit; text-decoration: none; }
-.wrap { max-width: var(--mp-width-list); margin: 0 auto; padding: 0 var(--mp-gutter); }
-.wrap.read { max-width: var(--mp-width-read); }
-section { padding-block: var(--mp-section); }
-p { max-width: var(--mp-width-para); opacity: var(--mp-opacity-body); }
+${IMPORTS()}
 \`\`\`
 
-\`\`\`html
-<meta name="theme-color" content="#F5F5F5" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#303841" media="(prefers-color-scheme: dark)">
-<meta name="color-scheme" content="light dark">
-\`\`\`
+- 세 기둥: 미니멀리즘 · 픽셀아트 · 레트로 컬러. 서체는 Mulmaru(\`var(--mp-font)\`) 하나, 굵기 400만, 기울임 없음.
+- 값은 \`--mp-*\` 변수만. 등록되지 않은 색·크기를 만들지 않는다. \`#FFF\`·\`#000\` 금지.
+- 선은 1px \`--mp-line\`, 모서리 직각(radius 0), 그림자·그라데이션·blur 없음.
+- 글자 위계는 색이 아니라 opacity. 필수 정보(본문·버튼·링크 라벨)는 .7 이상.
+- 상호작용은 잉크/배경 반전 또는 opacity → 1. 호버로 다른 색이 되지 않는다.
+- 강조 orange(\`--mp-accent\`)는 **화면 전체에서 하나**. 여러 요소를 조합하면 강조를 하나만 남긴다. 라이트에서 orange·teal 글자 금지, 강조 면 위 글자는 slate.
+- 라이트/다크 두 테마를 시맨틱 변수(\`--mp-bg\`, \`--mp-ink\` …)로 자동 대응한다.
+- 모션은 숨쉬기(ease-in-out 느리게) 또는 계단(\`steps()\`). \`prefers-reduced-motion: reduce\`면 정지.
+- 앱(iOS/Android)도 같은 원칙. OS가 강제하는 요소만 예외.
+- 규칙이 요구와 충돌하면 임의로 판단하지 말고 사용자에게 묻는다.
 
-테마 수동 지정: \`<html data-theme="light">\` 또는 \`<html data-theme="dark">\`. 지정하지 않으면 OS 설정(prefers-color-scheme)을 따른다.
+전체 철학: ${abs('/philosophy.md')} · 요소 색인: ${abs('/elements.json')} · 토큰: ${abs('/tokens.md')}`;
 
-### 1. 글자 위계
+const PLATFORM_LABEL: Record<string, string> = { web: '웹', ios: 'iOS', android: 'Android' };
+const statusLabel = (s: string) => ELEMENT_STATUS.find((x) => x.id === s)!.label;
+const elLink = (id: string) => (getElement(id) ? `[${id}](${elementMarkdownUrl(id, true)})` : `${id}(준비 중)`);
+const elLine = (e: DesignElement, aliasCount = 4) =>
+  `- ${e.id} — ${e.name} — ${e.aliases.slice(0, aliasCount).join(', ')} — ${elementMarkdownUrl(e.id, true)}`;
 
-\`\`\`css
-.hero    { font-size: var(--mp-size-hero);       letter-spacing: var(--mp-tracking-hero); }
-h1       { font-size: var(--mp-size-title);      letter-spacing: var(--mp-tracking-title); line-height: var(--mp-leading-title); }
-h2       { font-size: var(--mp-size-heading);    letter-spacing: var(--mp-tracking-heading); }
-h3       { font-size: var(--mp-size-subheading); letter-spacing: var(--mp-tracking-subheading); }
-.lead    { font-size: var(--mp-size-lead);       letter-spacing: var(--mp-tracking-lead); line-height: var(--mp-leading-body); opacity: var(--mp-opacity-body); }
-.kicker  { font-size: var(--mp-size-kicker);     letter-spacing: var(--mp-tracking-kicker); opacity: var(--mp-opacity-kicker); }
-.note    { opacity: var(--mp-opacity-muted); }
-small.fine { font-size: var(--mp-size-fine);     letter-spacing: var(--mp-tracking-fine); opacity: var(--mp-opacity-fine); }
-\`\`\`
+/** /elements/<id>.md */
+export function elementMarkdown(el: DesignElement): string {
+  const cat = getElementCategory(el.category)!;
+  const meta = [
+    `- 분류: ${cat.name} (\`${cat.id}\`) · 상태: ${statusLabel(el.status)} (\`${el.status}\`)${el.source ? ` · 출처: ${el.source}` : ''}`,
+    `- 플랫폼: ${el.platforms.map((p) => PLATFORM_LABEL[p]).join(', ')} · 기둥: ${el.pillars.map((p) => PILLAR_TITLE[p]).join(', ') || '없음'}`,
+    `- 검색어: ${el.aliases.join(', ')}`,
+    el.tokens.length && `- 토큰: ${el.tokens.map((t) => `\`${t}\``).join(', ')}`,
+    el.effects.length && `- 이펙트(함께 읽기): ${el.effects.map(elLink).join(', ')}`,
+    el.related.length && `- 관련 요소: ${el.related.map(elLink).join(', ')}`,
+    `- 사람용 데모: ${elementUrl(el.id, true)}`,
+  ].filter(Boolean);
+  return `# ${el.name} (${el.nameEn}) — \`${el.id}\`
 
-### 2. 카드
+> ${el.summary}
 
-\`\`\`css
-.card {
-  display: flex; flex-direction: column;
-  border: var(--mp-border) solid var(--mp-line);
-  padding: clamp(1.2rem, 3vw, 1.7rem);
-  background: transparent;
-  transition: border-color 0.3s ease, transform 0.3s ease;
-}
-.card:hover { border-color: var(--mp-line-strong); transform: translateY(-3px); }
-.card h3 { margin: 0 0 0.55em; font-size: var(--mp-size-subheading); letter-spacing: var(--mp-tracking-subheading); }
-.card p  { margin: 0 0 1.2em; line-height: var(--mp-leading-card); opacity: var(--mp-opacity-secondary); flex: 1; }
-\`\`\`
+${meta.join('\n')}
 
-### 3. 배지
+${el.body.trim()}
 
-\`\`\`css
-.meta  { display: flex; gap: 0.5em; flex-wrap: wrap; font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); }
-.badge { border: var(--mp-border) solid var(--mp-line); padding: 0.25em 0.6em; }
-.badge.soon { border-style: dashed; } /* "준비 중" */
-\`\`\`
+---
 
-### 4. 버튼 (잉크/배경 반전)
-
-\`\`\`css
-.btn {
-  display: inline-block;
-  padding: 0.75em 1.5em;
-  border: var(--mp-border) solid var(--mp-line-button);
-  background: transparent;
-  color: var(--mp-ink);
-  font: inherit;
-  font-size: var(--mp-size-small);
-  letter-spacing: var(--mp-tracking-small);
-  cursor: pointer;
-  transition: background var(--mp-duration-hover) ease, color var(--mp-duration-hover) ease;
-}
-.btn:hover, .btn:focus-visible { background: var(--mp-ink); color: var(--mp-bg); }
-\`\`\`
-
-### 5. 헤어라인 구분선·링크
-
-\`\`\`css
-hr { border: 0; border-top: var(--mp-border) solid var(--mp-line); margin: 0; }
-.foot { border-top: var(--mp-border) solid var(--mp-line); padding-top: var(--mp-section-lg); }
-.foot-links a {
-  font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small);
-  opacity: var(--mp-opacity-link);
-  border-bottom: var(--mp-border) solid var(--mp-line); padding-bottom: 0.15em;
-}
-.foot-links a:hover { opacity: 1; }
-.back { opacity: var(--mp-opacity-meta); } /* "< metaphr" */
-.back:hover { opacity: 1; }
-\`\`\`
-
-### 6. 모눈 썸네일
-
-\`\`\`css
-.thumb {
-  aspect-ratio: 4 / 3;            /* 상세 화면은 16 / 9 */
-  display: flex; align-items: center; justify-content: center;
-  font-size: clamp(2.9rem, 8.4vw, 4.1rem);
-  color: var(--mp-glyph);         /* 아이콘이 없을 때 앱 이름 첫 글자 */
-  background-color: var(--mp-grid-bg);
-  background-image:
-    linear-gradient(var(--mp-grid-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--mp-grid-line) 1px, transparent 1px);
-  background-size: var(--mp-grid-cell-card) var(--mp-grid-cell-card); /* 상세: --mp-grid-cell-detail */
-}
-\`\`\`
-
-모눈의 linear-gradient는 격자선을 그리는 용도로만 허용된다. 장식용 그라데이션은 금지.
-
-### 7. 픽셀 아이콘
-
-\`\`\`css
-.pixel {
-  width: var(--mp-pixel-card); height: var(--mp-pixel-card);   /* 40×40 → 120px (3×). 상세: --mp-pixel-detail 200px (5×) */
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
-  opacity: var(--mp-opacity-pixel);
-}
-\`\`\`
-
-\`\`\`html
-<div class="thumb" aria-hidden="true"><img class="pixel" src="${asset('icons/rhythm.png')}" width="40" height="40" alt=""></div>
-\`\`\`
-
-### 8. 점 인디케이터
-
-\`\`\`css
-.dot { width: 8px; height: 8px; padding: 0; border: var(--mp-border) solid var(--mp-line); background: transparent; opacity: 0.7; }
-.dot:hover { border-color: var(--mp-line-strong); opacity: 1; }
-.dot[aria-current="true"] { background: var(--mp-ink); border-color: var(--mp-ink); opacity: var(--mp-opacity-meta); }
-\`\`\`
-
-### 9. 깜빡이는 ■ 커서
-
-\`\`\`css
-.lead p:last-of-type::after {
-  content: "■";
-  margin-left: 0.35em;
-  font-size: 0.85em;
-  opacity: var(--mp-opacity-kicker);
-  animation: mp-caret var(--mp-duration-caret) steps(1, end) infinite;
-}
-@keyframes mp-caret { 50% { opacity: 0; } }
-\`\`\`
-
-### 10. 숨쉬기(float) 애니메이션
-
-\`\`\`css
-.float {
-  /* 요소마다 JS로 다르게: --fa 2.5–5.5px, --fd 3.4–5.8s, --fdl -5s–0s */
-  animation: mp-float var(--fd, 4s) var(--mp-ease-float) var(--fdl, 0s) infinite alternate;
-}
-.float:hover { animation-play-state: paused; }
-@keyframes mp-float {
-  from { transform: translateY(var(--fa, 3px)); }
-  to   { transform: translateY(calc(var(--fa, 3px) * -1)); }
+${commonRules()}
+`;
 }
 
-.reveal { opacity: 0; transform: translateY(14px); transition: opacity var(--mp-duration-reveal) ease, transform var(--mp-duration-reveal) ease; }
-.reveal.in { opacity: 1; transform: none; }
-\`\`\`
+/** /elements/<category>.md */
+export function categoryMarkdown(id: string): string {
+  const cat = getElementCategory(id)!;
+  const list = elements.filter((e) => e.category === id);
+  return `# 요소 — ${cat.name} (${cat.nameEn})
 
-\`\`\`js
-document.querySelectorAll('.float').forEach((el) => {
-  el.style.setProperty('--fa', (2.5 + Math.random() * 3).toFixed(2) + 'px');
-  el.style.setProperty('--fd', (3.4 + Math.random() * 2.4).toFixed(2) + 's');
-  el.style.setProperty('--fdl', (-Math.random() * 5).toFixed(2) + 's');
+> ${cat.summary}
+
+요소 ${list.length}개. 요청에 맞는 요소 문서만 골라 읽는다. 전체 색인: ${abs('/elements.json')}
+
+${list.length ? list.map((e) => `- [${e.name} \`${e.id}\`](${elementMarkdownUrl(e.id, true)}) (${statusLabel(e.status)}): ${e.summary}`).join('\n') : '아직 등록된 요소가 없다.'}
+`;
+}
+
+const PICK_STEPS = () => [
+  '요청에서 요소를 찾는다. 예: "메뉴 버튼 모양과 이펙트" → 메뉴, 버튼, 호버 이펙트.',
+  '아래 목록(또는 ' + abs('/elements.json') + ')의 이름·aliases로 요소 id를 고른다.',
+  '고른 요소의 문서 `/elements/<id>.md`만 읽는다. 전체 문서를 다 읽을 필요는 없다.',
+  '문서의 이펙트(effects)·관련 요소(related) 중 요청에 필요한 것을 따라가 읽는다.',
+  '문서 끝의 공통 규칙(세 기둥, 토큰 import, 화면당 강조 하나)을 확인하고 적용한다.',
+];
+
+/** /elements.json, /v1/elements.json */
+export const elementsIndex = () => ({
+  version: VERSION,
+  status: STATUS,
+  llms: abs('/llms.txt'),
+  statuses: ELEMENT_STATUS,
+  categories: elementCategories.map(({ id, name, nameEn, summary }) => ({ id, name, nameEn, summary, markdown: abs(`/elements/${id}.md`) })),
+  elements: elements.map((e) => ({
+    id: e.id,
+    name: e.name,
+    nameEn: e.nameEn,
+    category: e.category,
+    summary: e.summary,
+    aliases: e.aliases,
+    platforms: e.platforms,
+    status: e.status,
+    pillars: e.pillars,
+    effects: e.effects,
+    related: e.related,
+    url: elementUrl(e.id, true),
+    markdown: elementMarkdownUrl(e.id, true),
+  })),
 });
-\`\`\`
-
-### 11. fx-fill 호버 (8칸 계단 채움 반전)
-
-\`\`\`html
-<a class="fx-fill" href="mailto:ksthink@metaphr.dev">
-  <span class="label">ksthink@metaphr.dev</span>
-  <span class="fill" aria-hidden="true">
-    <span style="--d:0ms"></span><span style="--d:90ms"></span><span style="--d:30ms"></span><span style="--d:160ms"></span>
-    <span style="--d:60ms"></span><span style="--d:220ms"></span><span style="--d:120ms"></span><span style="--d:280ms"></span>
-  </span>
-</a>
-\`\`\`
-
-\`\`\`css
-.fx-fill { position: relative; }
-.fx-fill .label { position: relative; z-index: 1; transition: color var(--mp-duration-fill) step-end; }
-.fx-fill .fill { position: absolute; inset: 0; z-index: 0; display: grid; grid-template-columns: repeat(8, 1fr); pointer-events: none; }
-.fx-fill .fill span {
-  background: var(--mp-ink);
-  transform: scaleY(0);
-  transform-origin: bottom;
-  transition: transform var(--mp-duration-fill) var(--mp-steps-fill) var(--d, 0ms);
-}
-.fx-fill .fill span:nth-child(even) { transform-origin: top; }
-.fx-fill:hover .fill span, .fx-fill:focus-visible .fill span { transform: scaleY(1); }
-.fx-fill:hover .label, .fx-fill:focus-visible .label { color: var(--mp-bg); }
-\`\`\`
-
-### 12. 움직임 줄이기 (필수)
-
-\`\`\`css
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .float, .lead p:last-of-type::after, .scroll-hint { animation: none; }
-  .reveal { opacity: 1; transform: none; transition: none; }
-  .fx-fill .fill span, .fx-fill .label, .btn, .card { transition: none; }
-}
-\`\`\`
-
-글리프 캔버스 같은 JS 애니메이션은 \`matchMedia('(prefers-reduced-motion: reduce)').matches\`이면 첫 프레임(최종 상태)만 그리고 타이머를 시작하지 않는다.`;
-
-
-const IMAGE_RECIPE = `### 14. 테마별 이미지
-
-1비트 단색 아이콘(40×40 PNG, down.svg)은 mask로 \`--mp-ink\`를 칠해도 된다(공식 예외). 명암이 있는 워드마크는 칠하지 않고 테마별 파일을 쓴다.
-
-\`\`\`css
-/* 1비트 단색: 두 테마 모두 --mp-ink로 칠한다 */
-.pixel-mask {
-  width: var(--mp-pixel-card); height: var(--mp-pixel-card);   /* 정수 배율 유지 */
-  background: var(--mp-ink);
-  opacity: var(--mp-opacity-pixel);
-  -webkit-mask: var(--src) 0 0 / 100% 100% no-repeat;
-  mask: var(--src) 0 0 / 100% 100% no-repeat;
-}
-
-/* 워드마크: 라이트 metaphr.svg, 다크 metaphr-dark.svg */
-.foot-logo--dark { display: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .foot-logo--light { display: none; }
-  :root:not([data-theme="light"]) .foot-logo--dark { display: block; }
-}
-:root[data-theme="dark"] .foot-logo--light { display: none; }
-:root[data-theme="dark"] .foot-logo--dark { display: block; }
-\`\`\`
-
-\`\`\`html
-<span class="pixel-mask" style="--src:url(${asset('icons/rhythm.png')})" aria-hidden="true"></span>
-<img class="foot-logo foot-logo--light" src="${asset('logos/metaphr.svg')}" alt="metaphr" width="350" height="200">
-<img class="foot-logo foot-logo--dark" src="${asset('logos/metaphr-dark.svg')}" alt="metaphr" width="350" height="200">
-\`\`\`
-
-- 금지: 워드마크를 mask·filter·mix-blend-mode로 칠하기, 로고를 별도 패널(다른 배경색 박스) 위에 올리기, 아이콘을 --mp-ink 외의 색으로 칠하기.
-- 예외: 디자인 문서의 견본 표시(각 변형을 자기 테마 배경 위에 보여 주는 경우)는 허용. 실제 제품 화면에서는 판 없이 --mp-bg 위에 바로 둔다.`;
-
-const ACCENT_RECIPE = `### 13. 강조(orange)와 보조(teal)
-
-\`\`\`css
-/* 강조 ■ 마크 — 한 화면에 하나 */
-.accent-mark::before { content: "■"; color: var(--mp-accent); margin-right: 0.4em; }
-
-/* 강조 면 블록 — 라이트·다크 모두 slate(#303841) 글자, 24px 이상(--mp-size-title). orange 위 3.76:1 */
-.accent-block { background: var(--mp-accent); color: var(--mp-palette-slate); font-size: var(--mp-size-title); letter-spacing: var(--mp-tracking-title); padding: 0.25em 0.6em; }
-
-/* 보조 면: 선택 상태 표시 */
-.is-selected { background: var(--mp-secondary); color: var(--mp-palette-slate); }
-
-/* 다크 테마에서만: teal 글자 허용(slate 위 4.64:1) */
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .note-teal { color: var(--mp-secondary); } }
-:root[data-theme="dark"] .note-teal { color: var(--mp-secondary); }
-\`\`\`
-
-- \`.accent-block\`·\`.is-selected\` 위 글자는 두 테마 모두 \`--mp-palette-slate\`(orange 위 3.76:1이라 \`--mp-size-title\` 이상·최소 24px, teal 위 4.64:1). paper 글자는 orange 위 2.9:1, teal 위 2.35:1이라 금지.
-- 금지: 라이트에서 \`color: var(--mp-accent)\`·\`color: var(--mp-secondary)\` 글자, 다크에서 24px(\`--mp-size-title\`) 미만 orange 글자, orange 면 위 24px 미만 글자, orange와 teal을 맞붙인 배치(1.24:1), \`opacity\`로 옅게 한 강조색, \`#FFFFFF\` 글자, \`:hover { background: var(--mp-accent) }\`.`;
 
 type PillarId = 'minimalism' | 'pixel-art' | 'retro-color';
 
@@ -464,7 +298,7 @@ const MISTAKES: [PillarId, string, string, string][] = [
   ['minimalism', '테마 하드코딩', '`background: #F5F5F5`, `color: #303841`, 다크에서 안 바뀌는 색', '`var(--mp-bg)`, `var(--mp-ink)` 등 시맨틱 변수'],
   ['minimalism', '좁은 여백·빽빽한 행간', '섹션 padding 16px, `line-height: 1.5`, 문단 폭 제한 없음', '`--mp-section`/`--mp-section-lg`, `--mp-leading-body` 2.1, `--mp-width-para` 30em'],
   ['minimalism', '임의의 글자 크기', '`font-size: 14px`, `18px`, `2rem`', '`--mp-size-*` 10단계만'],
-  ['minimalism', '움직임 줄이기 무시', '`prefers-reduced-motion` 분기 없음', '레시피 12의 블록 포함'],
+  ['minimalism', '움직임 줄이기 무시', '`prefers-reduced-motion` 분기 없음', '`reduced-motion` 요소 문서의 블록 포함'],
   ['minimalism', '앱에서 OS 관습 따라가기', 'SwiftUI `RoundedRectangle`·`.shadow`·`.spring`, Material 둥근 카드', '직각·그림자 없음. OS 강제 요소(시스템 시트·아이콘 마스크·시스템 컨트롤)만 예외'],
   ['pixel-art', '다른 서체', 'system-ui, Pretendard, Inter, 다른 픽셀 서체, 코드 블록 monospace', '`font-family: var(--mp-font)` 하나'],
   ['pixel-art', '정수배가 아닌 픽셀 확대', '40×40 아이콘을 100px·150px·`width: 100%`로 표시, `image-rendering` 누락', '120px(3×) 또는 200px(5×) + `image-rendering: pixelated; crisp-edges`'],
@@ -592,19 +426,22 @@ ${table(['status', '라벨', '뜻'], LIBRARY_STATUS.map((s) => [`\`${s.id}\``, s
 export const libraryMarkdown = (kind: LibraryKind) =>
   `# 참고 라이브러리 — ${LIBRARY_KIND.find((k) => k.id === kind)!.title}\n\n${libraryIntro()}\n\n${librarySection(kind, 2)}`;
 
+/** JSON 출력용: thumbnail(/v1/ 기준 상대 경로)을 절대 URL로 */
+const withThumbUrl = (list: Library[]) => list.map((l) => (l.thumbnail ? { ...l, thumbnail: asset(l.thumbnail) } : l));
+
 export const librariesData = () => ({
   schema: abs(`/${VERSION}/libraries.schema.json`),
   status: LIBRARY_STATUS,
   rules: LIBRARY_RULES,
-  sites: libraries.sites,
-  apps: libraries.apps,
+  sites: withThumbUrl(libraries.sites),
+  apps: withThumbUrl(libraries.apps),
 });
 
 export const libraryKindData = (kind: LibraryKind) => ({
   schema: abs(`/${VERSION}/libraries.schema.json`),
   kind,
   status: LIBRARY_STATUS,
-  items: libraries[kind],
+  items: withThumbUrl(libraries[kind]),
 });
 
 export { librarySchema };
@@ -619,6 +456,23 @@ ${p.rules.map((r) => `- ${r}`).join('\n')}`,
   ).join('\n\n');
 
 const markdown: Record<Slug, () => string> = {
+  elements: () => `# 요소
+
+상태: ${STATUS}. 기계용 색인: ${abs('/elements.json')}
+
+metaphr의 디자인 요소를 분류별로 모았다. 요소 하나 = 문서 하나(용도·생김새·상태·동작·데모·CSS·앱·해야 할 것). 상태 \`추출\`은 metaphr.dev·기존 작업에서 가져온 것, \`제안\`은 원칙에 맞춰 새로 만든 제안안이다.
+
+## 요청한 요소만 골라 읽는 법
+
+${PICK_STEPS().map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+${elementCategories
+  .map((c) => {
+    const list = elements.filter((e) => e.category === c.id);
+    return `## ${c.name} (${c.nameEn}) — [${c.id}.md](${abs(`/elements/${c.id}.md`)})\n\n${c.summary}\n\n${list.length ? list.map((e) => `- [${e.name} \`${e.id}\`](${elementMarkdownUrl(e.id, true)}) (${statusLabel(e.status)}): ${e.summary}`).join('\n') : '아직 등록된 요소가 없다.'}`;
+  })
+  .join('\n\n')}`,
+
   philosophy: () => philosophyRaw.trim(),
 
   tokens: () => {
@@ -868,7 +722,7 @@ ${table(
 
   ai: () => `# AI로 만들 때
 
-AI 코딩 도구(Claude Code, Cursor 등)로 metaphr 스타일의 사이트나 앱을 만들 때의 규칙, 지시문, 순서, 레시피다. 디자인 원본은 ${ORIGIN} 이다. 결과물은 그 사이트와 같은 계열로 보여야 한다.
+AI 코딩 도구(Claude Code, Cursor 등)로 metaphr 스타일의 사이트나 앱을 만들 때의 규칙, 지시문, 순서다. 컴포넌트별 CSS는 요소 문서에 있다. 디자인 원본은 ${ORIGIN} 이다. 결과물은 그 사이트와 같은 계열로 보여야 한다.
 
 ## 세 기둥
 
@@ -884,15 +738,26 @@ ${aiPrompt()}
 
 ## AI가 따라야 할 순서
 
-1. ${abs('/llms-full.txt')} 를 끝까지 읽는다. 세 기둥·철학·토큰·폰트·로고·레시피·참고 라이브러리가 한 파일에 있다.
+1. ${abs('/llms.txt')} 를 읽고, 요청에 필요한 요소 문서(\`/elements/<id>.md\`)만 골라 읽는다. 규칙 전체가 필요하면 ${abs('/llms-full.txt')}.
 2. 아이콘·UI·픽셀아트 도구 등 참고 라이브러리가 필요하면 ${abs('/libraries.md')} 를 먼저 확인한다. \`adopted\` > \`recommended\` 순으로 고르고, \`avoid\`는 쓰지 않으며, 목록에 없으면 설치 전에 사용자에게 묻는다.
-3. 전역 CSS 맨 위에 \`tokens.css\`, \`fonts.css\`를 import하고 테마별 \`<meta name="theme-color">\` 두 개(라이트 \`#F5F5F5\`, 다크 \`#303841\`)를 넣는다.
-4. 아래 "0. 기반" 레시피를 그대로 넣는다 (배경·잉크·서체·굵기 400 초기화).
-5. 화면을 만들 때 레시피 1–11의 클래스를 조합한다. 새 컴포넌트는 레시피의 재료(1px \`--mp-line\`, opacity 단계, 잉크/배경 반전)로만 만든다.
-6. 강조가 필요하면 한 화면에 하나만 레시피 13(orange)을 쓴다. 보조 표시는 teal(\`--mp-secondary\`). status \`candidate\` 색은 쓰지 않는다. 라이트·다크 두 테마에서 모두 확인한다.
-7. 색·크기·자간·행간·투명도·여백·시간은 전부 \`--mp-*\` 변수로 쓴다. 하드코딩한 값이 있으면 토큰으로 바꾼다.
-8. 레시피 12(\`prefers-reduced-motion\`)를 반드시 넣는다.
-9. 마지막에 "자주 틀리는 것" 표를 한 줄씩 대조해 검사한다. 예: 코드에서 \`font-weight: [5-9]00\`, \`border-radius: [1-9]\`, \`box-shadow\`, \`#fff\`, \`#000\`, \`white\`, \`black\` 검색 결과가 0건, 팔레트 hex(\`#F5F5F5\` 등)를 직접 쓴 곳이 0건, \`var(--mp-accent)\` 사용 위치가 화면당 1곳이어야 한다.
+3. 전역 CSS 맨 위에 \`tokens.css\`, \`fonts.css\`를 import하고 테마별 \`<meta name="theme-color">\` 두 개(라이트 \`#F5F5F5\`, 다크 \`#303841\`)를 넣는다. 바탕 초기화는 ${elLink('theme')}·${elLink('typography')}·${elLink('spacing-layout')}.
+4. 화면은 요소 문서의 \`## 코드\` CSS를 조합해 만든다. 새 요소는 요소 문서의 재료(1px \`--mp-line\`, opacity 단계, 잉크/배경 반전)로만 만든다.
+5. 강조가 필요하면 한 화면에 하나만 orange를 쓴다(${elLink('color')}). 보조 표시는 teal(\`--mp-secondary\`). status \`candidate\` 색은 쓰지 않는다. 라이트·다크 두 테마에서 모두 확인한다.
+6. 색·크기·자간·행간·투명도·여백·시간은 전부 \`--mp-*\` 변수로 쓴다. 하드코딩한 값이 있으면 토큰으로 바꾼다.
+7. ${elLink('reduced-motion')}의 \`prefers-reduced-motion\` 블록을 반드시 넣는다.
+8. 마지막에 "자주 틀리는 것" 표를 한 줄씩 대조해 검사한다. 예: 코드에서 \`font-weight: [5-9]00\`, \`border-radius: [1-9]\`, \`box-shadow\`, \`#fff\`, \`#000\`, \`white\`, \`black\` 검색 결과가 0건, 팔레트 hex(\`#F5F5F5\` 등)를 직접 쓴 곳이 0건, \`var(--mp-accent)\` 사용 위치가 화면당 1곳이어야 한다.
+
+## 기반
+
+\`\`\`css
+${IMPORTS()}
+\`\`\`
+
+\`\`\`html
+<meta name="theme-color" content="#F5F5F5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#303841" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
+\`\`\`
 
 ## 자원 목록
 
@@ -914,13 +779,14 @@ ${LIBRARY_RULES.map((r) => `- ${r}`).join('\n')}
 
 metaphr.dev 원본 코드를 옮겨 올 때: \`var(--bg)\` → \`var(--mp-bg)\`, \`var(--ink)\` → \`var(--mp-ink)\`, \`var(--line)\` → \`var(--mp-line)\`.
 
-## 컴포넌트 레시피
+## 요소 문서 (옛 컴포넌트 레시피)
 
-${RECIPES}
+컴포넌트 CSS는 요소 문서로 옮겼다. 요소 전체 목록은 ${abs('/elements.md')}.
 
-${ACCENT_RECIPE}
-
-${IMAGE_RECIPE}
+${table(
+  ['옛 레시피', '요소 문서'],
+  RECIPE_MAP.map(([r, ids]) => [r, ids.map(elLink).join(', ')]),
+)}
 
 ## 자주 틀리는 것
 
@@ -940,7 +806,7 @@ ${LIBRARY_KIND.map((k) => librarySection(k.id, 2)).join('\n\n')}`,
 
 export function aiPrompt(): string {
   return `이 프로젝트는 metaphr 디자인 시스템(${VERSION}, 원본 ${ORIGIN}, 문서 ${abs('/')})을 따른다.
-작업 전에 ${abs('/llms-full.txt')} 를 읽고 모든 규칙을 지켜라.
+작업 전에 ${abs('/llms.txt')} 를 읽고, 요청에 필요한 요소 문서(/elements/<id>.md)를 골라 읽어 모든 규칙을 지켜라.
 - 전역 CSS 맨 위: @import url("${abs(`/${VERSION}/tokens.css`)}"); @import url("${abs(`/${VERSION}/fonts.css`)}");
 디자인의 세 기둥:
 [미니멀리즘]
@@ -971,7 +837,19 @@ export function llmsTxt(): string {
 
 > metaphr(${ORIGIN})의 디자인 시스템 공식 참조(${OFFICIAL_URL}). 상태: ${STATUS}. 슬로건 "여백을 담습니다". 디자인의 세 기둥은 미니멀리즘 · 픽셀아트 · 레트로 컬러다. metaphr 스타일의 사이트나 앱을 만들 때 이 규칙을 그대로 따른다.
 
-전체 내용을 한 번에 읽으려면 ${abs('/llms-full.txt')} 를 사용한다.
+## 요청한 요소만 골라 읽는 법
+
+${PICK_STEPS().map((s, i) => `${i + 1}. ${s}`).join('\n')}
+
+기계용 색인: ${abs('/elements.json')} · 사람용: ${abs('/elements')}
+
+## 요소
+
+형식: id — 이름 — 검색어 일부 — 문서 URL
+
+${elementsByCategory()
+  .map((c) => `### ${c.name} (${c.id}) — ${c.summary}\n\n${c.elements.map((e) => elLine(e)).join('\n')}`)
+  .join('\n\n')}
 
 ## 세 기둥
 
@@ -981,6 +859,7 @@ ${PILLARS.map((p) => `- ${p.title} (${p.en}): ${p.summary}`).join('\n')}
 
 ${pages.map((p) => `- [${p.title}](${abs(`/${p.slug}.md`)}): ${p.summary}`).join('\n')}
 ${LIBRARY_KIND.map((k) => `- [참고 라이브러리 — ${k.title}](${abs(`/libraries/${k.id}.md`)}): ${k.summary}`).join('\n')}
+- [전체 가이드](${abs('/llms-full.txt')}): 세 기둥·철학·토큰·폰트·로고·AI 가이드·라이브러리를 한 파일로 (요소 문서는 제외)
 
 ## 바로 쓰는 자원
 
@@ -992,8 +871,9 @@ export function llmsFull(): string {
   return [
     `# metaphr/design_lab — 전체 가이드 (${VERSION}, ${STATUS})`,
     `출처: ${abs('/')} · 디자인 원본: ${ORIGIN}`,
+    `## 디자인 요소\n\n요소 문서(버튼·메뉴·입력·이펙트 …)는 이 파일에 넣지 않는다. 요청에 맞는 요소만 골라 읽는다.\n\n- 목록: ${abs('/llms.txt')} · ${abs('/elements.md')}\n- 색인: ${abs('/elements.json')}\n- 문서: ${abs('/elements/<id>.md')}`,
     `## 디자인의 세 기둥\n\n${pillarsMarkdown(3)}`,
-    ...pages.map((p) => pageMarkdown(p.slug).replace(/^#/gm, '##')),
+    ...pages.filter((p) => p.slug !== 'elements').map((p) => pageMarkdown(p.slug).replace(/^#/gm, '##')),
   ].join('\n\n---\n\n');
 }
 
@@ -1008,6 +888,17 @@ export function manifest() {
     llms: abs('/llms.txt'),
     llmsFull: abs('/llms-full.txt'),
     pillars: PILLARS,
+    elements: {
+      index: abs('/elements.json'),
+      categories: elementCategories.map((c) => ({
+        id: c.id,
+        name: c.name,
+        nameEn: c.nameEn,
+        markdown: abs(`/elements/${c.id}.md`),
+        elements: elements.filter((e) => e.category === c.id).map((e) => e.id),
+      })),
+      count: elements.length,
+    },
     docs: [
       ...pages.map((p) => ({ ...p, html: abs(`/${p.slug}`), markdown: abs(`/${p.slug}.md`) })),
       ...LIBRARY_KIND.map((k) => ({

@@ -1,0 +1,230 @@
+---
+import Base from '../../layouts/Base.astro';
+import DemoFrame from '../../components/DemoFrame.astro';
+import { url } from '../../lib/docs';
+import { ELEMENT_STATUS, elementDemo, elements, elementsByCategory, elementUrl } from '../../lib/elements';
+
+const statusLabel = (id: string) => ELEMENT_STATUS.find((s) => s.id === id)?.label ?? id;
+const groups = elementsByCategory();
+// 썸네일 안의 orange(--mp-accent)는 견본(specimen)이라 '화면당 강조 하나'의 예외다. 이 페이지 자체(iframe 밖)에는 orange를 쓰지 않는다.
+
+// 필터가 찾는 글자 — 이름·영문·별칭을 소문자로 한 줄에
+const haystack = (e: (typeof elements)[number]) => [e.id, e.name, e.nameEn, ...e.aliases].join(' ').toLowerCase();
+---
+
+<Base title="디자인 요소" description="metaphr 사이트·앱의 디자인 요소를 실제로 렌더링한 예시로 봅니다. 요소마다 AI용 마크다운이 따로 있습니다." slug="elements" width="list">
+  <div class="intro">
+    <p class="kicker">elements · {elements.length}</p>
+    <h1>디자인 요소</h1>
+  </div>
+
+  <div class="tools">
+    <nav class="jump" aria-label="분류로 이동">
+      {groups.map((c) => <a href={`#${c.id}`}>{c.name} <span>{c.elements.length}</span></a>)}
+    </nav>
+    <div class="filter" data-filter hidden>
+      <label for="q" aria-hidden="true">&gt;</label>
+      <input id="q" type="search" placeholder="버튼, menu, toast" aria-label="요소 찾기" autocomplete="off" spellcheck="false" />
+      <output for="q" aria-live="polite"></output>
+    </div>
+  </div>
+
+  {groups.map((c) => (
+    <section id={c.id} class="section cat" aria-labelledby={`${c.id}-title`} data-cat>
+      <div class="section-head">
+        <h2 id={`${c.id}-title`}>{c.name}</h2>
+        <span>{c.nameEn}</span>
+      </div>
+      <ul class="grid" role="list">
+        {c.elements.map((e) => {
+          const d = elementDemo(e);
+          return (
+            <li data-q={haystack(e)}>
+              <a class="el" href={elementUrl(e.id)}>
+                <div class="shot">
+                  <DemoFrame html={d.html} css={d.css} title={`${e.name} 예시`} />
+                </div>
+                <p class="el-name">
+                  <span>{e.name}</span>
+                  <span class:list={['badge', e.status === 'proposed' && 'soon']}>{statusLabel(e.status)}</span>
+                </p>
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  ))}
+
+  <p class="none" data-none hidden>맞는 요소가 없습니다. 다른 이름으로 찾아보세요.</p>
+
+  <p class="machine">
+    AI <a href={url('/llms.txt')}>/llms.txt</a> · <a href={url('/elements.md')}>/elements.md</a> · <a href={url('/v1/elements.json')}>/v1/elements.json</a>
+  </p>
+</Base>
+
+<script is:inline>
+  // 이름·영문·별칭 필터 — 스크립트가 없으면 입력칸은 숨고 전부 보인다
+  (function () {
+    var box = document.querySelector('[data-filter]');
+    if (!box) return;
+    box.hidden = false;
+    var input = box.querySelector('input');
+    var out = box.querySelector('output');
+    var items = document.querySelectorAll('[data-q]');
+    var cats = document.querySelectorAll('[data-cat]');
+    var none = document.querySelector('[data-none]');
+    function run() {
+      var q = input.value.trim().toLowerCase();
+      var n = 0;
+      items.forEach(function (li) {
+        var hit = !q || q.split(/\s+/).every(function (w) { return li.getAttribute('data-q').indexOf(w) !== -1; });
+        li.hidden = !hit;
+        if (hit) n++;
+      });
+      cats.forEach(function (s) { s.hidden = !s.querySelector('[data-q]:not([hidden])'); });
+      none.hidden = n !== 0;
+      out.textContent = q ? n + '개' : '';
+    }
+    input.addEventListener('input', run);
+    if (input.value) run();
+  })();
+</script>
+
+<style>
+  .intro { max-width: var(--mp-width-read); }
+  .intro h1 { margin-bottom: clamp(1.4rem, 4vh, 2rem); }
+
+  .tools {
+    display: grid;
+    gap: 1.2em;
+    padding: 1.1em 0;
+    border-top: var(--mp-border) solid var(--mp-line);
+    border-bottom: var(--mp-border) solid var(--mp-line);
+  }
+
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 1.6em;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+  }
+  .jump a {
+    text-decoration: none;
+    opacity: var(--mp-opacity-link);
+    border-bottom: var(--mp-border) solid var(--mp-line);
+    padding-bottom: 0.15em;
+  }
+  .jump a:hover { opacity: 1; }
+  .jump span { opacity: var(--mp-opacity-meta); }
+
+  .filter {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    max-width: 30em;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+  }
+  .filter[hidden] { display: none; }
+  .filter label { opacity: var(--mp-opacity-kicker); }
+  .filter input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6em 0.8em;
+    border: var(--mp-border) solid var(--mp-line-button);
+    border-radius: 0;
+    background: transparent;
+    color: var(--mp-ink);
+    font: inherit;
+    letter-spacing: inherit;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .filter input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+  .filter input::placeholder { color: var(--mp-ink); opacity: var(--mp-opacity-muted); }
+  .filter input:focus-visible { outline-offset: 2px; }
+  .filter output {
+    min-width: 3em;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+
+  .cat { scroll-margin-top: 1.5rem; }
+  .cat[hidden] { display: none; }
+
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+    gap: clamp(0.9rem, 2.2vw, 1.5rem);
+  }
+  .grid li { display: flex; min-width: 0; }
+  .grid li[hidden] { display: none; }
+
+  .el {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border: var(--mp-border) solid var(--mp-line);
+    text-decoration: none;
+    transition: border-color var(--mp-duration-hover) ease;
+  }
+  .el:hover,
+  .el:focus-visible { border-color: var(--mp-line-strong); }
+
+  .shot {
+    aspect-ratio: 4 / 3;
+    border-bottom: var(--mp-border) solid var(--mp-line);
+    background: var(--mp-grid-bg);
+    overflow: hidden;
+  }
+
+  .el-name {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6em;
+    margin: 0;
+    padding: 0.75em 0.9em;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+  }
+  .el-name .badge {
+    flex: none;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+
+  /* 좁은 화면 — 두 장씩, 배지는 이름 아래로 */
+  @media (max-width: 560px) {
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+    .el-name { flex-wrap: wrap; padding: 0.6em 0.7em; }
+  }
+
+  .none {
+    margin: var(--mp-section) 0 0;
+    font-size: var(--mp-size-body);
+    opacity: var(--mp-opacity-meta);
+  }
+  .none[hidden] { display: none; }
+
+  .machine {
+    margin: var(--mp-section) 0 0;
+    padding-top: 1em;
+    border-top: var(--mp-border) solid var(--mp-line);
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    line-height: 1.9;
+    opacity: var(--mp-opacity-muted);
+    overflow-wrap: anywhere;
+  }
+  .machine a { text-decoration: none; border-bottom: var(--mp-border) solid var(--mp-line-strong); }
+  .machine a:hover { background: var(--mp-ink); color: var(--mp-bg); }
+</style>
