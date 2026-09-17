@@ -93,7 +93,7 @@ header[E](상단 바/앱 바) · menu[E](내비게이션 링크 목록, 현재 �
 text-field · textarea · search-field · checkbox · radio · switch · select · slider · stepper(+/−) · date-picker · file-upload · form-validation
 
 ### content — 내용 표시
-card[E] · list · table[E] · badge[E] · tag · avatar · image · divider[E] · code-block[E] · stat(숫자 강조) · accordion[E](`<details>` +/−) · rail[E](가로 캐러셀) · quote · key-value · timeline
+card[E] · list · table[E] · badge[E] · tag · avatar · image · divider[E] · code-block[E] · stat(숫자 강조) · chart(1px 선·막대 차트, 모눈 위) · accordion[E](`<details>` +/−) · rail[E](가로 캐러셀) · quote · key-value · timeline
 
 ### feedback — 상태 알림
 status-dot[E](기록 중 점 등, 강조 orange 한 곳) · toast · banner · progress-bar · loading(터미널형 `...`/■ 계단) · skeleton · tooltip · empty-state[E] · error-state · confirm-step[E](되돌릴 수 없는 행동 전 확인·입력 확인)
@@ -105,7 +105,7 @@ modal · bottom-sheet(앱) · popover · action-sheet(앱, OS 예외 명시)
 invert-hover[E](잉크/배경 반전) · fx-fill[E](8칸 steps 채움) · float[E](숨쉬기) · caret[E](■ 깜빡임) · reveal[E](등장) · glyph-field[E](터미널 글리프 배경) · scramble[E](브랜드 글자 스크램블) · press(누름: 1px 이동, 그림자 없음) · reduced-motion[E]
 
 ### patterns — 화면 패턴
-hero[E] · section-head[E](분류 제목 + 옅은 설명) · footer[E] · page-list[E](1180px 목록형) · page-read[E](760px 읽기형) · settings(앱 설정 화면) · onboarding · splash(앱) · app-icon(앱 아이콘, OS 마스크 예외) · widget(앱 위젯) · notification(알림 문구) · theme-switch[E] · dark-images[E](테마별 이미지·mask 예외)
+hero[E] · section-head[E](분류 제목 + 옅은 설명) · footer[E] · page-list[E](1180px 목록형) · page-read[E](760px 읽기형) · settings(앱 설정 화면) · onboarding · login-form(로그인 폼) · payment(결제 화면, 확인 단계) · chat(대화 화면) · splash(앱) · app-icon(앱 아이콘, OS 마스크 예외) · widget(앱 위젯) · notification(알림 문구) · theme-switch[E] · dark-images[E](테마별 이미지·mask 예외)
 
 ### writing — 문구
 microcopy[E](짧은 말투) · terminal-vocabulary[E](`>`, `[ ]`, `■`, `_`) · labels-numbers(숫자·단위 표기)

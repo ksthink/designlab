@@ -33,8 +33,8 @@
       "id": "content",
       "name": "내용 표시",
       "nameEn": "Content",
-      "summary": "정보를 담아 보여 주는 요소: 카드, 목록, 표, 배지, 구분선, 코드, 아코디언",
-      "order": ["card", "list", "table", "badge", "tag", "avatar", "image", "divider", "code-block", "stat", "accordion", "rail", "quote", "key-value", "timeline"]
+      "summary": "정보를 담아 보여 주는 요소: 카드, 목록, 표, 배지, 구분선, 코드, 차트, 아코디언",
+      "order": ["card", "list", "table", "badge", "tag", "avatar", "image", "divider", "code-block", "stat", "chart", "accordion", "rail", "quote", "key-value", "timeline"]
     },
     {
       "id": "feedback",
@@ -61,8 +61,8 @@
       "id": "patterns",
       "name": "화면 패턴",
       "nameEn": "Patterns",
-      "summary": "요소를 조합한 화면 단위: 히어로, 분류 제목, 푸터, 목록형·읽기형 페이지, 앱 화면",
-      "order": ["hero", "section-head", "footer", "page-list", "page-read", "settings", "onboarding", "splash", "app-icon", "widget", "notification", "theme-switch", "dark-images"]
+      "summary": "요소를 조합한 화면 단위: 히어로, 분류 제목, 푸터, 목록형·읽기형 페이지, 로그인·결제·대화, 앱 화면",
+      "order": ["hero", "section-head", "footer", "page-list", "page-read", "settings", "onboarding", "login-form", "payment", "chat", "splash", "app-icon", "widget", "notification", "theme-switch", "dark-images"]
     },
     {
       "id": "writing",
