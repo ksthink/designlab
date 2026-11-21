@@ -147,7 +147,7 @@ struct MPButtonStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     let inverted = configuration.isPressed
     configuration.label
-      .font(.custom("Mulmaru", size: 15)).tracking(0.9)
+      .font(.custom("Mulmaru", size: 12)).tracking(0.9)
       .padding(.vertical, 11).padding(.horizontal, 22).frame(minHeight: 44)
       .foregroundStyle(inverted ? MP.bg : (isOn ? MP.slate : MP.ink))
       .background(inverted ? MP.ink : (isOn ? MP.secondary : .clear))

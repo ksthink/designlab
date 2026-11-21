@@ -21,7 +21,7 @@ related: [text-action, progress-bar, labels-numbers, form-validation, confirm-st
 
 ## 생김새
 - 영역(드롭존)
-  - 테두리 `var(--mp-border) solid var(--mp-line)`, `border-radius: 0`, 배경 투명 — 점선 쓰지 않는다(점선은 "준비 중" 배지 전용)
+  - 테두리 `var(--mp-border) solid var(--mp-line-button)`(조작 요소 경계 3:1), `border-radius: 0`, 배경 투명 — 점선 쓰지 않는다(점선은 "준비 중" 배지 전용)
   - 여백 `1.6em`, 최소 높이 `8em`, 내용 가운데 정렬, 줄 간격 `0.7em`
   - 1행 안내 `> 끌어다 놓기` — `>` 프롬프트 + 짧은 말, `opacity: var(--mp-opacity-secondary)`
   - 2행 `[ 선택 ]` 터미널 버튼(`text-action`), 호버 시 반전
@@ -95,7 +95,7 @@ related: [text-action, progress-bar, labels-numbers, form-validation, confirm-st
 .mp-file-upload-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
 .mp-file-upload-zone {
   position: relative; display: grid; justify-items: center; align-content: center; gap: 0.7em;
-  min-height: 8em; padding: 1.6em; border: var(--mp-border) solid var(--mp-line); border-radius: 0; cursor: pointer;
+  min-height: 8em; padding: 1.6em; border: var(--mp-border) solid var(--mp-line-button); border-radius: 0; cursor: pointer;
   transition: border-color var(--mp-duration-hover) ease;
 }
 .mp-file-upload-hint { opacity: var(--mp-opacity-secondary); }

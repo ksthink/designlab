@@ -161,7 +161,7 @@ VStack(alignment: .leading, spacing: 0) {
   ForEach(options) { o in
     Button { sort = o; isOpen = false } label: { HStack(spacing: 8) {
       Rectangle().fill(o == sort ? Color.mpSecondary : .clear).frame(width: 8, height: 8)
-      Text(o.title).font(.custom("Mulmaru", size: 15))
+      Text(o.title).font(.custom("Mulmaru", size: 12))
     }.padding(.horizontal, 16).frame(minHeight: 44, alignment: .leading) }
     .buttonStyle(.plain).accessibilityAddTraits(o == sort ? .isSelected : [])
   }

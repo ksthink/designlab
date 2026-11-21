@@ -44,7 +44,7 @@ related: [key-value, widget, labels-numbers, status-dot, table]
 - 단위를 기호로만 쓰면(`m`) `aria-label="고도 1,240미터"`로 풀어 준다.
 - 주의 상태 `■`는 `aria-hidden="true"`, 뜻은 옆 글자("곧 끝남")로 전달한다. 색만으로 말하지 않는다.
 - 실시간으로 바뀌는 숫자는 `aria-live="polite"`, 초 단위로 바뀌면 live 영역에 넣지 않는다.
-- 이름이 .45라 이름만으로 필수 맥락을 전하지 않는다. 화면 제목이 맥락을 준다.
+- 이름은 작은 1× 글자라 이름만으로 필수 맥락을 전하지 않는다. 화면 제목이 맥락을 준다.
 - 숫자와 단위는 한 덩어리로 읽혀야 한다. 단위를 `span`으로 쪼개 따로 읽히면 `dd`에 `aria-label="12개"`를 주고 안쪽 `span`은 그대로 둔다.
 - 누르는 칸은 `a`, 이름 = "기록 7일, 자세히". 키보드 Tab/Enter.
 
@@ -103,21 +103,21 @@ a.mp-stat:hover, a.mp-stat:focus-visible, a.mp-stat.is-hover { background: var(-
 ```
 
 ## 앱
-- SwiftUI: `VStack(alignment: .leading, spacing: 4) { Text("남은 일").opacity(0.45); Text("12").font(.custom("Mulmaru", size: 32)).monospacedDigit() }`. 값 변경에 `.contentTransition(.numericText())`을 쓰지 않는다(`.identity`).
-- Compose: `Text("12", style = TextStyle(fontFamily = mulmaru, fontSize = 32.sp, fontFeatureSettings = "tnum"))`. `AnimatedContent` 없이 즉시 교체.
+- SwiftUI: `VStack(alignment: .leading, spacing: 4) { Text("남은 일").opacity(0.7); Text("12").font(.custom("Mulmaru", size: 36)).monospacedDigit() }`. 값 변경에 `.contentTransition(.numericText())`을 쓰지 않는다(`.identity`).
+- Compose: `Text("12", style = TextStyle(fontFamily = mulmaru, fontSize = 36.sp, fontFeatureSettings = "tnum"))`. `AnimatedContent` 없이 즉시 교체.
 - 앱 숫자 크기는 최소 24pt/24sp(orange ■ 옆 숫자도 잉크).
 - 여러 칸은 `Grid`/`LazyVerticalGrid` 2열, 칸 사이 1pt 선.
 - 위젯에서 쓰는 형태는 `widget` 문서.
 ```swift
 VStack(alignment: .leading, spacing: 4) {
-  Text("남은 일").font(.custom("Mulmaru", size: 13)).opacity(0.45)
-  Text("12개").font(.custom("Mulmaru", size: 32)).monospacedDigit().contentTransition(.identity)
+  Text("남은 일").font(.custom("Mulmaru", size: 12)).opacity(0.7)
+  Text("12개").font(.custom("Mulmaru", size: 36)).monospacedDigit().contentTransition(.identity)
 }.accessibilityElement(children: .combine)
 ```
 ```kotlin
 Column(Modifier.semantics(mergeDescendants = true) {}) {
-  Text("남은 일", Modifier.alpha(0.45f), fontSize = 13.sp)
-  Text("12개", fontSize = 32.sp, style = TextStyle(fontFeatureSettings = "tnum"))
+  Text("남은 일", Modifier.alpha(0.7f), fontSize = 12.sp)
+  Text("12개", fontSize = 36.sp, style = TextStyle(fontFeatureSettings = "tnum"))
 }
 ```
 

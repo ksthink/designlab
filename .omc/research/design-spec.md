@@ -15,7 +15,15 @@
 2. **다크 모드 전면 허용** (사이트·앱). 라이트: bg paper, ink slate. 다크: bg slate, ink paper. `prefers-color-scheme` 자동 + `[data-theme="light"|"dark"]` 수동 지정. 파생값(line, line-strong, line-button, grid-bg, grid-line, glyph)은 ink의 투명도로 테마마다 따로 정의: 라이트 ink rgb(48,56,65), 다크 ink rgb(245,245,245), 알파는 기존과 동일(.16/.45/.4/.035/.07/.55). `theme-color`도 테마별 meta 두 개.
 3. **앱(iOS/Android)도 같은 원칙**(직각, 굵기 400, 그림자 없음). OS가 강제하는 요소(시스템 시트, 앱 아이콘 마스크, 시스템 컨트롤)만 예외로 명시.
 4. **철학 문서 구조**: 세 기둥(미니멀리즘·픽셀아트·레트로 컬러) + '만드는 태도' 섹션 — (a) 빼기·가벼움·범위, (b) 되돌릴 수 없는 일 앞의 확인 단계·결정 이유 기록, (c) 터미널 어휘·말투. 로컬 우선은 원칙에 넣지 않음(미정 사항으로만 기록). 근거는 `.omc/research/portfolio-analysis.md`.
-5. 미정으로 남김: MonaS12→Mulmaru 교체 여부, 분류에 색이 필요할 때의 방법, 다음 추가 색.
+5. 미정으로 남김: MonaS12→Mulmaru 교체 여부, 다음 추가 색.
+
+### 2026-11-21 보강 (사용자 확정)
+6. **글자 크기는 Mulmaru 12px 격자의 정수배만.** `--mp-size-*`: hero 72 · title 48 · heading 36 · subheading 24 · lead 24 · body/small/kicker/meta/fine 12px. 좁은 화면(≤480px)은 hero 48, title 36(`$extensions.dev.metaphr.narrow` → tokens.css 미디어 쿼리). 이유: 유동 크기(14.4px 등)에서 픽셀이 뭉개져 버튼의 "켜짐"이 "커짐"으로 읽혔다. `clamp()`·`vw`·분수 em·16px 금지, 입력 칸 iOS 확대 방지는 24px.
+7. **글자 투명도는 .7 이상.** meta .55→.7, kicker .45→.7, fine .35→.7(라이트 3.06·2.41·1.93 → 4.53:1). muted .5는 비활성 요소 전용, 노트·placeholder는 secondary .7. 1× 글자끼리의 위계는 자간.
+8. **조작 요소 테두리 3:1.** `--mp-line-button` .4→.55(라이트 3.06, 다크 4.51:1). 입력 칸·선택 칸·검색 칸·드롭 영역도 `--mp-line`(장식) 대신 `--mp-line-button`.
+9. **분류 색:** 새 색 없이 투명도(body·secondary)와 빗금, 계열 최대 3개(chart 요소의 방법을 규칙으로).
+10. **견본 예외:** "orange 한 화면에 하나"는 라이트·다크 데모를 나란히 보여 주는 문서 영역에는 적용하지 않는다.
+11. **기준:** design_lab이 기준이고 metaphr.dev·앱이 따라온다(CLAUDE.md 갱신).
 
 
 ## 목표

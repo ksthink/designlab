@@ -31,7 +31,7 @@ related: [button, fx-fill, text-action, menu, focus-ring, press, dropdown-menu, 
 - 요소 크기·위치·padding·글자 크기는 바뀌지 않는다(레이아웃 이동 없음).
 - 반전 면은 요소의 padding 상자 전체. 글자만 감싸는 좁은 반전은 `fx-fill`의 영역이다.
 - 안의 아이콘(mask 방식)은 `background: currentColor`로 두면 함께 뒤집힌다.
-- 안의 옅은 글자(opacity .55 메타)는 반전 중에 1로 올린다. 뒤집힌 면 위 옅은 글자는 읽기 어렵다.
+- 안의 옅은 글자(opacity .7 메타)는 반전 중에 1로 올린다. 뒤집힌 면 위 옅은 글자는 읽기 어렵다.
 - 두 테마 모두 변수로 자동: 라이트는 slate 면·paper 글자, 다크는 paper 면·slate 글자.
 - 선택된 상태의 **지속** 표시는 반전이 아니라 teal 면(`--mp-secondary` + `--mp-palette-slate` 글자)이다. 반전은 "지금 가리키는 것", teal은 "골라 둔 것".
 

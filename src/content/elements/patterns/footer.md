@@ -33,7 +33,7 @@ related: [logo, divider, link, dark-images, page-list, page-read]
 - 링크 줄: `display: flex; flex-wrap: wrap; gap: 1.6em`, `--mp-size-small`, `--mp-tracking-small`
 - 링크: `opacity: var(--mp-opacity-link)`(.75), 밑줄 `border-bottom: 1px solid var(--mp-line)`, `padding-bottom: 0.15em`, `text-decoration: none`
 - 워드마크: 원본 350×200, 표시 폭 `clamp(120px, 20vw, 168px)`, `height: auto`, 가운데(`margin: clamp(2.5rem, 7vh, 4rem) auto 0`), `image-rendering: pixelated`, `user-select: none`, `loading="lazy" decoding="async"`
-- `© metaphr`: `display: block; margin-top: 1.4rem; text-align: center`, `--mp-size-fine`(.72rem), `--mp-tracking-fine`(.1em), `opacity: var(--mp-opacity-fine)`(.35)
+- `© metaphr`: `display: block; margin-top: 1.4rem; text-align: center`, `--mp-size-fine`(12px), `--mp-tracking-fine`(.1em), `opacity: var(--mp-opacity-fine)`(.7)
 
 **반응형**
 | 폭 | 동작 |
@@ -51,7 +51,7 @@ related: [logo, divider, link, dark-images, page-list, page-read]
 - 메일 링크 글자는 주소 자체(`ksthink@metaphr.dev`)로 — "연락하기"처럼 모호하게 쓰지 않는다
 - fx-fill 칠 층은 `aria-hidden="true"`, 글자는 `.label` span에 남긴다
 - 워드마크 `alt="metaphr"`. 라이트·다크 두 img 중 숨긴 쪽은 `display: none`이라 읽히지 않는다
-- `©` 줄은 .35라 보조 정보 전용. 연락처를 여기에 두지 않는다
+- `©` 줄은 가장 작은 보조 정보다. 연락처를 여기에 두지 않는다
 - 링크 포커스: fx-fill과 같은 반전 + `outline: 1px solid var(--mp-ink); outline-offset: 3px`
 - Tab 순서: 본문 마지막 요소 → 메일 링크 → 나머지 링크. 워드마크·©는 포커스 대상이 아니다
 - 외부 링크(`blog`)는 같은 탭에서 연다. 새 탭이 필요하면 링크 글자에 알린다

@@ -49,7 +49,7 @@ metaphr.dev는 카드가 3개를 넘을 때만 붙인다. 점이 10개를 넘으
 | 기본 | 1px `--mp-line`, 비어 있음, opacity 0.7 |
 | 호버 | 테두리 `--mp-line-strong`, opacity 1 |
 | 포커스 | 호버와 같음 + `outline: 1px solid var(--mp-ink); outline-offset: 3px` |
-| 현재 `aria-current="true"` | 배경·테두리 `--mp-ink`, `--mp-opacity-meta`(0.55) |
+| 현재 `aria-current="true"` | 배경·테두리 `--mp-ink`, `--mp-opacity-meta`(0.7) |
 | 비활성 | 없음 — 모든 점은 누를 수 있다 |
 
 ## 동작
@@ -100,15 +100,15 @@ metaphr.dev는 카드가 3개를 넘을 때만 붙인다. 점이 10개를 넘으
 ```
 
 ## 앱
-- SwiftUI: `TabView(.page)`의 시스템 점(원형)은 `.tabViewStyle(.page(indexDisplayMode: .never))`로 끄고 `HStack(spacing: 9)`에 `Rectangle().frame(width: 8, height: 8)`로 그린다. 현재는 `.fill(ink.opacity(0.55))`, 나머지는 `.stroke(line, lineWidth: 1)`.
-- Compose: `HorizontalPager` 아래 `Row(horizontalArrangement = Arrangement.spacedBy(9.dp))`에 `Box(Modifier.size(8.dp).border(1.dp, line))`, 현재는 `background(ink.copy(alpha = 0.55f))`.
+- SwiftUI: `TabView(.page)`의 시스템 점(원형)은 `.tabViewStyle(.page(indexDisplayMode: .never))`로 끄고 `HStack(spacing: 9)`에 `Rectangle().frame(width: 8, height: 8)`로 그린다. 현재는 `.fill(ink.opacity(0.7))`, 나머지는 `.stroke(line, lineWidth: 1)`.
+- Compose: `HorizontalPager` 아래 `Row(horizontalArrangement = Arrangement.spacedBy(9.dp))`에 `Box(Modifier.size(8.dp).border(1.dp, line))`, 현재는 `background(ink.copy(alpha = 0.7f))`.
 - 점 터치 영역은 `contentShape`/`Modifier.minimumInteractiveComponentSize()`로 넓히고 점 크기는 8 그대로.
 
 ```swift
 HStack(spacing: 9) {
   ForEach(0..<count, id: \.self) { i in
     Rectangle()
-      .fill(i == current ? ink.opacity(0.55) : .clear)
+      .fill(i == current ? ink.opacity(0.7) : .clear)
       .overlay(Rectangle().stroke(i == current ? ink : line, lineWidth: 1))
       .frame(width: 8, height: 8)
       .frame(width: 28, height: 44).contentShape(Rectangle())
@@ -124,7 +124,7 @@ Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
     val on = i == pagerState.currentPage
     Box(Modifier.size(48.dp).clickable { scope.launch { pagerState.animateScrollToPage(i) } }
         .semantics { contentDescription = "${i + 1}번째 카드"; selected = on }, contentAlignment = Alignment.Center) {
-      Box(Modifier.size(8.dp).border(1.dp, if (on) ink else line).background(if (on) ink.copy(alpha = 0.55f) else Color.Transparent))
+      Box(Modifier.size(8.dp).border(1.dp, if (on) ink else line).background(if (on) ink.copy(alpha = 0.7f) else Color.Transparent))
     }
   }
 }
@@ -132,7 +132,7 @@ Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
 - OS 예외: 잠금 화면·홈 화면 위젯 스택, 시스템 온보딩 화면의 점. 시스템 `UIPageControl`을 그대로 쓰는 화면은 원형 점을 받아들인다.
 
 ## 해야 할 것 / 하지 말 것
-- 해야 할 것: 8px 정사각, 1px 선, 현재는 잉크 채움 0.55.
+- 해야 할 것: 8px 정사각, 1px 선, 현재는 잉크 채움 0.7.
 - 해야 할 것: 누르면 해당 위치로 이동, 점마다 `aria-label`.
 - 해야 할 것: 카드가 3개 이하면 점을 두지 않는다.
 - 하지 말 것: 동그란 점, 현재 점을 길쭉하게 늘리기.
@@ -142,7 +142,7 @@ Row(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
 **자주 틀리는 것**
 - 동그란 점(모서리 50%) → 8px 정사각, 모서리 0
 - 현재 점을 `width: 20px`로 늘린 알약 → 크기 그대로, 채움만 바꾼다
-- 현재 점 `opacity: 1` 진한 잉크 → `--mp-opacity-meta`(0.55)
+- 현재 점 `opacity: 1` 진한 잉크 → `--mp-opacity-meta`(0.7)
 - 점을 `<span>`으로 그려 누를 수 없음 → `<button aria-label>`
 - 스크롤로 넘겨도 점이 안 바뀜 → `IntersectionObserver`로 가장 많이 보이는 카드와 동기화
 - 터치 기기에서 점 크기를 16px로 키움 → 점 8px, 투명 영역으로 누를 곳 확보

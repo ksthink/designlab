@@ -108,7 +108,7 @@ related: [icon-button, button, tab-bar, bottom-sheet]
 
 ```swift
 Button(action: add) {
-  Text("+").font(.custom("Mulmaru", size: 22))
+  Text("+").font(.custom("Mulmaru", size: 24))
     .frame(width: 56, height: 56)
     .foregroundStyle(pressed ? MP.ink : MP.bg)
     .background(pressed ? MP.bg : MP.ink)

@@ -50,7 +50,7 @@ related: [menu, back-link, text-action, theme-switch, drawer, tab-bar]
 ## 상태
 | 대상 | 기본 | 호버·포커스 | 현재 |
 |---|---|---|---|
-| 뒤로가기 | `--mp-opacity-meta`(0.55) | opacity 1 | — |
+| 뒤로가기 | `--mp-opacity-meta`(0.7) | opacity 1 | — |
 | 테마 토글 | `--mp-opacity-meta` | opacity 1 | 글자가 상태를 말한다 `[ 다크 ]` |
 | 브랜드 | `--mp-opacity-brand`(0.8) | opacity 1 | 홈이면 `aria-current="page"`, 모양 그대로 |
 | 메뉴 링크 | `--mp-opacity-nav`(0.7) | opacity 1 | teal ■ + opacity 1 + `--mp-line-strong` 밑선 |
@@ -122,7 +122,7 @@ NavigationStack {
     .toolbarBackground(Color.mpBg, for: .navigationBar)
     .toolbarBackgroundVisibility(.visible, for: .navigationBar)
     .toolbar {
-      ToolbarItem(placement: .principal) { Text("기록").font(.custom("Mulmaru", size: 17)) }
+      ToolbarItem(placement: .principal) { Text("기록").font(.custom("Mulmaru", size: 12)) }
       ToolbarItem(placement: .topBarTrailing) { Button("[ 편집 ]") { }.buttonStyle(.plain) }
     }
 }
@@ -141,7 +141,7 @@ Column {
 
 ## 해야 할 것 / 하지 말 것
 - 해야 할 것: 글자만, 본문과 같은 폭과 좌우 여백.
-- 해야 할 것: 브랜드 0.8 · 메뉴 0.7 · 뒤로가기 0.55의 투명도 위계를 지킨다.
+- 해야 할 것: 브랜드 0.8 · 메뉴 0.7 · 뒤로가기 0.7의 투명도 위계(같은 .7끼리는 자간과 위치로 나눈다)를 지킨다.
 - 해야 할 것: 건너뛰기 링크, `<header>`·`<nav>` 랜드마크, 라이트·다크 모두 변수로.
 - 하지 말 것: 색 막대 머리, 아래 그림자, 흐림 유리 배경.
 - 하지 말 것: 스크롤하면 줄어들거나 숨는 머리, 머리에 orange 강조.

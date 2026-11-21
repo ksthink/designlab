@@ -27,7 +27,7 @@ related: [tag, card, chip, status-dot]
 **수치**
 - 묶음: `display: flex; align-items: center; flex-wrap: wrap; gap: 0.5em`
 - 글자: `--mp-size-meta`, 자간 `--mp-tracking-meta`, 굵기 400, 행간 기본
-- 묶음 투명도: `opacity: var(--mp-opacity-meta)` (.55)
+- 묶음 투명도: `opacity: var(--mp-opacity-meta)` (.7)
 - 배지: `border: var(--mp-border) solid var(--mp-line)`, 안쪽 여백 `0.25em 0.6em`(목록 카드), `0.3em 0.7em`(읽기 화면, 글자 `clamp(0.7rem, 1.8vw, 0.78rem)`)
 - radius 0, 배경 없음, 아이콘 없음
 - 글자: 영문은 소문자(`ios`), 한국어는 짧은 명사(`준비 중`). 두 단어 이하
@@ -42,7 +42,7 @@ related: [tag, card, chip, status-dot]
 
 **접근성**
 - 장식이 아닌 정보이므로 `aria-hidden`을 붙이지 않는다. 묶음에 `aria-label="플랫폼"` 같은 이름을 줄 수 있다.
-- .55 투명도라 대비가 낮다. 배지에만 있는 필수 정보가 없게 한다(예: 출시 여부는 상세 화면 노트에도 쓴다).
+- 작은 1× 글자라 배지에만 있는 필수 정보가 없게 한다(예: 출시 여부는 상세 화면 노트에도 쓴다).
 - 점선/실선 차이만으로 뜻을 전하지 않는다 — `준비 중` 글자가 함께 있다.
 - 포커스를 받지 않는다(`tabindex` 없음). 누를 수 있어 보이는 커서·호버를 주지 않는다.
 
@@ -83,8 +83,8 @@ related: [tag, card, chip, status-dot]
   padding: 0.25em 0.6em; white-space: nowrap;
 }
 .mp-badge--soon { border-style: dashed; }
-.mp-badge-mark { color: var(--mp-accent); font-size: 0.8em; } /* 강조 — 화면당 하나 */
-.mp-badge-meta--read { font-size: clamp(0.7rem, 1.8vw, 0.78rem); }
+.mp-badge-mark { color: var(--mp-accent); } /* 강조 — 화면당 하나 */
+.mp-badge-meta--read { font-size: var(--mp-size-meta); }
 .mp-badge-meta--read .mp-badge { padding: 0.3em 0.7em; }
 ```
 
@@ -97,7 +97,7 @@ related: [tag, card, chip, status-dot]
 ```
 
 ## 앱
-- SwiftUI: `Text("ios").font(.custom("Mulmaru", size: 11)).tracking(0.9).padding(.horizontal, 7).padding(.vertical, 3).overlay(Rectangle().stroke(line, lineWidth: 1))`, 묶음 `HStack(spacing: 6)`에 `.opacity(0.55)`.
+- SwiftUI: `Text("ios").font(.custom("Mulmaru", size: 12)).tracking(0.9).padding(.horizontal, 7).padding(.vertical, 3).overlay(Rectangle().stroke(line, lineWidth: 1))`, 묶음 `HStack(spacing: 6)`에 `.opacity(0.7)`.
 - 점선: `Rectangle().stroke(line, style: StrokeStyle(lineWidth: 1, dash: [3, 2]))`.
 - Compose: `Text(modifier = Modifier.border(1.dp, line, RectangleShape).padding(horizontal = 7.dp, vertical = 3.dp))`. 점선은 `Modifier.drawBehind { drawRect(line, style = Stroke(1.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(6f, 4f)))) }`.
 - Material `Badge`/`BadgedBox`(원형 숫자 점)와 iOS `.badge()`(탭 아이템 빨간 원)는 쓰지 않는다. 탭 바 알림 수는 OS 탭 바를 쓸 때만 OS 모양 예외.
@@ -105,15 +105,15 @@ related: [tag, card, chip, status-dot]
 ```swift
 HStack(spacing: 6) {
   ForEach(platforms, id: \.self) { p in
-    Text(p).font(.custom("Mulmaru", size: 11)).tracking(0.9)
+    Text(p).font(.custom("Mulmaru", size: 12)).tracking(0.9)
       .padding(.horizontal, 7).padding(.vertical, 3)
       .overlay(Rectangle().stroke(Color("Line"), style: StrokeStyle(lineWidth: 1, dash: p == "준비 중" ? [3, 2] : [])))
   }
-}.opacity(0.55).accessibilityElement(children: .combine).accessibilityLabel("플랫폼: " + platforms.joined(separator: ", "))
+}.opacity(0.7).accessibilityElement(children: .combine).accessibilityLabel("플랫폼: " + platforms.joined(separator: ", "))
 ```
 ```kotlin
-FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.alpha(0.55f)) {
-  platforms.forEach { Text(it, fontFamily = Mulmaru, fontSize = 11.sp, modifier = Modifier.border(1.dp, line, RectangleShape).padding(horizontal = 7.dp, vertical = 3.dp)) }
+FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.alpha(0.7f)) {
+  platforms.forEach { Text(it, fontFamily = Mulmaru, fontSize = 12.sp, modifier = Modifier.border(1.dp, line, RectangleShape).padding(horizontal = 7.dp, vertical = 3.dp)) }
 }
 ```
 
@@ -132,6 +132,6 @@ FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), modifier = Modifier.
 |---|---|
 | 반지름 999px 알약 모양 | radius 0 사각형 |
 | 초록 배경 `출시`, 빨강 `종료` | 선만, 상태는 글자 + 점선 |
-| 배지마다 `opacity: .55` 후 묶음에도 `.55` | 투명도는 묶음에 한 번 |
+| 배지마다 `opacity: .7` 후 묶음에도 `.7` | 투명도는 묶음에 한 번 |
 | `IOS`, `Android` 표기 섞기 | 소문자 `ios`, `android` 통일 |
 | 배지를 `<a>`로 만들어 필터 | `chip` 사용 |

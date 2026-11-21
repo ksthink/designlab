@@ -24,7 +24,7 @@ related: [color, theme-switch, dark-images, logo]
 |---|---|---|
 | `--mp-bg` | paper #F5F5F5 | slate #303841 |
 | `--mp-ink` | slate #303841 | paper #F5F5F5 |
-| `--mp-line` / `-strong` / `-button` | slate 알파 .16 / .45 / .4 | paper 알파 .16 / .45 / .4 |
+| `--mp-line` / `-strong` / `-button` | slate 알파 .16 / .45 / .55 | paper 알파 .16 / .45 / .55 |
 | `--mp-grid-bg` / `--mp-grid-line` / `--mp-glyph` | slate .035 / .07 / .55 | paper .035 / .07 / .55 |
 | `--mp-secondary` / `--mp-accent` | teal / orange | teal / orange (같은 값) |
 

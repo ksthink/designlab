@@ -120,7 +120,7 @@ related: [card, carousel-nav, page-indicator, section-head, page-list]
   position: absolute; top: 50%; width: 2.4rem; height: 2.4rem; margin-top: -1.2rem; z-index: 2;
   display: none; align-items: center; justify-content: center;
   border: var(--mp-border) solid var(--mp-line); background: var(--mp-bg); color: inherit;
-  font: inherit; font-size: 0.9rem; cursor: pointer; opacity: var(--mp-opacity-muted);
+  font: inherit; font-size: var(--mp-size-small); cursor: pointer; opacity: var(--mp-opacity-muted);
   transition: opacity var(--mp-duration-hover) ease;
 }
 .mp-rail-nav:hover, .mp-rail-nav:focus-visible { opacity: 1; }

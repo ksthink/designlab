@@ -116,7 +116,7 @@ related: [tabs, chip, radio, switch]
 HStack(spacing: 0) {
   ForEach(options.indices, id: \.self) { i in
     Button(options[i]) { selection = i }
-      .font(.custom("Mulmaru", size: 14)).frame(maxWidth: .infinity, minHeight: 44)
+      .font(.custom("Mulmaru", size: 12)).frame(maxWidth: .infinity, minHeight: 44)
       .foregroundStyle(selection == i ? MP.slate : MP.ink.opacity(0.7))
       .background(selection == i ? MP.secondary : .clear)
       .overlay(alignment: .leading) { if i > 0 { Rectangle().fill(MP.lineButton).frame(width: 1) } }

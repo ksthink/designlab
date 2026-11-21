@@ -150,5 +150,5 @@ FilterChip(
 - Compose `FilterChip` 기본 체크 아이콘이 남음 → `leadingIcon = null`
 - Material 기본 `shape`(8dp 둥근 모서리) 그대로 → `RectangleShape`
 - 켜짐 칩 글자를 paper(`--mp-bg` 라이트값)로 둠 → 두 테마 모두 `--mp-palette-slate`
-- 꺼짐 칩을 kicker 투명도(0.45)까지 흐리게 → `--mp-opacity-secondary`(0.7)
+- 꺼짐 칩을 비활성 투명도(0.5)까지 흐리게 → `--mp-opacity-secondary`(0.7)
 - `div` + 클릭 처리로 만들어 키보드로 못 켬 → 체크박스 또는 `button aria-pressed`

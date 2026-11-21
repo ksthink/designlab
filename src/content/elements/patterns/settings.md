@@ -56,7 +56,7 @@ related: [list, key-value, switch, segmented-control, theme-switch, confirm-step
 - 키보드: Tab으로 행 이동, Enter로 이동·행동, Space로 토글. 포커스는 반전 + `outline: 1px solid var(--mp-bg); outline-offset: -3px`(반전된 행 안쪽)
 - VoiceOver/TalkBack: 행 하나가 요소 하나로 묶이게(`.accessibilityElement(children: .combine)`, `Modifier.semantics(mergeDescendants = true)`), 토글 행은 스위치 역할로
 - Dynamic Type / 글자 크기: 행 높이는 최소값만 두고 글자에 따라 늘어나게. 가장 큰 크기에서 값은 아래 줄로
-- 대비: 값 .7 이상 유지(.55 이하 금지). 비활성 행(.5)은 이유 문장을 따로 읽히게 `aria-describedby`
+- 대비: 글자는 .7 이상(그 아래 금지). 비활성 행(.5)은 이유 문장을 따로 읽히게 `aria-describedby`
 - 이동 행 VoiceOver 읽기 예: "테마, 시스템, 버튼". iOS `.accessibilityValue("시스템")` + `.accessibilityAddTraits(.isButton)`, Compose `semantics { stateDescription = "시스템"; role = Role.Button }`
 - 위험 행: `aria-haspopup="dialog"`(누르면 확인 창), 라벨은 "데이터 삭제"처럼 대상까지
 
@@ -136,7 +136,7 @@ related: [list, key-value, switch, segmented-control, theme-switch, confirm-step
         HStack { Text("테마"); Spacer(); Text("시스템 >").opacity(0.7) }
       }
       .accessibilityValue("시스템")
-    } header: { Text("화면").textCase(nil).font(.custom("Mulmaru", size: 13)).opacity(0.45) }
+    } header: { Text("화면").textCase(nil).font(.custom("Mulmaru", size: 12)).opacity(0.7) }
   }
   .listStyle(.plain).scrollContentBackground(.hidden)
   .listRowSeparatorTint(Color("Line")).background(Color("Background"))
@@ -168,7 +168,7 @@ related: [list, key-value, switch, segmented-control, theme-switch, confirm-step
 - 해야 할 것: 맨 아래 버전 한 줄, 문의 링크는 `link`로.
 - 하지 말 것: 둥근 그룹 카드(`insetGrouped`), 그림자 있는 설정 카드.
 - 하지 말 것: 행마다 색깔 아이콘 사각형(iOS 설정 앱 흉내).
-- 하지 말 것: 설명 문단을 기본으로 펼쳐 두기, 필수 정보를 .55 이하 글자로.
+- 하지 말 것: 설명 문단을 기본으로 펼쳐 두기, 글자를 .7 아래로 옅게.
 - 하지 말 것: 삭제·탈퇴 행을 목록 중간에 두거나 빨간 글자로.
 - 하지 말 것: 스위치 켜짐을 teal·orange·OS 기본 초록으로 칠하기(켜짐 = ink 채움).
 - 하지 말 것: "저장" 버튼, 값 변경마다 뜨는 확인 창(되돌릴 수 있는 변경은 확인하지 않는다).

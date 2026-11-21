@@ -121,7 +121,7 @@ related: [text-field, labels-numbers, popover, bottom-sheet, form-validation]
   - 각 칸 `.accessibilityLabel("9월 17일 목요일")`, 선택 `.accessibilityAddTraits(.isSelected)`.
 - Compose: Material3 `DatePicker` 대신 `LazyVerticalGrid(GridCells.Fixed(7))` + `Box(Modifier.size(48.dp).background(if (selected) ink else Color.Transparent))`.
   - `Modifier.semantics { selected = isSelected; contentDescription = "9월 17일 목요일" }`.
-- 잠긴 날: SwiftUI `Text(day).strikethrough(true).opacity(0.55)` + `.accessibilityLabel("9월 20일 토요일, 예약됨")`, 탭 동작 없음. Compose `TextDecoration.LineThrough` + `alpha(0.55f)`, `semantics { stateDescription = "예약됨" }`, `clickable` 없이 `focusable()`.
+- 잠긴 날: SwiftUI `Text(day).strikethrough(true).opacity(0.7)` + `.accessibilityLabel("9월 20일 토요일, 예약됨")`, 탭 동작 없음. Compose `TextDecoration.LineThrough` + `alpha(0.7f)`, `semantics { stateDescription = "예약됨" }`, `clickable` 없이 `focusable()`.
 - iOS 휠(`.wheel`)·Android 시스템 날짜 대화상자는 OS 모양 그대로 둔다.
 - 앱에서 달력은 `bottom-sheet`에 담고, 고르면 즉시 닫는다(기간은 끝 날짜를 고를 때 닫는다).
 

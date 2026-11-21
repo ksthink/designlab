@@ -58,7 +58,7 @@ related: [splash, button, text-action, page-indicator, empty-state, microcopy, s
 - Dynamic Type: 가장 큰 크기에서 그림 판을 숨기고 글자·버튼 우선
 - 캐럿·스와이프 애니메이션은 reduced-motion에서 정지
 - 장 전환 알림: 웹은 제목 포커스로 읽히게 하고, 앱은 iOS `UIAccessibility.post(notification: .screenChanged, argument: title)`, Android `Modifier.semantics { liveRegion = LiveRegionMode.Polite }` 또는 `announceForAccessibility("2 / 3, 기록")`
-- 대비: 글자·버튼 slate/paper 10.9:1, 건너뛰기(.55)는 보조 — 장을 넘기는 유일한 수단으로 두지 않는다
+- 대비: 글자·버튼 slate/paper 10.9:1, 건너뛰기(.7)는 보조 — 장을 넘기는 유일한 수단으로 두지 않는다
 
 **조합 규칙**
 - 흐름: `splash` → 온보딩(첫 실행만) → 첫 화면. 첫 화면이 비어 있으면 `empty-state`가 다음 할 일을 말한다 — 온보딩에서 같은 말을 반복하지 않는다.
@@ -117,7 +117,7 @@ related: [splash, button, text-action, page-indicator, empty-state, microcopy, s
 }
 .mp-onboarding-title { max-width: var(--mp-width-para); margin: 0; font-size: var(--mp-size-heading); letter-spacing: var(--mp-tracking-heading); }
 .mp-onboarding-title::after {
-  content: "■"; margin-left: 0.35em; font-size: 0.85em; opacity: var(--mp-opacity-kicker);
+  content: "■"; margin-left: 0.35em; opacity: var(--mp-opacity-kicker);
   animation: mp-onboarding-caret var(--mp-duration-caret) steps(1, end) infinite;
 }
 @keyframes mp-onboarding-caret { 50% { opacity: 0; } }
@@ -149,7 +149,7 @@ related: [splash, button, text-action, page-indicator, empty-state, microcopy, s
   TabView(selection: $page) { ForEach(0..<3) { OnboardingPage(i: $0).tag($0) } }
     .tabViewStyle(.page(indexDisplayMode: .never))
   HStack(spacing: 9) { ForEach(0..<3) { i in
-    Rectangle().fill(i == page ? ink.opacity(0.55) : .clear)
+    Rectangle().fill(i == page ? ink.opacity(0.7) : .clear)
       .frame(width: 8, height: 8).overlay(Rectangle().stroke(line, lineWidth: 1)) } }
     .accessibilityElement().accessibilityLabel("3장 중 \(page + 1)장")
   // 완료: @AppStorage("onboarded") var onboarded = false → .fullScreenCover(isPresented: !onboarded)
@@ -160,7 +160,7 @@ related: [splash, button, text-action, page-indicator, empty-state, microcopy, s
   HorizontalPager(state) { OnboardingPage(it) }
   Row(Modifier.semantics(mergeDescendants = true) { contentDescription = "3장 중 ${state.currentPage + 1}장" }) {
     repeat(3) { i -> Box(Modifier.size(8.dp).border(1.dp, Line, RectangleShape)
-      .background(if (i == state.currentPage) Ink.copy(alpha = .55f) else Color.Transparent)) }
+      .background(if (i == state.currentPage) Ink.copy(alpha = 0.7f) else Color.Transparent)) }
   }
   ```
 - 그림: `Image.interpolation(.none)` / `FilterQuality.None`, 정수 배율 120·200.

@@ -236,11 +236,11 @@ export const PILLARS: { id: PillarId; title: string; en: string; summary: string
     summary: '빼고 덜어낸다. 넓은 여백, 서체 하나, 굵기 하나, 투명도 위계, 1px 헤어라인, 장식 없음.',
     rules: [
       '여백을 넓게: 섹션 세로 padding `--mp-section` `clamp(2.5rem, 8vh, 5rem)` – `--mp-section-lg` `clamp(4rem, 12vh, 9rem)`, 좌우 `--mp-gutter`, 목록 폭 `--mp-width-list` 1180px, 읽기 폭 `--mp-width-read` 760px, 문단 폭 `--mp-width-para` 30em.',
-      '글자 크기는 `--mp-size-*` 10단계만, 같은 이름의 `--mp-tracking-*`와 짝. 본문 행간 `--mp-leading-body` 2.1, 카드 설명 1.85, h1 1.35.',
+      '글자 크기는 `--mp-size-*` 10단계만, 같은 이름의 `--mp-tracking-*`와 짝. 모든 단계는 Mulmaru 12px 격자의 정수배(12·24·36·48·72px). 본문 행간 `--mp-leading-body` 2.1, 카드 설명 1.85, h1 1.35.',
       '굵기 400 하나. `font-weight` 500 이상·`font-style: italic` 금지. 위계는 크기·자간·투명도로.',
-      '필수 정보(본문·버튼·링크 라벨)는 opacity 0.7 이상. 0.55 이하는 보조·장식 정보(메타·kicker·커서·저작권)에만 쓴다.',
-      '글자 위계는 색이 아니라 `opacity`: 본문 0.85 · 브랜드 0.8 · 푸터 링크 0.75 · 보조 0.7 · 상단 링크 0.7 · 메타/배지 0.55 · 노트 0.5 · kicker/커서 0.45 · 저작권 0.35. 호버 시 1.',
-      '선은 1px `--mp-line`(ink 알파 0.16), 호버 `--mp-line-strong` 0.45, 버튼 `--mp-line-button` 0.4.',
+      '글자는 모두 opacity 0.7 이상(라이트 4.53:1, 다크 6.24:1 이상). 0.5(`--mp-opacity-muted`)는 비활성 요소 전용.',
+      '글자 위계는 색이 아니라 `opacity`: 본문 0.85 · 브랜드 0.8 · 푸터 링크 0.75 · 보조·노트 0.7 · 상단 링크 0.7 · 메타/배지 0.7 · kicker/커서 0.7 · 저작권 0.7 · 비활성 0.5. 1× 글자끼리의 위계는 자간이 맡는다. 호버 시 1.',
+      '선은 1px `--mp-line`(ink 알파 0.16), 호버 `--mp-line-strong` 0.45, 버튼·입력 칸 `--mp-line-button` 0.55(조작 요소 경계 3:1 이상).',
       '`border-radius: 0`, `box-shadow`·`text-shadow`·장식 그라데이션·`backdrop-filter` 없음.',
       '라이트/다크 두 테마를 모두 지원한다: `prefers-color-scheme` 자동 + `[data-theme="light"|"dark"]` 수동. 색은 항상 시맨틱 변수(`--mp-bg`, `--mp-ink` …)로 써서 테마가 저절로 바뀌게 한다.',
       '앱(iOS/Android)도 같은 원칙(직각, 굵기 400, 그림자 없음, 같은 팔레트). 예외는 OS가 강제하는 요소(시스템 시트, 앱 아이콘 마스크, 시스템 컨트롤)뿐이다.',
@@ -256,9 +256,10 @@ export const PILLARS: { id: PillarId; title: string; en: string; summary: string
     summary: '화면이 격자라는 사실을 드러낸다. 비트맵 서체, 1비트 아이콘, 정수 배율, 모눈, 계단식 움직임.',
     rules: [
       '서체는 비트맵 서체 Mulmaru 하나(`--mp-font`). 다른 서체를 섞지 않는다.',
+      '글자도 정수 배율: Mulmaru는 12px 격자 서체라 글자 크기는 12px의 정수배만(1× 12 · 2× 24 · 3× 36 · 4× 48 · 6× 72px). `clamp()`·`vw`·`0.85em` 같은 연속·분수 크기 금지. 좁은 화면(≤480px)은 한 단계씩 내린다(hero 72→48, title 48→36).',
       '아이콘은 40×40 1비트 PNG. 정수 배율만: 카드 3× `--mp-pixel-card` 120px, 상세 5× `--mp-pixel-detail` 200px. `image-rendering: pixelated; crisp-edges`, opacity 0.72.',
       '썸네일은 모눈 배경: 면 `--mp-grid-bg`, 1px 격자선 `--mp-grid-line`, 칸 12px(카드)/16px(상세), 대체 글리프 `--mp-glyph`.',
-      '커서 `■`는 `steps(1, end)` 1.2s로 깜빡임, opacity 0.45.',
+      '커서 `■`는 `steps(1, end)` 1.2s로 깜빡임, opacity `--mp-opacity-kicker`(0.7), 크기는 부모 글자와 같게.',
       '호버 강조 fx-fill: 8칸이 `steps(4, end)` 0.19s로 차오르며 잉크/배경 반전.',
       '글리프 캔버스는 83ms(`--mp-tick`) 셀 단위 갱신. 셀 사이 부드러운 트윈 금지.',
       '로고·스크롤 힌트는 등록된 파일을 그대로, `image-rendering: pixelated`. 워드마크는 테마별 파일(라이트 `metaphr.svg`, 다크 `metaphr-dark.svg`), 1비트 단색(아이콘 PNG, `down.svg`)은 mask로 `--mp-ink`를 칠해도 된다.',
@@ -313,7 +314,8 @@ const MISTAKES: [PillarId, string, string, string][] = [
   ['retro-color', '라이트에서 강조색 글자', '`color: var(--mp-accent)` 링크, `color: var(--mp-secondary)` 설명', '면·■ 마크·픽셀 포인트 (paper 위 2.9:1, 2.35:1)'],
   ['retro-color', '다크에서 작은 orange 글자', 'body 크기 orange 링크', '--mp-size-title 이상(최소 24px)만 (slate 위 3.76:1). 작은 글자는 teal 또는 ink'],
   ['retro-color', '강조색 면 위 흰/paper/작은 글자', 'orange 버튼에 흰 글자, orange 면 위 body 크기 글자', 'slate 글자(`--mp-palette-slate`), orange 면 위는 `--mp-size-title` 이상(최소 24px)'],
-  ['minimalism', '옅은 필수 정보', '버튼 라벨·본문에 opacity .55 이하', '필수 정보는 opacity .7 이상'],
+  ['minimalism', '옅은 글자', '메타·노트·placeholder에 opacity .55 이하', '글자는 opacity .7 이상, .5는 비활성 요소만'],
+  ['pixel-art', '격자에서 벗어난 글자 크기', '`font-size: clamp(0.9rem, 2vw, 1.1rem)`, `16px`, `0.85em`', '`--mp-size-*`(12px의 정수배)만'],
   ['retro-color', 'teal과 orange 맞붙이기', 'teal 면 위 orange ■, orange 테두리 teal 칸', '사이에 bg를 두거나 한쪽만 (1.24:1)'],
   ['retro-color', '옅은 강조색', '`opacity: .5` orange 면, `rgba(255,87,34,.2)` 배경', '불투명 `--mp-accent`만'],
 ];
@@ -334,7 +336,7 @@ function paletteTable(): string {
 
 const opacityTable = () => `### 투명도별 실효 대비
 
-ink를 opacity로 옅게 한 글자가 같은 테마 bg 위에서 갖는 대비(WCAG 2, 빌드 때 계산). 필수 정보(본문·버튼·링크 라벨)는 opacity 0.7 이상, 0.55 이하는 보조·장식 정보에만 쓴다.
+ink를 opacity로 옅게 한 글자가 같은 테마 bg 위에서 갖는 대비(WCAG 2, 빌드 때 계산). 글자는 모두 opacity 0.7 이상. 0.5(muted)는 비활성 요소 전용.
 
 ${table(
   ['CSS 변수', 'opacity', '라이트(slate on paper)', '다크(paper on slate)', '용도 구분'],
@@ -347,9 +349,7 @@ ${table(
       ? '픽셀 이미지용(글자 아님)'
       : Number(t.value) >= 0.7
         ? '필수 정보 가능'
-        : Number(t.value) > 0.55
-          ? '필수 정보에는 쓰지 않음'
-          : '보조·장식 정보만',
+        : '비활성 요소 전용(글자 아님)',
   ]),
 )}`;
 

@@ -117,7 +117,7 @@ const total = sections.reduce((n, s) => n + s.items.length, 0);
   .empty {
     margin: 0;
     padding: clamp(2rem, 6vh, 3rem) 0;
-    font-size: clamp(0.9rem, 2.1vw, 1.05rem);
+    font-size: var(--mp-size-body);
     line-height: 2;
     opacity: var(--mp-opacity-meta);
   }
@@ -230,7 +230,7 @@ const total = sections.reduce((n, s) => n + s.items.length, 0);
     margin: 1.8em 0 0;
     font-size: var(--mp-size-meta);
     letter-spacing: var(--mp-tracking-meta);
-    opacity: var(--mp-opacity-muted);
+    opacity: var(--mp-opacity-secondary);
     overflow-wrap: anywhere;
   }
   .machine a { text-decoration: none; border-bottom: var(--mp-border) solid var(--mp-line-strong); }

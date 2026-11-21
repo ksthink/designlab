@@ -90,7 +90,7 @@ related: [key-value, labels-numbers, radio, text-field, form-validation, button,
 ### 반응형
 - 700px 이하: 한 줄 단, 좌우 `--mp-gutter`, 결제 버튼 전체 폭. 모바일에서 결제 버튼을 화면 아래 고정하면 합계 금액이 버튼 안에 있어야 한다. 700–860px은 한 단, 최대 폭 `--mp-width-read`.
 - 860px 이상: 두 단. 왼쪽 수단·입력(1fr), 오른쪽 요약·버튼(`18em`, `position: sticky; top: 1.5em`).
-- 입력 글자는 iOS 확대 방지를 위해 16px 이상(`max(16px, var(--mp-size-body))`).
+- 입력 글자는 iOS 확대 방지를 위해 좁은 화면에서 `--mp-size-subheading`(24px, 12px 격자의 2×).
 
 ## 데모
 ```html demo
@@ -133,7 +133,7 @@ related: [key-value, labels-numbers, radio, text-field, form-validation, button,
 .mp-payment-pay:disabled { cursor: not-allowed; }
 .mp-payment-pay:disabled:not(.is-busy) { opacity: var(--mp-opacity-muted); }
 .mp-payment-mark { color: var(--mp-accent); } /* 강조 — 화면당 하나 */
-.mp-payment-cells { display: inline-flex; gap: 0.2em; font-size: 0.8em; }
+.mp-payment-cells { display: inline-flex; gap: 0.2em; }
 .mp-payment-cells span { opacity: var(--mp-opacity-muted); animation: mp-payment-step var(--mp-duration-caret) steps(1, end) infinite; }
 .mp-payment-cells span:nth-child(2) { animation-delay: 0.4s; }
 .mp-payment-cells span:nth-child(3) { animation-delay: 0.8s; }

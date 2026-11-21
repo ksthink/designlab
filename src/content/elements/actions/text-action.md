@@ -48,7 +48,7 @@ design_lab 머리의 테마 토글 `[ 시스템 ]`, `menu`의 메뉴 버튼 `[ �
 ## 상태
 | 상태 | 표현 |
 |---|---|
-| 기본 | `--mp-opacity-meta`(0.55), 투명 배경 |
+| 기본 | `--mp-opacity-meta`(0.7), 투명 배경 |
 | 호버 | opacity 1 + 배경 `--mp-ink`, 글자 `--mp-bg` |
 | 포커스 | 호버와 같음 + `outline: 1px solid var(--mp-ink); outline-offset: 3px` |
 | 누름 | 호버와 같음(이동 없음) |
@@ -67,7 +67,7 @@ design_lab 머리의 테마 토글 `[ 시스템 ]`, `menu`의 메뉴 버튼 `[ �
 - 토글은 상태를 이름에 담는다: `aria-label="화면 테마: 라이트 — 눌러서 바꾸기"`(design_lab 방식) 또는 `aria-pressed`
 - 패널을 열면 `aria-expanded` + `aria-controls`
 - 키보드: `Tab` 포커스, `Enter`·`Space` 실행. 닫기 동작은 `Esc`에도 연결한다
-- 기본 opacity 0.55는 보조 행동이라 허용한다. 필수 행동이면 `button`으로 올린다
+- 기본 opacity 0.7(메타)은 보조 행동의 단계다. 필수 행동이면 `button`으로 올린다
 - 메뉴를 여는 텍스트 액션은 `aria-haspopup="menu"` 또는 `"dialog"`를 맞게 준다
 - 진행 중(`[ ... ]`)에는 `aria-busy="true"`와 함께 누름을 막고, 끝나면 `aria-live="polite"` 영역에 결과를 알린다
 
@@ -104,7 +104,7 @@ design_lab 머리의 테마 토글 `[ 시스템 ]`, `menu`의 메뉴 버튼 `[ �
 ```
 
 ## 앱
-- SwiftUI: `Button("[ 확인 ]") { }` + `.buttonStyle(.plain)`, 사용자 `ButtonStyle`에서 `configuration.isPressed`일 때 배경 ink·글자 bg, 기본 `.opacity(0.55)`. `.accessibilityLabel("확인")`.
+- SwiftUI: `Button("[ 확인 ]") { }` + `.buttonStyle(.plain)`, 사용자 `ButtonStyle`에서 `configuration.isPressed`일 때 배경 ink·글자 bg, 기본 `.opacity(0.7)`. `.accessibilityLabel("확인")`.
 - Compose: `TextButton(shape = RectangleShape, contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp), colors = ButtonDefaults.textButtonColors(contentColor = ink))`, ripple 대신 눌림 반전, `Modifier.semantics { contentDescription = "확인" }`.
 - 앱 바 오른쪽의 `[ 편집 ]`, 시트 맨 아래 `[ 취소 ]`에 쓴다. 최소 터치 높이 44pt/48dp.
 - OS 예외: 시스템 알림창(`.alert`, `AlertDialog` 기본형)의 버튼 글자는 괄호 없이 OS 모양 그대로 둔다.
@@ -113,11 +113,11 @@ design_lab 머리의 테마 토글 `[ 시스템 ]`, `menu`의 메뉴 버튼 `[ �
 struct TextActionStyle: ButtonStyle {
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
-      .font(.custom("Mulmaru", size: 13)).tracking(1)
+      .font(.custom("Mulmaru", size: 12)).tracking(1)
       .padding(.horizontal, 5).padding(.vertical, 3).frame(minHeight: 44)
       .foregroundStyle(configuration.isPressed ? MP.bg : MP.ink)
       .background(configuration.isPressed ? MP.ink : .clear)
-      .opacity(configuration.isPressed ? 1 : 0.55)
+      .opacity(configuration.isPressed ? 1 : 0.7)
   }
 }
 // Button("[ 취소 ]", action: cancel).buttonStyle(TextActionStyle()).accessibilityLabel("취소")
@@ -129,7 +129,7 @@ Text(
   "[ 취소 ]", fontFamily = Mulmaru, color = if (pressed) MP.bg else MP.ink,
   modifier = Modifier
     .background(if (pressed) MP.ink else Color.Transparent)
-    .alpha(if (pressed) 1f else 0.55f).heightIn(min = 48.dp).padding(horizontal = 6.dp, vertical = 2.dp)
+    .alpha(if (pressed) 1f else 0.7f).heightIn(min = 48.dp).padding(horizontal = 6.dp, vertical = 2.dp)
     .clickable(interactionSource = source, indication = null, onClick = cancel)
     .semantics { role = Role.Button; contentDescription = "취소" },
 )

@@ -157,7 +157,7 @@ related: [modal, action-sheet, drawer, list]
 .sheet(isPresented: $open) {
   VStack(alignment: .leading, spacing: 12) {
     Rectangle().fill(MP.ink.opacity(0.5)).frame(width: 32, height: 3).frame(maxWidth: .infinity)
-    Text("측정소").font(.custom("Mulmaru", size: 18))
+    Text("측정소").font(.custom("Mulmaru", size: 24))
   }
   .padding(.horizontal, 20).padding(.top, 10)
   .presentationDetents([.height(contentHeight), .large])

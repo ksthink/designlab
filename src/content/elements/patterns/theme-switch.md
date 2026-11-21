@@ -28,7 +28,7 @@ related: [theme, header, text-action, dark-images, settings, segmented-control]
 **수치**
 - `padding: 0.2em 0`, 테두리·배경 없음, `color: inherit`, `font: inherit`
 - `--mp-size-kicker`, 자간 `--mp-tracking-meta`(.08em), `white-space: nowrap`
-- `opacity: var(--mp-opacity-meta)`(.55), 호버·포커스 1, 전환 `--mp-duration-hover` ease(투명도만)
+- `opacity: var(--mp-opacity-meta)`(.7), 호버·포커스 1, 전환 `--mp-duration-hover` ease(투명도만)
 - 해 ☀·달 ☾ 아이콘이나 스위치 모양을 쓰지 않는다
 
 **반응형**
@@ -46,7 +46,7 @@ related: [theme, header, text-action, dark-images, settings, segmented-control]
 - `aria-label`에 현재 값과 행동: `화면 테마: 시스템 — 눌러서 바꾸기`. 누를 때마다 갱신
 - `aria-pressed`는 쓰지 않는다(세 값 순환이라 참/거짓이 아니다)
 - 포커스 링 `outline: 1px solid var(--mp-ink); outline-offset: 3px`
-- 버튼 글자 .55는 보조 단계지만 현재 값이 `aria-label`로도 전달되고 호버·포커스에서 1이 된다
+- 버튼 글자 .7은 보조 단계지만 현재 값이 `aria-label`로도 전달되고 호버·포커스에서 1이 된다
 - 두 테마 모두 모든 글자 대비가 유지되도록 색은 시맨틱 변수만 쓴다
 - 바뀐 값 알림: 버튼 글자 자체가 바뀌므로 별도 `aria-live`는 두지 않는다. 포커스가 버튼에 남아 있어 스크린리더가 새 `aria-label`을 읽는다
 - `role="switch"`·체크박스로 만들지 않는다(두 값이 아니다)

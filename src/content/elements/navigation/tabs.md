@@ -131,7 +131,7 @@ related: [menu, segmented-control, tab-bar, accordion, code-block]
 HStack(spacing: 22) { ForEach(tabs.indices, id: \.self) { i in
   Button { selected = i } label: { HStack(spacing: 6) {
     if i == selected { Rectangle().fill(Color.mpSecondary).frame(width: 8, height: 8) }
-    Text(tabs[i]).font(.custom("Mulmaru", size: 15))
+    Text(tabs[i]).font(.custom("Mulmaru", size: 12))
   }.padding(.vertical, 10)
    .overlay(alignment: .bottom) { Rectangle().fill(i == selected ? Color.mpLineStrong : .clear).frame(height: 1) } }
   .buttonStyle(.plain).opacity(i == selected ? 1 : 0.7)

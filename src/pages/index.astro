@@ -143,7 +143,7 @@ const prompt = `이 프로젝트는 metaphr 디자인 시스템(${VERSION})을 �
 
   .field span {
     position: absolute;
-    font-size: 16px;
+    font-size: var(--mp-size-meta);
     line-height: 1;
     opacity: 0;
     animation: twinkle var(--tw) steps(1, end) var(--twd) infinite;
@@ -183,7 +183,7 @@ const prompt = `이 프로젝트는 metaphr 디자인 시스템(${VERSION})을 �
     margin: 0;
     padding-top: calc(var(--mp-size-hero) * 0.85);
     text-align: center;
-    font-size: clamp(0.8rem, 2.4vw, 1.5rem);
+    font-size: var(--mp-size-subheading);
     letter-spacing: 0.12em;
     opacity: var(--mp-opacity-brand);
   }
@@ -224,8 +224,8 @@ const prompt = `이 프로젝트는 metaphr 디자인 시스템(${VERSION})을 �
   }
 
   @media (max-width: 480px) {
-    .slogan { font-size: clamp(1.68rem, 7.2vw, 2.34rem); }
-    .sub { padding-top: calc(clamp(1.68rem, 7.2vw, 2.34rem) * 0.85); }
+    .slogan { font-size: var(--mp-size-heading); }
+    .sub { padding-top: calc(var(--mp-size-heading) * 0.85); font-size: var(--mp-size-small); }
   }
 
   .elements { padding-top: var(--mp-section-lg); scroll-margin-top: 1rem; }
@@ -264,7 +264,7 @@ const prompt = `이 프로젝트는 metaphr 디자인 시스템(${VERSION})을 �
   .card .thumb {
     aspect-ratio: 4 / 3;
     margin-bottom: clamp(0.9rem, 2vw, 1.2rem);
-    font-size: clamp(2.9rem, 8.4vw, 4.1rem);
+    font-size: var(--mp-size-title);
     letter-spacing: var(--mp-tracking-hero);
   }
 
@@ -277,7 +277,7 @@ const prompt = `이 프로젝트는 metaphr 디자인 시스템(${VERSION})을 �
   .card p {
     flex: 1;
     margin: 0 0 1.2em;
-    font-size: clamp(0.88rem, 2.4vw, 1.1rem);
+    font-size: var(--mp-size-body);
     line-height: var(--mp-leading-card);
     opacity: var(--mp-opacity-secondary);
   }
