@@ -66,7 +66,7 @@ related: [pixel-icon, card, image, dark-images, rail]
 .mp-grid-thumbnail {
   aspect-ratio: 4 / 3;
   display: flex; align-items: center; justify-content: center;
-  font-size: clamp(2.9rem, 8.4vw, 4.1rem);
+  font-size: var(--mp-size-title);
   color: var(--mp-glyph);
   background-color: var(--mp-grid-bg);
   background-image:

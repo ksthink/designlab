@@ -24,7 +24,7 @@ related: [page-indicator, badge, loading, color, header]
 - 점: `8px × 8px` 정사각형, `border-radius: 0` — metaphr.dev 점 인디케이터와 같은 크기. 원을 쓰지 않는다
 - 세 종류만 있다
   - 강조 점: 채움 `--mp-accent`, 테두리 없음, opacity 1. **화면 전체에서 하나**
-  - 보통 점: 채움 `--mp-ink`, `opacity: var(--mp-opacity-meta)`(.55)
+  - 보통 점: 채움 `--mp-ink`, `opacity: var(--mp-opacity-meta)`(.7)
   - 꺼진 점: 배경 투명, `var(--mp-border) solid var(--mp-line)` 테두리
 - 글자와 한 줄: `display: inline-flex; align-items: center; gap: 0.5em`
 - 글자: `--mp-size-meta`, `--mp-tracking-meta`, `opacity: var(--mp-opacity-secondary)`(.7), 시간·숫자는 `tabular-nums`
@@ -37,7 +37,7 @@ related: [page-indicator, badge, loading, color, header]
 |---|---|---|---|
 | 기록 중 | 강조 `--mp-accent` | `기록 중 00:12:48` | 깜빡임 `steps(1, end)` |
 | 저장 안 됨 | 강조 `--mp-accent` | `저장 안 됨` | 멈춤 |
-| 동기화됨·연결됨 | 보통 잉크 .55 | `동기화됨` | 멈춤 |
+| 동기화됨·연결됨 | 보통 잉크 .7 | `동기화됨` | 멈춤 |
 | 오프라인·꺼짐 | 빈 1px 칸 | `오프라인` | 멈춤 |
 | 조건 없음 | 점과 글자를 지운다 | — | — |
 

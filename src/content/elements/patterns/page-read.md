@@ -42,7 +42,7 @@ related: [page-list, back-link, badge, button, image, grid-thumbnail, footer, ta
 - 본문 문단: `--mp-size-body`, 행간 `--mp-leading-body`(2.1), 자간 `--mp-tracking-body`, `opacity: var(--mp-opacity-body)`, 문단 사이 `1.6em`
 - 배지 줄: 위 `clamp(2.5rem, 7vh, 4rem)`, 아래 `clamp(2rem, 6vh, 3rem)`, 글자 `clamp(0.7rem, 1.8vw, 0.78rem)`, 배지 여백 `0.3em 0.7em`
 - 버튼 줄: `display: flex; flex-wrap: wrap; gap: 0.8em`
-- 노트: 위 `clamp(2rem, 6vh, 3rem)`, `clamp(0.78rem, 2vw, 0.88rem)`, 행간 1.9, `opacity: var(--mp-opacity-muted)`
+- 노트: 위 `clamp(2rem, 6vh, 3rem)`, `clamp(0.78rem, 2vw, 0.88rem)`, 행간 1.9, `opacity: var(--mp-opacity-secondary)`
 
 **반응형**
 | 폭 | 동작 |

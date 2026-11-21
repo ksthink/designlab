@@ -9,7 +9,7 @@ platforms: [web, ios, android]
 status: extracted
 source: metaphr.dev index.html .cat-head
 pillars: [minimalism]
-tokens: [--mp-size-heading, --mp-tracking-heading, --mp-opacity-muted, --mp-size-small, --mp-section, --mp-ease-float, --mp-border, --mp-line]
+tokens: [--mp-size-heading, --mp-tracking-heading, --mp-opacity-secondary, --mp-size-small, --mp-section, --mp-ease-float, --mp-border, --mp-line]
 effects: [float, reveal]
 related: [rail, page-list, card, typography]
 ---
@@ -29,7 +29,7 @@ related: [rail, page-list, card, typography]
 - 머리: `display: flex; align-items: baseline; flex-wrap: wrap; gap: 0 1.2em`
 - 머리 아래 여백 `clamp(1.5rem, 4vh, 2.5rem)`
 - 제목 h2: `--mp-size-heading`(`clamp(1.15rem, 3.2vw, 1.7rem)`), `--mp-tracking-heading`(.06em), 굵기 400, `margin: 0`
-- 설명: `clamp(0.78rem, 2vw, 0.95rem)`(metaphr.dev 원값, 가까운 토큰 `--mp-size-small`), 자간 `0.04em`, `opacity: var(--mp-opacity-muted)`(.5)
+- 설명: `--mp-size-small`(12px), 자간 `0.04em`, `opacity: var(--mp-opacity-muted)`(.5)
 - 분류 영역 `.cat`: 위아래 `--mp-section`, `overflow-x: clip`(떠 있는 레일이 가로 스크롤을 만들지 않게)
 - 제목 글자 수: 한 단어(2–6자). 설명: 한 줄, 20자 안팎
 
@@ -92,7 +92,7 @@ related: [rail, page-list, card, typography]
   animation: mp-section-head-float var(--fd, 4s) var(--mp-ease-float) var(--fdl, 0s) infinite alternate;
 }
 .mp-section-head h2 { margin: 0; font-weight: 400; font-size: var(--mp-size-heading); letter-spacing: var(--mp-tracking-heading); }
-.mp-section-head span { font-size: var(--mp-size-small); letter-spacing: 0.04em; opacity: var(--mp-opacity-muted); }
+.mp-section-head span { font-size: var(--mp-size-small); letter-spacing: 0.04em; opacity: var(--mp-opacity-secondary); }
 @keyframes mp-section-head-float {
   from { transform: translateY(var(--fa, 3px)); }
   to   { transform: translateY(calc(var(--fa, 3px) * -1)); }
@@ -124,7 +124,7 @@ related: [rail, page-list, card, typography]
 | 틀린 예 | 맞는 방법 |
 |---|---|
 | `align-items: center`로 크기가 다른 두 글자의 기준선이 어긋남 | `align-items: baseline` |
-| 설명을 `color: #888` 회색으로 | `color` 그대로, `opacity: var(--mp-opacity-muted)` |
+| 설명을 `color: #888` 회색으로 | `color` 그대로, `opacity: var(--mp-opacity-secondary)` |
 | 작아 보이게 하려고 `<h4>` 사용 | 문서 구조대로 `h2`, 크기는 `--mp-size-heading` |
 | 제목·설명을 한 요소로 묶어 같이 떠오름 | 두 요소에 서로 다른 `--fd`/`--fdl` |
 | 떠오름 때문에 가로 스크롤 생김 | 분류 영역 `.cat { overflow-x: clip }` |

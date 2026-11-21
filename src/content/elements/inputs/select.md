@@ -24,13 +24,13 @@ related: [text-field, radio, segmented-control, dropdown-menu, form-validation]
 - 구조: 라벨(위) → 칸 → 도움말·오류 자리(아래). `text-field`와 같은 세로 리듬
 - 라벨: `--mp-size-small`, `--mp-tracking-small`, `opacity: var(--mp-opacity-secondary)`, 칸과 간격 `0.5em`
 - 칸
-  - 테두리 `var(--mp-border) solid var(--mp-line)`, `border-radius: 0`, 배경 투명, 글자 `--mp-ink`
+  - 테두리 `var(--mp-border) solid var(--mp-line-button)`(조작 요소 경계 3:1), `border-radius: 0`, 배경 투명, 글자 `--mp-ink`
   - 글자 `--mp-size-body` / `--mp-tracking-body`, 행간 1.4
   - 여백 `0.7em 2.4em 0.7em 0.9em` — 오른쪽 2.4em은 ▼ 자리
   - 폭: 가장 긴 선택지 + ▼ 자리. 폼 안에서는 `max-width: 18em`, 좁은 화면은 100%
   - `appearance: none`으로 OS 화살표를 지운다
 - ▼ 표시
-  - 글자 `▼`(Mulmaru에 있음), `font-size: 0.6em`, 오른쪽 `0.9em`, 세로 가운데
+  - 글자 `▼`(Mulmaru에 있음), `font-size: var(--mp-size-meta)`, 오른쪽 `0.9em`, 세로 가운데
   - `opacity: var(--mp-opacity-meta)`, `pointer-events: none`, `aria-hidden`
   - 곡선 화살표 아이콘·`▾`(Mulmaru에 없음)는 쓰지 않는다
 - 선택되지 않은 첫 값: `<option value="" disabled selected>선택</option>`, 칸 글자 `opacity: var(--mp-opacity-muted)`
@@ -40,8 +40,8 @@ related: [text-field, radio, segmented-control, dropdown-menu, form-validation]
 ## 상태
 | 상태 | 표현 |
 |---|---|
-| 기본 | 1px `--mp-line`, ▼ opacity .55 |
-| 값 없음(placeholder) | 칸 글자 `opacity: var(--mp-opacity-muted)` |
+| 기본 | 1px `--mp-line-button`, ▼ opacity .7 |
+| 값 없음(placeholder) | 칸 글자 `opacity: var(--mp-opacity-secondary)` |
 | 호버 | 테두리 `--mp-line-strong` (`--mp-duration-hover` ease), ▼ opacity 1 |
 | 포커스 | 테두리 `--mp-line-strong` + `outline: 1px solid var(--mp-ink); outline-offset: 3px` |
 | 열림 | 네이티브 목록 표시, 칸은 포커스 모양 유지 |
@@ -90,12 +90,12 @@ related: [text-field, radio, segmented-control, dropdown-menu, form-validation]
 .mp-select-box { position: relative; display: block; }
 .mp-select-box::after {
   content: "▼"; position: absolute; right: 0.9em; top: 50%; transform: translateY(-50%);
-  font-size: 0.6em; opacity: var(--mp-opacity-meta); pointer-events: none;
+  font-size: var(--mp-size-meta); opacity: var(--mp-opacity-meta); pointer-events: none;
 }
 .mp-select-box:hover::after { opacity: 1; }
 .mp-select-box select {
   appearance: none; -webkit-appearance: none; width: 100%; min-height: 44px;
-  padding: 0.7em 2.4em 0.7em 0.9em; border: var(--mp-border) solid var(--mp-line); border-radius: 0;
+  padding: 0.7em 2.4em 0.7em 0.9em; border: var(--mp-border) solid var(--mp-line-button); border-radius: 0;
   background: transparent; color: var(--mp-ink);
   font: 400 var(--mp-size-body) / 1.4 var(--mp-font); letter-spacing: var(--mp-tracking-body); cursor: pointer;
   transition: border-color var(--mp-duration-hover) ease;
@@ -114,7 +114,7 @@ related: [text-field, radio, segmented-control, dropdown-menu, form-validation]
 - SwiftUI: `Picker(.menu)`의 펼친 메뉴는 시스템 메뉴(OS 예외). 닫힌 칸은 직접 그린다.
   ```swift
   Menu { ForEach(options) { o in Button(o.name) { value = o } } } label: {
-    HStack { Text(value.name); Spacer(); Text("▼").font(.custom("Mulmaru", size: 9)).opacity(0.55) }
+    HStack { Text(value.name); Spacer(); Text("▼").font(.custom("Mulmaru", size: 12)).opacity(0.7) }
       .padding(.horizontal, 14).frame(minHeight: 44)
       .overlay(Rectangle().stroke(line, lineWidth: 1))
   }

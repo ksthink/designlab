@@ -28,7 +28,7 @@ related: [theme, typography, status-dot, badge, elevation, invert-hover]
 
 **역할 변수** (테마마다 값이 바뀐다, `theme` 참고)
 - `--mp-bg` 배경 · `--mp-ink` 글자·선 기본 · `--mp-secondary` teal · `--mp-accent` orange
-- 파생: `--mp-line`(ink 알파 .16, 기본 헤어라인), `--mp-line-strong`(.45, 호버·떠 있는 층), `--mp-line-button`(.4, 버튼 테두리), `--mp-grid-bg`(.035), `--mp-grid-line`(.07), `--mp-glyph`(.55)
+- 파생: `--mp-line`(ink 알파 .16, 기본 헤어라인), `--mp-line-strong`(.45, 호버·떠 있는 층), `--mp-line-button`(.55, 버튼·입력 칸 테두리, 3:1), `--mp-grid-bg`(.035), `--mp-grid-line`(.07), `--mp-glyph`(.55)
 
 **대비 실측**
 | 조합 | 대비 | 판정 |
@@ -41,8 +41,8 @@ related: [theme, typography, status-dot, badge, elevation, invert-hover]
 | teal / orange | 1.24:1 | 맞붙이지 않는다 |
 
 **글자 위계는 색이 아니라 투명도**
-- 글자색은 `--mp-ink` 하나. 옅게 할 때는 `--mp-opacity-*` 단계(본문 .85 · 보조 .7 · 메타 .55 · 노트 .5 · kicker .45 · 저작권 .35).
-- 필수 정보(본문, 버튼·링크 라벨)는 .7 이상. .55 이하는 보조 정보 전용.
+- 글자색은 `--mp-ink` 하나. 옅게 할 때는 `--mp-opacity-*` 단계(본문 .85 · 보조·노트·메타·kicker·저작권 .7 · 비활성 .5).
+- 글자는 모두 .7 이상(라이트 4.53:1, 다크 6.24:1). .5는 비활성 요소 전용.
 
 **강조 orange 규칙**
 - 한 화면에 한 곳. 지금 가장 중요한 상태 하나(기록 중, 곧 만료, 되돌릴 수 없음)에만.

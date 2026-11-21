@@ -143,7 +143,7 @@ const haystack = (e: (typeof elements)[number]) => [e.id, e.name, e.nameEn, ...e
     appearance: none;
   }
   .filter input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
-  .filter input::placeholder { color: var(--mp-ink); opacity: var(--mp-opacity-muted); }
+  .filter input::placeholder { color: var(--mp-ink); opacity: var(--mp-opacity-secondary); }
   .filter input:focus-visible { outline-offset: 2px; }
   .filter output {
     min-width: 3em;
@@ -222,7 +222,7 @@ const haystack = (e: (typeof elements)[number]) => [e.id, e.name, e.nameEn, ...e
     font-size: var(--mp-size-meta);
     letter-spacing: var(--mp-tracking-meta);
     line-height: 1.9;
-    opacity: var(--mp-opacity-muted);
+    opacity: var(--mp-opacity-secondary);
     overflow-wrap: anywhere;
   }
   .machine a { text-decoration: none; border-bottom: var(--mp-border) solid var(--mp-line-strong); }

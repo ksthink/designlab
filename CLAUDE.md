@@ -7,11 +7,12 @@ metaphr의 디자인 철학·토큰·폰트·로고·참고 라이브러리를 �
 ## 디자인의 세 기둥
 **미니멀리즘 · 픽셀아트 · 레트로 컬러.** 모든 규칙은 이 셋 중 하나에 속한다. 규칙 목록은 `src/lib/docs.ts`의 `PILLARS`가 원본이다(ai.md·llms.txt·manifest가 여기서 생성).
 
-## 디자인 원본은 metaphr.dev
-- 디자인의 원본은 https://metaphr.dev (소스: https://github.com/ksthink/metaphr.dev). design_lab은 그 디자인을 **문서화하고 배포**할 뿐, 새 규칙을 만들지 않는다.
+## 디자인 기준은 design_lab
+- 2026-09-17 결정 이후 **design_lab이 metaphr 디자인의 기준**이다. metaphr.dev(소스: https://github.com/ksthink/metaphr.dev)와 각 앱이 이 규칙을 따라온다. 새 규칙은 결정 로그(`.omc/research/design-spec.md` 맨 위)에 이유와 함께 먼저 적고 반영한다.
+- metaphr.dev는 서체·모눈·움직임 같은 디자인의 출발점이다. 그곳의 옛 팔레트(크림 #F7F2E9 · 차콜 #3A3A38 · 토마토 #FF6347)는 폐기됐으니 되살리지 않는다.
 - 참고 사본: `reference/index.html`, `reference/app.html`, `reference/ref-*.png`.
 - 공통 명세: `.omc/research/design-spec.md` (CSS 변수 계약, 자원 경로).
-- design_lab 사이트 자신도 같은 규칙을 따른다: Mulmaru 한 서체(굵기 400), 4색 팔레트 paper `#F5F5F5`·slate `#303841`·teal `#76ABAE`(보조)·orange `#FF5722`(강조, 한 화면에 하나), 라이트/다크 두 테마, 투명도 위계, 1px 헤어라인, 모서리 직각, 그림자·그라데이션 없음. 결정 로그(`.omc/research/design-spec.md` 맨 위)가 본문보다 우선한다.
+- design_lab 사이트 자신도 같은 규칙을 따른다: Mulmaru 한 서체(굵기 400), 4색 팔레트 paper `#F5F5F5`·slate `#303841`·teal `#76ABAE`(보조)·orange `#FF5722`(강조, 한 화면에 하나), 라이트/다크 두 테마, 글자 크기는 12px의 정수배만(`clamp`·`vw`·분수 em 금지), 글자 투명도 .7 이상(.5는 비활성 전용), 조작 요소 테두리 `--mp-line-button`(3:1), 1px 헤어라인, 모서리 직각, 그림자·그라데이션 없음. 결정 로그(`.omc/research/design-spec.md` 맨 위)가 본문보다 우선한다.
 - 이전 초안(종이/잉크 격자, signal 강조색, fontcdn 4서체, 2px 선, 하드 그림자)은 폐기됨. 되살리지 않는다. 다크 모드는 결정 로그에 따라 허용한다(라이트/다크 두 테마).
 
 ## 원칙: 원본은 한 곳

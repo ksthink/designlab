@@ -28,7 +28,7 @@ related: [scroll-hint, header, section-head, logo, splash, page-list]
 4. 히어로 바로 뒤 `<main>`은 `position: relative; z-index: 1; background: var(--mp-bg)` — 스크롤할 때 캔버스를 덮는다
 
 **수치**
-- 슬로건 h1: `position: absolute; inset: 0; display: flex; align-items: center; justify-content: center`, `--mp-size-hero`(`clamp(1.95rem, 7.8vw, 5.2rem)`), `--mp-tracking-hero`(.05em), `white-space: nowrap`, 굵기 400, 여백 0
+- 슬로건 h1: `position: absolute; inset: 0; display: flex; align-items: center; justify-content: center`, `--mp-size-hero`(72px, 좁은 화면 48px), `--mp-tracking-hero`(.05em), `white-space: nowrap`, 굵기 400, 여백 0
 - 브랜드: `position: absolute; left: 0; right: 0; top: 50%`, `padding-top: calc(var(--mp-size-hero) * 0.85)`, 글자 `clamp(0.8rem, 2.4vw, 1.5rem)`(원값), 자간 `0.12em`, 가운데, 켜지면 `opacity: var(--mp-opacity-brand)`(.8)
 - 링크 `blog >`: `position: absolute; top: 0; left: 0`(JS가 슬로건 왼쪽 위 칸에 맞춰 옮긴다), `fx-fill` 칠 영역 `inset: -0.1em -0.15em`
 - 스크롤 힌트: `left: 50%; bottom: clamp(1.5rem, 4vh, 3rem); transform: translateX(-50%)`, 안쪽 여백 `0.4em 0.8em`, 이미지 `down.svg` 폭 `clamp(16px, 2.2vw, 22px)`, 켜지면 `opacity: .75`(`--mp-opacity-link`)

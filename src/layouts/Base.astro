@@ -333,7 +333,7 @@ const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mul
     font-size: var(--mp-size-meta);
     letter-spacing: var(--mp-tracking-meta);
     line-height: 1.9;
-    opacity: var(--mp-opacity-muted);
+    opacity: var(--mp-opacity-secondary);
     overflow-wrap: anywhere;
   }
   .ai-note a {
@@ -464,9 +464,9 @@ const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mul
   }
 
   .section-head span {
-    font-size: clamp(0.78rem, 2vw, 0.95rem);
+    font-size: var(--mp-size-small);
     letter-spacing: 0.04em;
-    opacity: var(--mp-opacity-muted);
+    opacity: var(--mp-opacity-secondary);
   }
 
   .body-text {
@@ -480,16 +480,15 @@ const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mul
 
   .note {
     margin: 1.2em 0 0;
-    font-size: clamp(0.78rem, 2vw, 0.88rem);
+    font-size: var(--mp-size-small);
     line-height: 1.9;
-    opacity: var(--mp-opacity-muted);
+    opacity: var(--mp-opacity-secondary);
   }
 
   /* 문단 끝의 터미널 커서 */
   .caret::after {
     content: "■";
     margin-left: 0.35em;
-    font-size: 0.85em;
     opacity: var(--mp-opacity-kicker);
     animation: caret var(--mp-duration-caret) steps(1, end) infinite;
   }
@@ -583,7 +582,6 @@ const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mul
     padding: 0.05em 0.35em;
     background: var(--mp-grid-bg);
     border: var(--mp-border) solid var(--mp-line);
-    font-size: 0.9em;
     overflow-wrap: anywhere;
   }
 
@@ -676,8 +674,8 @@ const fontFace = `@font-face{font-family:"Mulmaru";src:url("${url('/v1/fonts/mul
     position: absolute;
     left: 0;
     top: 0;
-    font-size: 0.55em;
-    line-height: calc(var(--mp-leading-body) * 1em / 0.55);
+    font-size: var(--mp-size-meta);
+    line-height: var(--mp-leading-body);
     opacity: var(--mp-opacity-kicker);
   }
   .prose li li { opacity: 1; }

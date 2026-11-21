@@ -140,7 +140,7 @@ related: [tooltip, dropdown-menu, modal, bottom-sheet, icon-button]
 Button("[ ? ]") { open.toggle() }
   .overlay(alignment: .topLeading) {
     if open {
-      Text("도움말").font(.custom("Mulmaru", size: 14))
+      Text("도움말").font(.custom("Mulmaru", size: 12))
         .padding(.horizontal, 14).padding(.vertical, 11).frame(width: 220, alignment: .leading)
         .background(MP.bg).overlay(Rectangle().stroke(MP.lineStrong, lineWidth: 1))
         .offset(y: 44 + 8).accessibilityAddTraits(.isModal)

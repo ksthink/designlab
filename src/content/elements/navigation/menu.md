@@ -190,7 +190,7 @@ struct MenuRow: View {
   var body: some View {
     HStack(spacing: 6) {
       Rectangle().fill(current ? Color.mpSecondary : .clear).frame(width: 8, height: 8)
-      Text(title).font(.custom("Mulmaru", size: 15)).foregroundStyle(Color.mpInk)
+      Text(title).font(.custom("Mulmaru", size: 12)).foregroundStyle(Color.mpInk)
     }
     .opacity(current ? 1 : 0.7)
     .accessibilityAddTraits(current ? .isSelected : [])

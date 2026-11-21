@@ -158,7 +158,7 @@ dialog.mp-modal[open] { animation: mp-modal-in var(--mp-duration-hover) ease; }
 ZStack {
   MP.bg.opacity(0.85).ignoresSafeArea()
   VStack(alignment: .leading, spacing: 10) {
-    Text("삭제?").font(.custom("Mulmaru", size: 20))
+    Text("삭제?").font(.custom("Mulmaru", size: 24))
     HStack(spacing: 18) { Spacer(); Button("[ 취소 ]", action: cancel); Button("삭제", action: remove) }
   }
   .padding(24).frame(maxWidth: 420).background(MP.bg)

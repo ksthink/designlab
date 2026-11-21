@@ -53,7 +53,7 @@ related: [rail, badge, grid-thumbnail, pixel-icon, page-list]
 - 썸네일은 `aria-hidden="true"`(장식), 이름은 `h3` 글자로 읽힌다
 - 목록이면 부모에 `role="list"`, 카드 층에 `role="listitem"`, 또는 `<ul>/<li>`
 - 키보드: Tab으로 카드마다 한 번 멈춘다. 포커스 링 `outline: 1px solid var(--mp-ink); outline-offset: 3px`
-- 설명(.7)까지는 필수 정보 가능, 메타(.55)에는 필수 정보를 두지 않는다
+- 설명·메타 모두 .7이라 읽을 수 있지만, 가격·출시 여부 같은 필수 정보는 메타 배지에만 두지 않는다
 - 링크 이름: `<a>`의 접근 가능한 이름은 안쪽 글자 전체(제목 + 설명 + 배지)가 된다. 너무 길면 `aria-labelledby="<제목 id>"`로 제목만 이름으로, 설명은 `aria-describedby`로 잇는다.
 - `준비 중` 카드도 링크면 이름에 상태가 들어가게 배지 글자를 남긴다(`aria-hidden` 금지).
 
@@ -113,7 +113,7 @@ related: [rail, badge, grid-thumbnail, pixel-icon, page-list]
 .mp-card-thumb {
   aspect-ratio: 4 / 3; display: flex; align-items: center; justify-content: center;
   margin-bottom: clamp(0.9rem, 2vw, 1.2rem);
-  font-size: clamp(2.9rem, 8.4vw, 4.1rem); letter-spacing: 0.05em; color: var(--mp-glyph);
+  font-size: var(--mp-size-title); letter-spacing: 0.05em; color: var(--mp-glyph);
   background-color: var(--mp-grid-bg);
   background-image: linear-gradient(var(--mp-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--mp-grid-line) 1px, transparent 1px);
   background-size: var(--mp-grid-cell-card) var(--mp-grid-cell-card);
@@ -149,7 +149,7 @@ struct MPCard: View {
     VStack(alignment: .leading, spacing: 0) {
       ZStack { GridBackground(cell: 12); Image(icon).renderingMode(.template).interpolation(.none).resizable().frame(width: 120, height: 120).opacity(0.72) }
         .aspectRatio(4/3, contentMode: .fit).padding(.bottom, 16)
-      Text(title).font(.custom("Mulmaru", size: 20)).tracking(0.8)
+      Text(title).font(.custom("Mulmaru", size: 24)).tracking(0.8)
     }
     .padding(20).overlay(Rectangle().stroke(Color("Line"), lineWidth: 1))
     .accessibilityElement(children: .combine).accessibilityAddTraits(.isLink)
@@ -181,5 +181,5 @@ Column(Modifier.border(1.dp, line, RectangleShape)
 | 호버 `transform: scale(1.03)` | 크기 변화 없음, 3px 이동만 |
 | 아이콘 `width: 100%`로 늘림 | `--mp-pixel-card` 120px(3×) 고정 |
 | 카드 안 `<a>` 제목 + `<button>` 다운로드 | 카드 전체 `<a>` 하나, 행동은 상세 화면 |
-| 메타(.55)에만 가격·출시 여부 | 필수 정보는 설명(.7) 이상에 |
+| 메타 배지에만 가격·출시 여부 | 필수 정보는 설명(.7) 이상에 |
 | float을 카드 자신에 걸어 호버 이동과 충돌 | float은 감싼 층, 호버는 카드 |

@@ -134,7 +134,7 @@ related: [button, back-link, menu, text-action]
 
 ```swift
 Link(destination: url) {
-  Text("철학 문서").font(.custom("Mulmaru", size: 15))
+  Text("철학 문서").font(.custom("Mulmaru", size: 12))
     .foregroundStyle(MP.ink)
     .overlay(alignment: .bottom) { Rectangle().fill(MP.lineStrong).frame(height: 1).offset(y: 2) }
 }

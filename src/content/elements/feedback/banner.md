@@ -74,7 +74,7 @@ related: [toast, error-state, form-validation, text-action, header]
   padding: 0.9em 1.1em; border: var(--mp-border) solid var(--mp-line-strong); border-radius: 0;
   color: var(--mp-ink); font: 400 var(--mp-size-small) / 1.7 var(--mp-font); letter-spacing: var(--mp-tracking-small);
 }
-.mp-banner-mark { flex: none; font-size: 0.8em; color: var(--mp-ink); }
+.mp-banner-mark { flex: none; color: var(--mp-ink); }
 .mp-banner-mark.is-accent { color: var(--mp-accent); } /* 강조 — 화면당 하나 */
 .mp-banner-text { flex: 1; min-width: 12em; opacity: var(--mp-opacity-body); }
 .mp-banner-action, .mp-banner-close {

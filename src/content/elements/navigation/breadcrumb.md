@@ -49,7 +49,7 @@ related: [back-link, header, menu, link]
 ## 상태
 | 상태 | 표현 |
 |---|---|
-| 상위 링크 기본 | `--mp-opacity-meta`(0.55) |
+| 상위 링크 기본 | `--mp-opacity-meta`(0.7) |
 | 상위 링크 호버·포커스 | opacity 1, `--mp-duration-hover` ease |
 | 포커스 링 | `outline: 1px solid var(--mp-ink); outline-offset: 3px` |
 | 현재 | opacity 1, 누를 수 없음 |
@@ -137,4 +137,4 @@ related: [back-link, header, menu, link]
 - 현재 항목까지 링크로 두고 `aria-current` 없음 → 링크 없는 `<li aria-current="page">`
 - `홈 > 요소 > 메뉴` → `>`는 터미널 프롬프트 어휘. `요소 / 이동 / 메뉴`
 - 좁은 화면에서 두세 줄로 줄바꿈 → 가운데 단계를 `…` 버튼 하나로 줄인다(첫·현재 유지)
-- 링크를 `--mp-opacity-kicker`(0.45)로 흐리게 → 상위 링크는 `--mp-opacity-meta`(0.55), 구분자만 0.45
+- 링크를 비활성 단계(0.5)로 흐리게 → 상위 링크는 `--mp-opacity-meta`(0.7)

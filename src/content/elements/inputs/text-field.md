@@ -24,11 +24,11 @@ related: [textarea, search-field, form-validation, focus-ring, select, labels-nu
 - 라벨: `--mp-size-small`, `--mp-tracking-small`, `opacity: var(--mp-opacity-secondary)`. 필수 여부는 라벨 뒤 `(필수)` 또는 선택 칸에 `(선택)` — 적은 쪽 하나만 표시한다
 - 터미널 느낌이 맞는 화면(로그인, 설정)에서는 라벨 앞에 `> `를 붙일 수 있다(`>`는 `aria-hidden`)
 - 칸
-  - 전체 테두리 `var(--mp-border) solid var(--mp-line)`, `border-radius: 0`, 배경 투명
+  - 전체 테두리 `var(--mp-border) solid var(--mp-line-button)`(조작 요소 경계 3:1), `border-radius: 0`, 배경 투명
   - 글자 `--mp-size-body` / `--mp-tracking-body`, 행간 `1.4`, 색 `--mp-ink`
   - 안쪽 여백 `0.7em 0.9em` → 높이 약 `2.8em`(터치 44px 이상 확보)
   - 폭: 값 길이에 맞춘다. 이메일·이름 `max-width: 22em`, 숫자 4자리 `6em`, 인증번호 6자리 `8em`
-  - placeholder: 예시 값만(`name@metaphr.dev`), `color: var(--mp-ink)` + `opacity: var(--mp-opacity-muted)`
+  - placeholder: 예시 값만(`name@metaphr.dev`), `color: var(--mp-ink)` + `opacity: var(--mp-opacity-secondary)`
   - 커서 `caret-color: var(--mp-ink)`
 - 조용한 화면(설정 목록 안)에서는 아래 선 하나(`border-width: 0 0 var(--mp-border)`)로 줄여도 된다. 한 화면 안에서 두 모양을 섞지 않는다
 - 도움말 줄: `--mp-size-meta`, `--mp-tracking-meta`, `opacity: var(--mp-opacity-meta)`. 오류 문구가 뜰 수 있으면 `min-height: 1.6em`으로 자리를 미리 잡는다
@@ -61,7 +61,7 @@ related: [textarea, search-field, form-validation, focus-ring, select, labels-nu
 
 ### 반응형
 - 480px 이하에서 칸은 `width: 100%`, `max-width` 해제.
-- iOS Safari는 16px 미만 글자의 칸에 포커스하면 화면을 확대한다. 좁은 화면에서는 `font-size: max(16px, var(--mp-size-body))`로 16px을 보장한다.
+- iOS Safari는 16px 미만 글자의 칸에 포커스하면 화면을 확대한다. 좁은 화면에서는 `font-size: var(--mp-size-subheading)`(24px, 12px 격자의 2×)로 올린다. 16px은 격자에서 벗어나 글자가 깨진다.
 - 라벨과 칸을 가로로 나란히 두는 배치는 폭 720px 이상에서만, 라벨 폭 `8em`.
 
 ## 데모
@@ -82,12 +82,12 @@ related: [textarea, search-field, form-validation, focus-ring, select, labels-nu
 .mp-text-field-label { font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small); opacity: var(--mp-opacity-secondary); }
 .mp-text-field-input {
   width: 100%; margin: 0; padding: 0.7em 0.9em;
-  border: var(--mp-border) solid var(--mp-line); border-radius: 0;
+  border: var(--mp-border) solid var(--mp-line-button); border-radius: 0;
   background: transparent; color: var(--mp-ink); caret-color: var(--mp-ink);
   font: 400 var(--mp-size-body) / 1.4 var(--mp-font); letter-spacing: var(--mp-tracking-body);
   transition: border-color var(--mp-duration-hover) ease;
 }
-.mp-text-field-input::placeholder { color: var(--mp-ink); opacity: var(--mp-opacity-muted); }
+.mp-text-field-input::placeholder { color: var(--mp-ink); opacity: var(--mp-opacity-secondary); }
 .mp-text-field-input:hover { border-color: var(--mp-line-strong); }
 .mp-text-field-input:focus-visible, .mp-text-field-input.is-focus { border-color: var(--mp-line-strong); outline: 1px solid var(--mp-ink); outline-offset: 3px; }
 .mp-text-field-input[aria-invalid="true"] { border-color: var(--mp-ink); }
@@ -96,7 +96,7 @@ related: [textarea, search-field, form-validation, focus-ring, select, labels-nu
 .mp-text-field-msg { min-height: 1.6em; font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); }
 .mp-text-field-msg.is-error { opacity: var(--mp-opacity-body); }
 .mp-text-field-msg.is-error::before { content: "■"; margin-right: 0.4em; color: var(--mp-accent); } /* 첫 오류 하나만 */
-@media (max-width: 480px) { .mp-text-field-input { font-size: max(16px, var(--mp-size-body)); } }
+@media (max-width: 480px) { .mp-text-field-input { font-size: var(--mp-size-subheading); } }
 @media (prefers-reduced-motion: reduce) { .mp-text-field-input { transition: none; } }
 ```
 

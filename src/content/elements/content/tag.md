@@ -43,7 +43,7 @@ related: [badge, chip, list, card, microcopy]
 - 태그 묶음은 `ul` + `li`로 개수를 전달하거나, `p`면 `aria-label="분류"`로 묶음 뜻을 준다.
 - 구분자 `·`는 CSS 의사 요소라 읽히지 않는다(의도).
 - 링크 태그는 링크 텍스트가 그대로 목적지다: "생산성" → 생산성 분류 목록. `aria-current="page"`로 현재 분류 표시.
-- `.55` 투명도라 필수 정보를 태그에만 두지 않는다. 분류가 중요하면 제목 근처에 불투명 글자로.
+- 옅은 보조 글자라 필수 정보를 태그에만 두지 않는다. 분류가 중요하면 제목 근처에 불투명 글자로.
 - 포커스 링 `outline: 1px solid var(--mp-ink); outline-offset: 2px`.
 - 링크 태그 묶음이 탐색 역할이면 `nav aria-label="분류"` > `ul` > `li` > `a`.
 - 키보드: 링크 태그만 Tab에 들어간다. 글자 태그(`span`)는 포커스를 받지 않는다. `+N`은 `button aria-expanded="false" aria-label="태그 2개 더 보기"`.
@@ -94,16 +94,16 @@ a.mp-tag:focus-visible { outline: 1px solid var(--mp-ink); outline-offset: 2px; 
 ```
 
 ## 앱
-- SwiftUI: `Text(tags.prefix(3).joined(separator: " · "))`, `.font(.custom("Mulmaru", size: 12))`, `.opacity(0.55)`. 누르는 태그는 `Button` + `.buttonStyle(.plain)`로 각각.
-- Compose: `FlowRow` 안에 `Text`, 구분자 `" · "`, `Modifier.alpha(0.55f)`. Material `AssistChip`/`SuggestionChip`은 둥글고 테두리가 있어 쓰지 않는다.
+- SwiftUI: `Text(tags.prefix(3).joined(separator: " · "))`, `.font(.custom("Mulmaru", size: 12))`, `.opacity(0.7)`. 누르는 태그는 `Button` + `.buttonStyle(.plain)`로 각각.
+- Compose: `FlowRow` 안에 `Text`, 구분자 `" · "`, `Modifier.alpha(0.7f)`. Material `AssistChip`/`SuggestionChip`은 둥글고 테두리가 있어 쓰지 않는다.
 - 터치 태그는 글자가 작으므로 `Modifier.minimumInteractiveComponentSize()`/`.contentShape(Rectangle())`로 44pt/48dp 영역을 확보한다.
 ```swift
 Text(tags.prefix(3).joined(separator: " · ") + (tags.count > 3 ? " +\(tags.count - 3)" : ""))
-  .font(.custom("Mulmaru", size: 12)).opacity(0.55).accessibilityLabel("분류: " + tags.joined(separator: ", "))
+  .font(.custom("Mulmaru", size: 12)).opacity(0.7).accessibilityLabel("분류: " + tags.joined(separator: ", "))
 ```
 ```kotlin
 FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-  tags.forEachIndexed { i, t -> Text(if (i == 0) t else "· $t", Modifier.alpha(0.55f), fontSize = 12.sp) }
+  tags.forEachIndexed { i, t -> Text(if (i == 0) t else "· $t", Modifier.alpha(0.7f), fontSize = 12.sp) }
 }
 ```
 

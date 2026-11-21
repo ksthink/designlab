@@ -113,8 +113,8 @@ related: [card, table, key-value, settings, divider, empty-state]
 .mp-list-bullet { list-style: none; margin: 1.2em 0 0; padding: 0; }
 .mp-list-bullet li { position: relative; padding-left: 1.3em; margin-bottom: 0.4em; line-height: var(--mp-leading-body); opacity: var(--mp-opacity-body); }
 .mp-list-bullet li::before {
-  content: "■"; position: absolute; left: 0; top: 0; font-size: 0.55em;
-  line-height: calc(var(--mp-leading-body) * 1em / 0.55); opacity: var(--mp-opacity-kicker);
+  content: "■"; position: absolute; left: 0; top: 0; font-size: var(--mp-size-meta);
+  line-height: var(--mp-leading-body); opacity: var(--mp-opacity-kicker);
 }
 @media (max-width: 390px) { .mp-list-meta { width: 100%; } }
 @media (prefers-reduced-motion: reduce) { .mp-list a { transition: none; } }
@@ -128,7 +128,7 @@ related: [card, table, key-value, settings, divider, empty-state]
 - 당겨서 새로고침의 시스템 스피너는 OS 예외로 둔다.
 ```swift
 List(items) { item in
-  NavigationLink(value: item) { HStack { Text(item.title); Spacer(); Text(item.date).opacity(0.55).monospacedDigit() } }
+  NavigationLink(value: item) { HStack { Text(item.title); Spacer(); Text(item.date).opacity(0.7).monospacedDigit() } }
     .listRowSeparatorTint(Color("Line")).listRowBackground(Color.clear)
 }.listStyle(.plain)
 ```
@@ -136,7 +136,7 @@ List(items) { item in
 LazyColumn { items(items) { item ->
   Row(Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable { open(item) }.padding(horizontal = 6.dp),
       verticalAlignment = Alignment.CenterVertically) {
-    Text(item.title, Modifier.weight(1f)); Text(item.date, Modifier.alpha(0.55f))
+    Text(item.title, Modifier.weight(1f)); Text(item.date, Modifier.alpha(0.7f))
   }
   HorizontalDivider(thickness = 1.dp, color = Line)
 } }
@@ -159,5 +159,5 @@ LazyColumn { items(items) { item ->
 | 행마다 카드 박스·그림자 | 행 사이 1px `--mp-line`만 |
 | 제목과 `>` 를 따로 누르게(탭 두 번) | 행 전체가 링크 하나 |
 | 호버 시 teal 배경 | 호버는 `--mp-ink`/`--mp-bg` 반전, teal은 선택 상태만 |
-| 메타를 .35로 옅게 | 메타 `--mp-opacity-meta`(.55), 필수면 제목에 |
+| 메타를 .7 아래로 옅게 | 메타 `--mp-opacity-meta`(.7), 필수면 제목에 |
 | 빈 목록에 선만 남김 | `empty-state` |

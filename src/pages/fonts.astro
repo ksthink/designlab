@@ -96,7 +96,7 @@ const fontFace = `@font-face {
       <p class="h-body">하루를 아침·낮·저녁·밤 네 칸으로 나눕니다. 할 일을 적는 대신, 지나간 칸에 무엇을 했는지만 남깁니다.</p>
       <div class="meta"><span class="badge">iOS</span><span class="badge soon">준비 중</span></div>
     </div>
-    <p class="note">kicker .45 → 제목 1 → tagline .7 → 본문 .85 → 배지 .55. 크기가 커질수록 자간은 좁히고, 작아질수록 넓힙니다.</p>
+    <p class="note">kicker .7 → 제목 1 → tagline .7 → 본문 .85 → 배지 .7. 크기는 12px 격자의 정수배만 쓰고, 커질수록 자간은 좁히고 작아질수록 넓힙니다.</p>
   </section>
 
   <section class="section" aria-labelledby="f-use">
@@ -159,7 +159,7 @@ const fontFace = `@font-face {
   .specimen {
     aspect-ratio: 16 / 9;
     margin-bottom: clamp(1.5rem, 4vh, 2.2rem);
-    font-size: clamp(4rem, 16vw, 8rem);
+    font-size: calc(var(--mp-size-title) * 2);
     letter-spacing: var(--mp-tracking-hero);
   }
   .file-meta { margin-bottom: 0; }
@@ -245,9 +245,9 @@ const fontFace = `@font-face {
     content: "■";
     position: absolute;
     left: 0;
-    font-size: 0.55em;
-    top: 0.1em;
-    line-height: calc(var(--mp-leading-body) * 1em / 0.55);
+    font-size: var(--mp-size-meta);
+    top: 0;
+    line-height: var(--mp-leading-body);
     opacity: var(--mp-opacity-kicker);
   }
 

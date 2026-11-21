@@ -52,7 +52,7 @@ related: [text-field, textarea, text-action, status-dot, loading, caret, avatar,
 - 입력 중 `■■■`는 `aria-hidden="true"`, 대신 상태 문구 "리듬이 입력 중" 을 `role="status"`로 한 번.
 - 입력칸: `<textarea aria-label="메시지">`. **Enter = 보내기, Shift+Enter = 줄바꿈**. 한글 조합 중(`isComposing`)에는 Enter로 보내지 않는다.
 - 보낸 뒤 포커스는 입력칸에 남고, 새 메시지가 와도 옮기지 않는다. 과거를 읽는 중이면 자동으로 맨 아래로 내리지 않고 "새 메시지 ■" `text-action`을 보인다.
-- 대비: 본문은 불투명 잉크(내 블록 틴트 면 위에서도 10:1 이상). 메타(.55)에는 필수 정보를 두지 않는다 — 전송 실패는 본문 크기 글자로.
+- 대비: 본문은 불투명 잉크(내 블록 틴트 면 위에서도 10:1 이상). 메타(.7) 줄에만 필수 정보를 두지 않는다 — 전송 실패는 본문 크기 글자로.
 
 **움직임 줄이기**
 - 새 메시지는 즉시 나타난다(미끄러짐·튕김 없음), 스크롤은 `behavior: 'auto'`. 입력 중 ■ 계단과 스트리밍 커서는 `prefers-reduced-motion: reduce`이면 멈춘다: `■■■` 정지 표시, 커서는 켜진 채.
@@ -105,7 +105,7 @@ related: [text-field, textarea, text-action, status-dot, loading, caret, avatar,
 .mp-chat-msg.is-mine { align-self: flex-end; background: var(--mp-grid-bg); }
 .mp-chat-meta { margin: 0 0 0.9em; font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); }
 .mp-chat-meta.is-mine { align-self: flex-end; }
-.mp-chat-msg.is-streaming::after { content: "■"; margin-left: 0.3em; font-size: 0.85em; opacity: var(--mp-opacity-kicker); animation: mp-chat-caret var(--mp-duration-caret) steps(1, end) infinite; }
+.mp-chat-msg.is-streaming::after { content: "■"; margin-left: 0.3em; opacity: var(--mp-opacity-kicker); animation: mp-chat-caret var(--mp-duration-caret) steps(1, end) infinite; }
 .mp-chat-msg.is-failed::before { content: "■"; margin-right: 0.4em; color: var(--mp-accent); }
 .mp-chat-typing { display: flex; gap: 0.2em; }
 .mp-chat-typing i { display: block; width: 0.7em; height: 0.7em; background: var(--mp-ink); opacity: var(--mp-opacity-kicker); animation: mp-chat-dot var(--mp-duration-caret) steps(1, end) infinite; }

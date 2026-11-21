@@ -21,10 +21,10 @@ related: [text-field, terminal-vocabulary, empty-state, list, loading]
 
 ## 생김새
 - 한 줄: `[>] [입력] [결과 수] [×]`, 요소 사이 간격 `0.6em`, 세로 가운데가 아닌 글자 기준선 정렬
-- 선: 아래 선 하나 `var(--mp-border) solid var(--mp-line)`, 다른 세 변 없음, radius 0, 선 위 여백 `0.4em`
+- 선: 아래 선 하나 `var(--mp-border) solid var(--mp-line-button)`(조작 요소 경계 3:1), 다른 세 변 없음, radius 0, 선 위 여백 `0.4em`
 - 프롬프트 `>`: `--mp-size-body`, `opacity: var(--mp-opacity-kicker)`, `aria-hidden="true"`
 - 입력: 테두리 없음, 배경 투명, `--mp-size-body` / `--mp-tracking-body`, 커서 `caret-color: var(--mp-ink)`
-- placeholder: 한 단어 + 밑줄 `검색_`, `opacity: var(--mp-opacity-muted)`. "무엇이든 검색하세요" 같은 문장은 쓰지 않는다
+- placeholder: 한 단어 + 밑줄 `검색_`, `opacity: var(--mp-opacity-secondary)`. "무엇이든 검색하세요" 같은 문장은 쓰지 않는다
 - 결과 수: `12개` — `--mp-size-meta`, `--mp-tracking-meta`, `opacity: var(--mp-opacity-meta)`, `tabular-nums`. 입력이 비었을 때는 숨긴다
 - 지우기 `×`: 입력이 있을 때만, 누르는 영역 `2em × 2em`, `opacity: var(--mp-opacity-link)`
 - 폭: 목록 머리 안에서 `max-width: 26em`. 상단 바에 넣으면 `14em`
@@ -56,7 +56,7 @@ related: [text-field, terminal-vocabulary, empty-state, list, loading]
 - 아래 화살표로 결과 목록 첫 항목에 이동할 수 있게 하면 좋다(자동완성이면 `combobox` 패턴 필수).
 
 ### 반응형
-- 480px 이하: 폭 100%, `font-size: max(16px, var(--mp-size-body))`(iOS 확대 방지).
+- 480px 이하: 폭 100%, `font-size: var(--mp-size-subheading)`(24px, iOS 확대 방지 — 16px은 12px 격자에서 벗어난다).
 - 상단 바에서 공간이 모자라면 `>` 버튼 하나로 접고, 누르면 바 전체를 검색 줄로 바꾼다(즉시 전환).
 
 ## 데모
@@ -72,7 +72,7 @@ related: [text-field, terminal-vocabulary, empty-state, list, loading]
 .mp-search-field-demo { display: grid; gap: 1.6em; max-width: 20em; }
 .mp-search-field {
   display: flex; align-items: baseline; gap: 0.6em; width: 100%; max-width: 26em;
-  padding-bottom: 0.4em; border-bottom: var(--mp-border) solid var(--mp-line);
+  padding-bottom: 0.4em; border-bottom: var(--mp-border) solid var(--mp-line-button);
   transition: border-color var(--mp-duration-hover) ease;
 }
 .mp-search-field:hover { border-bottom-color: var(--mp-line-strong); }
@@ -85,7 +85,7 @@ related: [text-field, terminal-vocabulary, empty-state, list, loading]
   font: 400 var(--mp-size-body) / 1.4 var(--mp-font); letter-spacing: var(--mp-tracking-body);
   -webkit-appearance: none; appearance: none;
 }
-.mp-search-field-input::placeholder { color: var(--mp-ink); opacity: var(--mp-opacity-muted); }
+.mp-search-field-input::placeholder { color: var(--mp-ink); opacity: var(--mp-opacity-secondary); }
 .mp-search-field-input::-webkit-search-cancel-button, .mp-search-field-input::-webkit-search-decoration { -webkit-appearance: none; display: none; }
 .mp-search-field-count { font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .mp-search-field-clear {
@@ -96,12 +96,12 @@ related: [text-field, terminal-vocabulary, empty-state, list, loading]
 }
 .mp-search-field-clear:hover, .mp-search-field-clear:focus-visible { background: var(--mp-ink); color: var(--mp-bg); opacity: 1; }
 .mp-search-field-clear:focus-visible { outline: 1px solid var(--mp-ink); outline-offset: 3px; }
-@media (max-width: 480px) { .mp-search-field { max-width: none; } .mp-search-field-input { font-size: max(16px, var(--mp-size-body)); } }
+@media (max-width: 480px) { .mp-search-field { max-width: none; } .mp-search-field-input { font-size: var(--mp-size-subheading); } }
 @media (prefers-reduced-motion: reduce) { .mp-search-field, .mp-search-field-clear { transition: none; } }
 ```
 
 ## 앱
-- SwiftUI: `.searchable`은 시스템 검색 막대(OS 예외, 둥근 회색 칸)라 브랜드 화면에서는 쓰지 않는다. `HStack { Text(">").opacity(0.45); TextField("검색_", text: $q); if !q.isEmpty { Text("\(n)개"); Button("×") { q = "" } } }` + 아래 `Rectangle().frame(height: 1)`.
+- SwiftUI: `.searchable`은 시스템 검색 막대(OS 예외, 둥근 회색 칸)라 브랜드 화면에서는 쓰지 않는다. `HStack { Text(">").opacity(0.7); TextField("검색_", text: $q); if !q.isEmpty { Text("\(n)개"); Button("×") { q = "" } } }` + 아래 `Rectangle().frame(height: 1)`.
 - `.submitLabel(.search)`, `.autocorrectionDisabled()`, `.textInputAutocapitalization(.never)`.
 - Compose: `BasicTextField` + `Modifier.drawBehind { drawLine(line, Offset(0f, size.height), Offset(size.width, size.height), 1.dp.toPx()) }`, `KeyboardOptions(imeAction = ImeAction.Search)`. Material 3 `SearchBar`(둥근 알약)는 쓰지 않는다.
 - 시스템 설정·목록 화면에서 `.searchable`을 이미 쓰는 경우는 OS 모양을 그대로 둔다.

@@ -99,7 +99,7 @@ related: [text-field, textarea, select, error-state, banner, microcopy, confirm-
 .mp-form-validation-label { font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small); opacity: var(--mp-opacity-secondary); }
 .mp-form-validation-required { font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); }
 .mp-form-validation-input {
-  width: 100%; padding: 0.7em 0.9em; border: var(--mp-border) solid var(--mp-line); border-radius: 0;
+  width: 100%; padding: 0.7em 0.9em; border: var(--mp-border) solid var(--mp-line-button); border-radius: 0;
   background: transparent; color: var(--mp-ink); caret-color: var(--mp-ink);
   font: 400 var(--mp-size-body) / 1.4 var(--mp-font); letter-spacing: var(--mp-tracking-body);
 }

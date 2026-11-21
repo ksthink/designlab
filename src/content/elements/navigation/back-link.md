@@ -45,7 +45,7 @@ design_lab은 외부 사이트 metaphr.dev로 나가는 링크로 같은 모양�
 ## 상태
 | 상태 | 표현 |
 |---|---|
-| 기본 | `--mp-opacity-meta`(0.55) |
+| 기본 | `--mp-opacity-meta`(0.7) |
 | 호버·포커스 | opacity 1, `--mp-duration-hover` ease |
 | 누름 | opacity 1 |
 | 포커스 링 | `outline: 1px solid var(--mp-ink); outline-offset: 3px` |
@@ -61,7 +61,7 @@ design_lab은 외부 사이트 metaphr.dev로 나가는 링크로 같은 모양�
 - 스크린리더가 `<`를 "보다 작음"으로 읽으므로 `<` 는 `<span aria-hidden="true">&lt;</span>`로 감싸거나 `aria-label="metaphr로 돌아가기"`를 준다
 - 포커스 순서: 건너뛰기 링크 다음, 머리에서 첫 번째
 - 키보드: `Tab`으로 도달, `Enter`로 이동. 따로 단축키를 두지 않는다
-- 필수 정보가 아니라 보조 길이라 0.55를 허용한다. 유일한 이동 수단이면 `--mp-opacity-nav`(0.7)로 올린다
+- 보조 길이라 `--mp-opacity-meta`(0.7)를 쓴다. 유일한 이동 수단이면 `--mp-opacity-nav`(0.7)와 상단 위치로 드러낸다
 
 **reduced-motion**
 - transition 없이 즉시 opacity 1
@@ -91,17 +91,17 @@ design_lab은 외부 사이트 metaphr.dev로 나가는 링크로 같은 모양�
 
 ## 앱
 - 앱은 시스템 뒤로 동작(iOS 가장자리 스와이프, 안드로이드 뒤로 제스처·버튼)을 막지 않는다.
-- SwiftUI: 시스템 `NavigationStack` 뒤로 버튼을 쓰면 OS 모양 그대로(예외). 직접 그린 머리에서만 `Button { dismiss() } label: { Text("< 목록") }.opacity(0.55)`, `.navigationBarBackButtonHidden(true)`로 둘이 겹치지 않게.
+- SwiftUI: 시스템 `NavigationStack` 뒤로 버튼을 쓰면 OS 모양 그대로(예외). 직접 그린 머리에서만 `Button { dismiss() } label: { Text("< 목록") }.opacity(0.7)`, `.navigationBarBackButtonHidden(true)`로 둘이 겹치지 않게.
 - Compose: `TopAppBar(navigationIcon = { TextButton(onClick = onBack, shape = RectangleShape) { Text("< 목록") } })`, 기본 `ArrowBack` 아이콘 대신 글자. `BackHandler`는 시스템 뒤로와 같은 동작으로.
 - 터치 영역 44pt/48dp, `accessibilityLabel("목록으로 돌아가기")`.
 
 ```swift
 // 직접 그린 머리에서만. 시스템 뒤로 버튼과 겹치지 않게 숨긴다
 Button { dismiss() } label: {
-  Text("< 목록").font(.custom("Mulmaru", size: 14)).tracking(1.1)
+  Text("< 목록").font(.custom("Mulmaru", size: 12)).tracking(1.1)
 }
 .buttonStyle(.plain)
-.opacity(isPressed ? 1 : 0.55)
+.opacity(isPressed ? 1 : 0.7)
 .frame(minWidth: 44, minHeight: 44, alignment: .leading)
 .accessibilityLabel("목록으로 돌아가기")
 // 화면: .navigationBarBackButtonHidden(true)
@@ -113,13 +113,13 @@ TextButton(
   shape = RectangleShape,
   contentPadding = PaddingValues(horizontal = 4.dp),
   modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = "목록으로 돌아가기" },
-) { Text("< 목록", color = ink.copy(alpha = 0.55f), fontFamily = Mulmaru) }
+) { Text("< 목록", color = ink.copy(alpha = 0.7f), fontFamily = Mulmaru) }
 BackHandler(onBack = onBack) // 시스템 뒤로와 같은 목적지
 ```
 - OS 예외: iOS 가장자리 스와이프 뒤로·안드로이드 예측 뒤로(predictive back) 애니메이션은 OS가 그린다. 끄지 않는다.
 
 ## 해야 할 것 / 하지 말 것
-- 해야 할 것: `< ` + 목적지 이름, 옅게(0.55), 호버 opacity 1.
+- 해야 할 것: `< ` + 목적지 이름, 옅게(0.7), 호버 opacity 1.
 - 해야 할 것: 정해진 상위 주소로 가는 `<a>`, `<`는 스크린리더에서 숨긴다.
 - 해야 할 것: 상세 페이지에서는 제목과 넉넉히 띄운다.
 - 하지 말 것: 둥근 화살표 아이콘, `←`·`‹` 글리프, 버튼 테두리.
@@ -130,5 +130,5 @@ BackHandler(onBack = onBack) // 시스템 뒤로와 같은 목적지
 - `<a href="#" onclick="history.back()">` — 외부에서 바로 들어온 사람은 사이트 밖으로 튕긴다 → 정해진 상위 주소 `href`
 - `‹ metaphr`, `← 목록` — metaphr.dev 옛 글리프·화살표 → `< metaphr`(ASCII `<` + 공백)
 - 스크린리더가 "보다 작음 metaphr"로 읽음 → `<`를 `aria-hidden` span으로
-- 호버에서 밑줄·반전 면을 넣음 → opacity 0.55 → 1만
+- 호버에서 밑줄·반전 면을 넣음 → opacity 0.7 → 1만
 - 앱에서 시스템 뒤로 버튼과 직접 그린 `< 목록`이 둘 다 보임 → `.navigationBarBackButtonHidden(true)` 또는 직접 그린 것을 뺀다

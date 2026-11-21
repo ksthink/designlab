@@ -22,7 +22,7 @@ related: [text-field, form-validation, labels-numbers, page-read]
 - 구조: `라벨` → `칸` → `아래 줄(도움말·오류 왼쪽 / 글자 수 오른쪽)`, 간격 `0.5em`
 - 라벨: `text-field`와 같다(`--mp-size-small`, `opacity: var(--mp-opacity-secondary)`)
 - 칸
-  - 테두리 `var(--mp-border) solid var(--mp-line)`, `border-radius: 0`, 배경 투명
+  - 테두리 `var(--mp-border) solid var(--mp-line-button)`(조작 요소 경계 3:1), `border-radius: 0`, 배경 투명
   - 여백 `0.7em 0.9em`
   - 글자 `--mp-size-body`, 자간 `--mp-tracking-body`, 행간 `--mp-leading-body`(2.1) — 읽는 본문과 같은 리듬
   - 최소 높이 4줄(`rows="4"`, `min-height: 9em`), 최대 높이 `60vh` 뒤로는 칸 안 스크롤
@@ -55,7 +55,7 @@ related: [text-field, form-validation, labels-numbers, page-read]
 - Tab은 다음 칸으로 이동한다(탭 문자 입력으로 가로채지 않는다).
 
 ### 반응형
-- 480px 이하: `width: 100%`, `max-width` 해제, `font-size: max(16px, var(--mp-size-body))`(iOS 확대 방지).
+- 480px 이하: `width: 100%`, `max-width` 해제, `font-size: var(--mp-size-subheading)`(24px, iOS 확대 방지 — 16px은 12px 격자에서 벗어난다).
 - 가상 키보드가 열려도 커서 줄이 보이도록 칸 최대 높이를 `40vh`로 줄인다.
 
 ## 데모
@@ -75,12 +75,12 @@ related: [text-field, form-validation, labels-numbers, page-read]
 .mp-textarea-label { font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small); opacity: var(--mp-opacity-secondary); }
 .mp-textarea-input {
   width: 100%; min-height: 7em; max-height: 60vh; margin: 0; padding: 0.7em 0.9em; resize: vertical;
-  border: var(--mp-border) solid var(--mp-line); border-radius: 0;
+  border: var(--mp-border) solid var(--mp-line-button); border-radius: 0;
   background: transparent; color: var(--mp-ink); caret-color: var(--mp-ink);
   font: 400 var(--mp-size-body) / var(--mp-leading-body) var(--mp-font); letter-spacing: var(--mp-tracking-body);
   transition: border-color var(--mp-duration-hover) ease;
 }
-.mp-textarea-input::placeholder { color: var(--mp-ink); opacity: var(--mp-opacity-muted); }
+.mp-textarea-input::placeholder { color: var(--mp-ink); opacity: var(--mp-opacity-secondary); }
 .mp-textarea-input:hover { border-color: var(--mp-line-strong); }
 .mp-textarea-input:focus-visible, .mp-textarea-input.is-focus { border-color: var(--mp-line-strong); outline: 1px solid var(--mp-ink); outline-offset: 3px; }
 .mp-textarea-input[aria-invalid="true"] { border-color: var(--mp-ink); }
@@ -88,7 +88,7 @@ related: [text-field, form-validation, labels-numbers, page-read]
 .mp-textarea-count { justify-self: end; font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); font-variant-numeric: tabular-nums; }
 .mp-textarea-count.is-near, .mp-textarea-count.is-over { opacity: 1; }
 .mp-textarea-count.is-over::before { content: "■"; margin-right: 0.4em; color: var(--mp-accent); } /* 화면당 하나 */
-@media (max-width: 480px) { .mp-textarea-input { font-size: max(16px, var(--mp-size-body)); max-height: 40vh; } }
+@media (max-width: 480px) { .mp-textarea-input { font-size: var(--mp-size-subheading); max-height: 40vh; } }
 @media (prefers-reduced-motion: reduce) { .mp-textarea-input { transition: none; } }
 ```
 

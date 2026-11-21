@@ -38,7 +38,7 @@ related: [table, stat, tooltip, empty-state, loading, labels-numbers, color]
 |---|---|
 | 1 | 잉크 채움 `opacity: 1` |
 | 2 | 잉크 `opacity: var(--mp-opacity-secondary)` (.7) |
-| 3 | 잉크 `opacity: var(--mp-opacity-kicker)` (.45) + 빗금(2px 간격 1px 선) |
+| 3 | 잉크 `opacity: var(--mp-opacity-muted)` (.5) + 빗금(2px 간격 1px 선) |
 | 강조 한 곳 | `--mp-accent` 면(막대 하나·점 하나·구간 하나). 글자는 칠하지 않는다 |
 | 비교·선택 | `--mp-secondary` 면(선택한 막대, 비교 기준 구간). orange와 맞붙이지 않는다 |
 - 계열은 최대 3개. 넘으면 차트를 나누거나 `table`로.
@@ -57,7 +57,7 @@ related: [table, stat, tooltip, empty-state, loading, labels-numbers, color]
 - 같은 데이터를 `<table>`로 함께 둔다: `<details><summary>표로 보기</summary><table>…</table></details>` 또는 시각적으로 숨긴 표. `th scope` 포함.
 - 색만으로 말하지 않는다: 강조 막대에는 값 라벨이나 ■ 범례 글자, 계열 3은 빗금으로도 구분한다.
 - 누를 수 있는 막대는 `button`(`aria-label="목요일 12개"`), 좌우 화살표로 이동, 포커스 시 `tooltip` 표시. 누를 수 없으면 포커스를 받지 않는다.
-- 대비: 계열 3(.45)은 면이라 허용하지만 라벨 글자로 쓰지 않는다.
+- 대비: 계열 3(.5)은 면이라 허용하지만(빗금이 함께 구분) 라벨 글자로 쓰지 않는다.
 
 **움직임 줄이기**
 - 막대는 처음 한 번만 `steps(4, end)`로 계단식으로 자란다. `prefers-reduced-motion: reduce`이면 움직임 없이 최종 상태.
@@ -113,7 +113,7 @@ related: [table, stat, tooltip, empty-state, loading, labels-numbers, color]
 }
 .mp-chart span.is-s2 { opacity: var(--mp-opacity-secondary); }
 .mp-chart span.is-s3 {
-  opacity: var(--mp-opacity-kicker); background: transparent;
+  opacity: var(--mp-opacity-muted); background: transparent;
   background-image: repeating-linear-gradient(0deg, var(--mp-ink) 0 1px, transparent 1px 3px);   /* 빗금: 2px 간격 1px 선 */
   outline: var(--mp-border) solid var(--mp-ink); outline-offset: -1px;
 }
@@ -160,7 +160,7 @@ related: [table, stat, tooltip, empty-state, loading, labels-numbers, color]
   .chartYAxis { AxisMarks { AxisGridLine().foregroundStyle(Color("GridLine")) } }
   .chartLegend(.hidden)
   ```
-  둥근 막대(`cornerRadius`)·`.catmullRom` 보간·그라데이션 `foregroundStyle` 금지. 축 글자는 `.font(.custom("Mulmaru", size: 11))`.
+  둥근 막대(`cornerRadius`)·`.catmullRom` 보간·그라데이션 `foregroundStyle` 금지. 축 글자는 `.font(.custom("Mulmaru", size: 12))`.
 - Compose: `Canvas`에 `drawRect`로 막대·1px 계단선을 정수 px로(`toPx().roundToInt()`), `Paint.isAntiAlias = false`. Vico를 쓰면 `lineSpec(pointConnector = 계단형)`·`shape = Shapes.rectShape`, 그림자·그라데이션 끄기.
 - 두 플랫폼 모두 차트에 `accessibilityLabel` 요약, iOS는 `AXChartDescriptor`(Swift Charts 기본 제공), Android는 `contentDescription` + 표 화면 제공.
 - OS 예외: 시스템 위젯·잠금 화면에서 OS가 단색 렌더링하면 강조색이 사라진다 — 값 라벨로 말한다.
@@ -175,7 +175,7 @@ related: [table, stat, tooltip, empty-state, loading, labels-numbers, color]
 **자주 틀리는 것**
 | 틀린 예 | 맞는 방법 |
 |---|---|
-| 라이브러리 기본 팔레트(파랑·주황·초록) | 잉크 1 / .7 / .45+빗금, 강조 하나만 `--mp-accent` |
+| 라이브러리 기본 팔레트(파랑·주황·초록) | 잉크 1 / .7 / .5+빗금, 강조 하나만 `--mp-accent` |
 | 곡선 보간(`monotone`, `catmullRom`) | `stepEnd` 계단선 또는 정사각 점 |
 | 막대 폭 `%`로 늘여 1.5px 경계가 흐림 | 정수 px로 계산·스냅, `crispEdges` |
 | 강조 값을 orange 글자로 | orange 면 + 잉크 라벨 |

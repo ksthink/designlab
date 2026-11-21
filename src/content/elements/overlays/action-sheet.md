@@ -157,7 +157,7 @@ ModalBottomSheet(onDismissRequest = close, shape = RectangleShape, containerColo
       .clickable(onClick = act).padding(horizontal = 20.dp, vertical = 14.dp).semantics { role = Role.Button })
     HorizontalDivider(color = MP.line, thickness = 1.dp)
   }
-  Text("[ 취소 ]", fontFamily = Mulmaru, modifier = Modifier.alpha(0.55f).clickable(onClick = close).padding(20.dp))
+  Text("[ 취소 ]", fontFamily = Mulmaru, modifier = Modifier.alpha(0.7f).clickable(onClick = close).padding(20.dp))
 }
 ```
 - OS 예외 목록: iOS `confirmationDialog`·`UIAlertController(.actionSheet)`, 아이패드에서 팝오버로 뜨는 시트, 공유 시트, 사진 선택기

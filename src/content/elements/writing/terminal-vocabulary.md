@@ -24,9 +24,9 @@ related: [microcopy, text-action, caret, back-link, carousel-nav, status-dot, ac
 |---|---|---|---|
 | `>` | 프롬프트, 다음으로 | 입력 라벨 앞 `> 이메일`, 링크 꼬리 `blog >`, 시각 표시 `> 15:13` | 라벨 앞 `--mp-opacity-kicker`, 링크 꼬리는 링크와 같게 |
 | `[ ]` | 누를 수 있음 | `[ 저장 ]`, `[ 시스템 ]` — 괄호 안 앞뒤 한 칸 (`text-action`) | 라벨과 같게 |
-| `■` | 커서, 켜짐, 강조 | 깜빡 커서(잉크 .45, `caret`), 강조 마크(`--mp-accent`, 화면당 하나), 켜짐 표시 | 커서 .45 / 강조 1 |
+| `■` | 커서, 켜짐, 강조 | 깜빡 커서(잉크 .7, `caret`), 강조 마크(`--mp-accent`, 화면당 하나), 켜짐 표시 | 커서 .7 / 강조 1 |
 | `□` | 꺼짐 | `□ 다크`처럼 선택 안 됨 | `--mp-opacity-meta` |
-| `_` | 입력 대기 | 빈 입력 끝, 타자기 태그라인 | .45 |
+| `_` | 입력 대기 | 빈 입력 끝, 타자기 태그라인 | .7 |
 | `<` `>` (뒤로가기) | 뒤로·앞으로 | `< metaphr`(`back-link`). metaphr.dev의 `‹ ›`는 Mulmaru에 글리프가 없어 폴백 서체로 그려지므로 ASCII로 쓴다 | 링크와 같게 |
 | `<` `>` | 이전·다음 버튼 | 캐러셀·페이지(`carousel-nav`, `pagination`) | 버튼 라벨 |
 | `+` `-` | 펼침·접힘, 증감 | `accordion`, `stepper` (ASCII 하이픈. U+2212 `−`는 Mulmaru에 없다) | 라벨과 같게 |
@@ -61,7 +61,7 @@ related: [microcopy, text-action, caret, back-link, carousel-nav, status-dot, ac
 | 선택됨 / 아님 | `■ 라이트` / `□ 다크` |
 | 기록 중(강조) | `■ 기록 중` — ■만 `--mp-accent` |
 | 펼침 / 접힘 | `-` / `+` |
-| 행 액션 기본 / 호버 | `DEL` .55 / 1 |
+| 행 액션 기본 / 호버 | `DEL` .7 / 1 |
 | 값 없음 | `—` |
 
 ## 데모

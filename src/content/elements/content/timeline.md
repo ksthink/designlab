@@ -113,13 +113,13 @@ related: [list, page-indicator, status-dot, labels-numbers, progress-bar]
 HStack(alignment: .firstTextBaseline, spacing: 14) {
   Rectangle().fill(isNow ? Color("Ink") : Color("Bg")).frame(width: 8, height: 8)
     .overlay(Rectangle().stroke(Color("Line"), lineWidth: 1))
-  VStack(alignment: .leading) { Text(time).opacity(0.55).monospacedDigit(); Text(title) }
+  VStack(alignment: .leading) { Text(time).opacity(0.7).monospacedDigit(); Text(title) }
 }.accessibilityElement(children: .combine).accessibilityAddTraits(isNow ? .isSelected : [])
 ```
 ```kotlin
 Row(Modifier.semantics(mergeDescendants = true) { if (isNow) stateDescription = "현재" }) {
   Box(Modifier.padding(top = 6.dp).size(8.dp).border(1.dp, Line, RectangleShape).background(if (isNow) Ink else Bg))
-  Spacer(Modifier.width(14.dp)); Column { Text(time, Modifier.alpha(0.55f)); Text(title) }
+  Spacer(Modifier.width(14.dp)); Column { Text(time, Modifier.alpha(0.7f)); Text(title) }
 }
 ```
 

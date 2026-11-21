@@ -31,7 +31,7 @@ related: [page-read, hero, section-head, rail, card, footer, spacing-layout, hea
 - 틀 `.wrap`: `max-width: var(--mp-width-list)`(1180px), `margin: 0 auto`, 좌우 `--mp-gutter`(`clamp(1.25rem, 5vw, 4rem)`)
 - lead: 위 `--mp-section-lg`(`clamp(4rem, 12vh, 9rem)`), 아래 `clamp(2rem, 6vh, 4rem)`. `.wrap`의 좌우 여백을 지우지 않도록 세로 값만 지정
 - lead 문단: `max-width: var(--mp-width-para)`(30em), `--mp-size-lead`, `--mp-tracking-lead`(.02em), 행간 `--mp-leading-body`(2.1), `opacity: var(--mp-opacity-body)`, 문단 사이 `1.1em`
-- lead 마지막 문단 끝 `■`: `margin-left: 0.35em; font-size: 0.85em; opacity: var(--mp-opacity-kicker)`
+- lead 마지막 문단 끝 `■`: `margin-left: 0.35em; opacity: var(--mp-opacity-kicker)`
 - 분류 `.cat`: 위아래 `--mp-section`(`clamp(2.5rem, 8vh, 5rem)`), `overflow-x: clip`
 - 레일 대신 격자: `grid-template-columns: repeat(auto-fill, minmax(288px, 1fr))`, 간격 `clamp(0.9rem, 2.2vw, 1.5rem)`
 - 푸터: 위 바깥 `clamp(3rem, 8vh, 5rem)`, 윗선 1px `--mp-line`
@@ -52,7 +52,7 @@ related: [page-read, hero, section-head, rail, card, footer, spacing-layout, hea
 - h1 하나(히어로 슬로건 또는 페이지 제목), 분류 제목 h2, 카드 제목 h3
 - 첫 요소로 "본문으로 건너뛰기" 링크(`href="#main"`), 포커스될 때만 보인다
 - 카드 순서 = DOM 순서 = 탭 순서. 레일 끌기와 무관하게 Tab으로 모든 카드에 닿는다
-- 데이터를 못 불러오면 `.load-error` 문단(`opacity .55`, 행간 2)으로 원인 한 줄. 이 문단은 `role="status"`
+- 데이터를 못 불러오면 `.load-error` 문단(`opacity: var(--mp-opacity-secondary)` .7, 행간 2)으로 원인 한 줄. 이 문단은 `role="status"`
 - 레일 좌우 버튼은 `aria-label="이전"`/`"다음"`, 점은 `aria-label="3번째"` + `aria-current="true"`. 키보드 사용자는 Tab으로 카드를 돌며 레일이 `scroll-snap`으로 따라온다(`scrollIntoView({ inline: 'center' })`)
 - 반응형에서도 DOM 순서를 바꾸지 않는다(CSS `order` 금지)
 
@@ -114,7 +114,7 @@ related: [page-read, hero, section-head, rail, card, footer, spacing-layout, hea
 .mp-page-list-cat { padding: 1em 0; }
 .mp-page-list-head { display: flex; align-items: flex-end; gap: 1.2em; margin-bottom: 0.8em; }
 .mp-page-list-head b { width: 4em; height: calc(var(--mp-size-heading) * 0.5); }
-.mp-page-list-head i { width: 6em; opacity: var(--mp-opacity-muted); }
+.mp-page-list-head i { width: 6em; opacity: var(--mp-opacity-secondary); }
 .mp-page-list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: clamp(0.9rem, 2.2vw, 1.5rem); }
 .mp-page-list-grid div { aspect-ratio: 3 / 4; border: var(--mp-border) solid var(--mp-line); }
 .mp-page-list-foot { margin-top: 1em; padding-top: 1.2em; border-top: var(--mp-border) solid var(--mp-line); }

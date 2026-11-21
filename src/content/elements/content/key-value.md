@@ -115,7 +115,7 @@ document.querySelectorAll('.mp-key-value-copy').forEach((btn) => {
 - 복사 알림은 OS 클립보드 알림(Android 13+)이 뜨면 앱 쪽 알림을 생략한다.
 ```swift
 LabeledContent { Text("1.4.0").monospacedDigit() } label: { Text("버전").opacity(0.7) }
-  .font(.custom("Mulmaru", size: 15)).padding(.vertical, 10)
+  .font(.custom("Mulmaru", size: 12)).padding(.vertical, 10)
   .overlay(alignment: .bottom) { Rectangle().fill(Color("Line")).frame(height: 1) }
 ```
 ```kotlin

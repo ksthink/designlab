@@ -91,7 +91,7 @@ orange ■은 화면에 하나: 인증 실패 줄 또는 첫 형식 오류 중 �
 ### 반응형
 - 모든 폭에서 한 단. 좁은 화면은 좌우 `--mp-gutter`, 폼 폭 100%. 넓은 화면에서도 폭 `22em`을 넘기지 않는다.
 - 모바일에서 키보드가 올라와도 주 행동이 보이게 폼을 위쪽에 둔다(세로 가운데 정렬 금지).
-- 칸 글자 16px 이상(`max(16px, var(--mp-size-body))`)으로 iOS 확대 방지.
+- 좁은 화면에서 칸 글자 `--mp-size-subheading`(24px, 12px 격자의 2×)로 iOS 확대 방지.
 
 ## 데모
 ```html demo
@@ -111,7 +111,7 @@ orange ■은 화면에 하나: 인증 실패 줄 또는 첫 형식 오류 중 �
 .mp-login-form-field { display: grid; gap: 0.5em; }
 .mp-login-form-label { opacity: var(--mp-opacity-secondary); }
 .mp-login-form-label.is-prompt::before { content: "> "; opacity: var(--mp-opacity-kicker); }
-.mp-login-form input { width: 100%; padding: 0.7em 0.9em; border: var(--mp-border) solid var(--mp-line); border-radius: 0; background: transparent; color: var(--mp-ink); caret-color: var(--mp-ink); font: 400 var(--mp-size-body) / 1.4 var(--mp-font); letter-spacing: var(--mp-tracking-body); }
+.mp-login-form input { width: 100%; padding: 0.7em 0.9em; border: var(--mp-border) solid var(--mp-line-button); border-radius: 0; background: transparent; color: var(--mp-ink); caret-color: var(--mp-ink); font: 400 var(--mp-size-body) / 1.4 var(--mp-font); letter-spacing: var(--mp-tracking-body); }
 .mp-login-form input:hover { border-color: var(--mp-line-strong); }
 .mp-login-form input:focus-visible { border-color: var(--mp-line-strong); outline: 1px solid var(--mp-ink); outline-offset: 3px; }
 .mp-login-form input[aria-invalid="true"] { border-color: var(--mp-ink); }
@@ -132,7 +132,7 @@ orange ■은 화면에 하나: 인증 실패 줄 또는 첫 형식 오류 중 �
 .mp-login-form-error:not(:empty)::before { content: "■"; margin-right: 0.5em; color: var(--mp-ink); }
 .mp-login-form-error.is-first::before { color: var(--mp-accent); } /* 강조 — 화면당 하나 */
 .mp-login-form-otp { text-align: center; letter-spacing: 0.4em; font-variant-numeric: tabular-nums; }
-@media (max-width: 480px) { .mp-login-form input { font-size: max(16px, var(--mp-size-body)); } }
+@media (max-width: 480px) { .mp-login-form input { font-size: var(--mp-size-subheading); } }
 @media (prefers-reduced-motion: reduce) { .mp-login-form-submit { transition: none; } }
 ```
 

@@ -26,8 +26,8 @@ related: [progress-bar, skeleton, status-dot, microcopy, button, terminal-vocabu
 - **화면 가운데**: 첫 화면 전체 대기. 가운데 정렬 inline 표시 하나. 화면을 덮는 반투명 막은 쓰지 않는다
 구성 수치:
 - 문구: `불러오는 중` / `저장하는 중` / `확인하는 중`(`… 중`), `--mp-size-small`, `--mp-tracking-small`, `opacity: var(--mp-opacity-secondary)`
-- 칸: `■` 글자 세 개, `font-size: 0.8em`, 칸 간격 `0.2em`, 문구와 간격 `0.6em`
-- 꺼진 칸 `opacity: var(--mp-opacity-kicker)`(.45), 켜진 칸 opacity 1
+- 칸: `■` 글자 세 개, `글자 크기는 부모 그대로(12px 격자), 칸 간격 `0.2em`, 문구와 간격 `0.6em`
+- 꺼진 칸 `opacity: var(--mp-opacity-muted)`(.5, 글자 아닌 장식 칸), 켜진 칸 opacity 1
 - 대안 표기: 글자 `...` 세 개를 같은 방식으로(코드·터미널 느낌이 강한 화면)
 - 문구 없이 칸만 쓰는 곳(아주 좁은 칸)은 `aria-label` 필수
 
@@ -70,12 +70,12 @@ related: [progress-bar, skeleton, status-dot, microcopy, button, terminal-vocabu
 .mp-loading-demo { display: flex; flex-wrap: wrap; align-items: center; gap: 1.6em; }
 .mp-loading { display: inline-flex; align-items: baseline; gap: 0.6em; margin: 0; color: var(--mp-ink); font: 400 var(--mp-size-small) / 1.5 var(--mp-font); letter-spacing: var(--mp-tracking-small); }
 .mp-loading-text { opacity: var(--mp-opacity-secondary); }
-.mp-loading-cells { display: inline-flex; gap: 0.2em; font-size: 0.8em; }
+.mp-loading-cells { display: inline-flex; gap: 0.2em; }
 .mp-loading-cells.is-dots { font-size: 1em; gap: 0.1em; }
-.mp-loading-cells span { opacity: var(--mp-opacity-kicker); animation: mp-loading-step var(--mp-duration-caret) steps(1, end) infinite; }
+.mp-loading-cells span { opacity: var(--mp-opacity-muted); animation: mp-loading-step var(--mp-duration-caret) steps(1, end) infinite; }
 .mp-loading-cells span:nth-child(2) { animation-delay: 0.4s; }
 .mp-loading-cells span:nth-child(3) { animation-delay: 0.8s; }
-@keyframes mp-loading-step { 0% { opacity: 1; } 33.34% { opacity: var(--mp-opacity-kicker); } }
+@keyframes mp-loading-step { 0% { opacity: 1; } 33.34% { opacity: var(--mp-opacity-muted); } }
 .mp-loading-button {
   display: inline-flex; align-items: baseline; gap: 0.6em; padding: 0.75em 1.5em;
   border: var(--mp-border) solid var(--mp-line-button); border-radius: 0; background: transparent; color: var(--mp-ink);

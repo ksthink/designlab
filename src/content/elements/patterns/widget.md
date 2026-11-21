@@ -53,7 +53,7 @@ related: [stat, app-icon, status-dot, notification, empty-state]
 - 위젯 전체에 읽을 문장 하나: `.accessibilityLabel("오늘 3개 남음, 마감 1개")`, Compose Glance는 `contentDescription`.
 - `■` 강조는 장식으로 숨기고 뜻은 글자("마감 1개")로 말한다.
 - Dynamic Type·글자 크기 확대에서 핵심 숫자가 잘리면 메타 줄을 먼저 숨긴다(`ViewThatFits`).
-- 대비는 slate/paper 10.9:1, 메타 줄(.55)에는 필수 정보를 두지 않는다.
+- 대비는 slate/paper 10.9:1, 메타 줄(.7)은 보조 정보 자리다.
 - 역할: iOS 위젯 전체가 하나의 버튼(딥링크)으로 읽힌다 — `.accessibilityElement(children: .combine)` + `.accessibilityAddTraits(.isButton)`. Android는 루트에 `contentDescription` 한 문장 + `clickable`.
 - 비트맵 텍스트(Android Glance 예외 방법)를 쓰면 반드시 `contentDescription`에 같은 글자를 넣는다.
 - 글자 크기 한계: iOS `.dynamicTypeSize(...DynamicTypeSize.xxLarge)`로 상한을 두고, 넘치면 `ViewThatFits`로 숫자만 남긴다. Android는 sp가 시스템 배율을 따르므로 가장 큰 배율(200%)에서 잘리는지 확인한다.
@@ -73,7 +73,7 @@ related: [stat, app-icon, status-dot, notification, empty-state]
 | 비어 있음 | 핵심 자리에 `-`, 메타 "없음" |
 | 불러오기 전(placeholder) | 같은 배치, 글자 대신 `redacted` — OS 기본 회색 막대(예외) |
 | 로그인 필요·오류 | 핵심 자리에 짧은 명사("열기"), 누르면 앱으로 |
-| 오래된 데이터 | 메타에 마지막 갱신 시각 `HH:mm`, `--mp-opacity-muted` |
+| 오래된 데이터 | 메타에 마지막 갱신 시각 `HH:mm`, `--mp-opacity-secondary` |
 | 누름 | OS 눌림 효과(예외). 앱의 해당 화면으로 딥링크 |
 
 ## 동작
@@ -124,11 +124,11 @@ related: [stat, app-icon, status-dot, notification, empty-state]
 - **iOS WidgetKit**
   ```swift
   VStack(alignment: .leading) {
-    Text("오늘").font(.custom("Mulmaru", size: 13)).opacity(0.45)
+    Text("오늘").font(.custom("Mulmaru", size: 12)).opacity(0.7)
     Spacer()
     Text("\(count)").font(.custom("Mulmaru", size: 36)).monospacedDigit()
     Spacer()
-    Text(updated, style: .time).font(.custom("Mulmaru", size: 11)).opacity(0.55)
+    Text(updated, style: .time).font(.custom("Mulmaru", size: 12)).opacity(0.7)
   }
   .containerBackground(Color("Background"), for: .widget)
   ```
@@ -143,7 +143,7 @@ related: [stat, app-icon, status-dot, notification, empty-state]
       val ink = ColorProvider(day = Slate, night = Paper)
       Column(GlanceModifier.fillMaxSize().background(ColorProvider(day = Paper, night = Slate))
         .padding(16.dp).clickable(actionStartActivity<MainActivity>())) {
-        Text("오늘", style = TextStyle(color = ink, fontSize = 13.sp, fontFamily = FontFamily.SansSerif)) // 서체 예외
+        Text("오늘", style = TextStyle(color = ink, fontSize = 12.sp, fontFamily = FontFamily.SansSerif)) // 서체 예외
         Spacer(GlanceModifier.defaultWeight())
         Text("3", style = TextStyle(color = ink, fontSize = 36.sp, fontWeight = FontWeight.Normal))
       }

@@ -43,7 +43,7 @@ related: [table, text-action, terminal-vocabulary, toast]
 **접근성**
 - 복사 버튼은 실제 `<button type="button">`, `aria-label="코드 복사"`. 결과는 `aria-live="polite"` 영역(버튼 글자 교체로 충분)으로 알린다.
 - 키보드: Tab으로 복사 버튼에 닿고 Enter/Space로 복사. `pre`는 스크롤이 생길 때만 `tabindex="0"`.
-- 글자 색은 `--mp-ink` 그대로(모눈 틴트 .035 위 대비 유지). 주석(.55)에 필수 정보를 두지 않는다.
+- 글자 색은 `--mp-ink` 그대로(모눈 틴트 .035 위 대비 유지). 주석도 .7 이상으로 둔다.
 - 결과 알림 마크업: `<button type="button" class="mp-code-block-copy" aria-label="코드 복사">[ 복사 ]</button><span class="sr-status" role="status" aria-live="polite"></span>` — 복사 후 `status`에 "복사했습니다"를 넣고 1.5초 뒤 비운다. 버튼 글자만 바꾸면 일부 스크린리더가 읽지 않으므로 status를 함께 쓴다.
 - 코드 블록에 `aria-label`을 붙이지 않는다(내용이 곧 이름). 언어 표시는 위 kicker 글자로.
 - `kbd` 조합은 `<kbd>Ctrl</kbd>+<kbd>C</kbd>`, 기호 `⌘`만 쓰지 않고 `Cmd`를 글자로.
@@ -105,7 +105,7 @@ related: [table, text-action, terminal-vocabulary, toast]
 .mp-code-block-copy:hover, .mp-code-block-copy:focus-visible, .mp-code-block-copy.is-hover { background: var(--mp-ink); color: var(--mp-bg); }
 .mp-code-block-copy:focus-visible { outline: 1px solid var(--mp-ink); outline-offset: 3px; }
 .mp-code-inline {
-  padding: 0.05em 0.35em; font-family: var(--mp-font); font-size: 0.9em;
+  padding: 0.05em 0.35em; font-family: var(--mp-font);
   border: var(--mp-border) solid var(--mp-line); background: var(--mp-grid-bg); overflow-wrap: anywhere;
 }
 @media (max-width: 480px) { .mp-code-block-pre { padding: 0.9em 5em 0.9em 1em; } }

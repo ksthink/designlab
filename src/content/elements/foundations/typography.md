@@ -25,25 +25,25 @@ related: [color, spacing-layout, microcopy, labels-numbers, section-head, hero]
 - `h1`–`h6`, `strong`, `b`, `th`, `em`, `i`, `code`, `pre`, `kbd`, `button`, `input`의 기본 굵기·기울임·서체를 되돌린다.
 - 서체 로드: `/v1/fonts.css`(woff2, `font-display: swap`). 히어로처럼 첫 화면 글자가 크면 필요한 글자만 담은 서브셋을 먼저 불러온다.
 
-**크기 10단계** (크기와 자간은 항상 같은 이름으로 짝)
+**크기 10단계** (크기와 자간은 항상 같은 이름으로 짝). Mulmaru는 12px 격자 서체라 모든 값이 12px의 정수배다(1×·2×·3×·4×·6×). 좁은 화면(≤480px)은 tokens.css가 hero·title을 한 단계 내린다.
 | 단계 | 값 | 자간 | 쓰는 곳 |
 |---|---|---|---|
-| hero | `clamp(1.95rem, 7.8vw, 5.2rem)` | .05em | 히어로 슬로건 한 줄 |
-| title | `clamp(1.8rem, 6vw, 3rem)` | .04em | 페이지 제목 h1, 행간 `--mp-leading-title` 1.35 |
-| heading | `clamp(1.15rem, 3.2vw, 1.7rem)` | .06em | 분류 제목 h2 |
-| subheading | `clamp(1.1rem, 3.1vw, 1.45rem)` | .04em | 카드 제목 h3 |
-| lead | `clamp(0.95rem, 2.2vw, 1.2rem)` | .02em | 소개 문단 |
-| body | `clamp(0.92rem, 2.2vw, 1.05rem)` | .01em | 본문 |
-| small | `clamp(0.82rem, 2vw, 0.95rem)` | .06em | 링크·버튼·입력 |
-| kicker | `clamp(0.75rem, 2vw, 0.9rem)` | .14em | 머리 표지 |
-| meta | `clamp(0.68rem, 1.7vw, 0.75rem)` | .08em | 배지·날짜·메타 |
-| fine | 0.72rem | .1em | 저작권 |
+| hero | 72px (좁은 화면 48px) | .05em | 히어로 슬로건 한 줄 |
+| title | 48px (좁은 화면 36px) | .04em | 페이지 제목 h1, 행간 `--mp-leading-title` 1.35 |
+| heading | 36px | .06em | 분류 제목 h2 |
+| subheading | 24px | .04em | 카드 제목 h3 |
+| lead | 24px | .02em | 소개 문단 |
+| body | 12px | .01em | 본문 |
+| small | 12px | .06em | 링크·버튼·입력 |
+| kicker | 12px | .14em | 머리 표지 |
+| meta | 12px | .08em | 배지·날짜·메타 |
+| fine | 12px | .1em | 저작권 |
 
 **행간과 폭**
 - 본문·리드 `--mp-leading-body` 2.1, 카드 설명 `--mp-leading-card` 1.85, 제목 `--mp-leading-title` 1.35. UI 한 줄 요소(버튼, 배지)는 1.
 - 문단 폭 `--mp-width-para` 30em 이하. 한국어 줄바꿈은 `word-break: keep-all`, 긴 URL은 `overflow-wrap: anywhere`.
 
-**투명도 위계** — 본문 .85 · 브랜드 .8 · 푸터 링크 .75 · 보조 .7 · 메타 .55 · 노트 .5 · kicker .45 · 저작권 .35. 호버하면 1.
+**투명도 위계** — 본문 .85 · 브랜드 .8 · 푸터 링크 .75 · 보조·노트·메타·kicker·저작권 .7 · 비활성 .5. 같은 .7끼리는 자간이 위계를 맡는다. 호버하면 1.
 
 **반응형**
 - 모든 단계가 clamp라 따로 미디어 쿼리를 두지 않는다. 480px 이하에서 히어로 한 줄이 넘치면 hero 대신 title 단계로 내린다.
@@ -52,7 +52,8 @@ related: [color, spacing-layout, microcopy, labels-numbers, section-head, hero]
 **접근성**
 - 제목 단계는 문서 구조(h1 하나, h2·h3 순서)와 맞춘다. 크기 때문에 제목 레벨을 건너뛰지 않는다.
 - 사용자가 브라우저 글자 크기를 키우면 rem 기반이라 함께 커진다. px 고정 크기를 쓰지 않는다.
-- .55 이하 투명도 글자에는 필수 정보를 두지 않는다.
+- 글자는 .7 아래로 옅게 하지 않는다(.5는 비활성 요소 전용).
+- 글자 크기는 `--mp-size-*`만 — 모두 Mulmaru 12px 격자의 정수배(12·24·36·48·72px). `clamp()`·`vw`·`0.85em`처럼 격자를 벗어난 크기는 픽셀을 뭉갠다.
 
 ## 상태
 | 상태 | 표현 |

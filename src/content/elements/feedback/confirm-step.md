@@ -100,7 +100,7 @@ related: [modal, action-sheet, button, text-field, form-validation, microcopy, t
 .mp-confirm-step-warn span { margin-right: 0.5em; color: var(--mp-accent); } /* 강조 — 화면당 하나 */
 .mp-confirm-step-code { display: grid; gap: 0.5em; font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small); }
 .mp-confirm-step-code input {
-  width: 4em; padding: 0.5em; text-align: center; border: var(--mp-border) solid var(--mp-line); border-radius: 0;
+  width: 4em; padding: 0.5em; text-align: center; border: var(--mp-border) solid var(--mp-line-button); border-radius: 0;
   background: transparent; color: var(--mp-ink); caret-color: var(--mp-ink);
   font: 400 var(--mp-size-body) / 1.2 var(--mp-font); letter-spacing: var(--mp-tracking-body);
 }

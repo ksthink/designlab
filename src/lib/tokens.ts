@@ -142,6 +142,10 @@ export function tokensCss(): string {
     .filter(([, list]) => list.length)
     .map(([group, list]) => `  /* ${group} */\n${decl(list, '  ')}`)
     .join('\n\n');
+  const narrow = tokenList.filter((t) => !t.theme && typeof t.meta?.narrow === 'string');
+  const narrowCss = narrow.length
+    ? `\n/* 좁은 화면: 글자 크기를 12px 격자 한 단계 아래로 (tokens.json $extensions.dev.metaphr.narrow) */\n@media (max-width: 480px) {\n  :root {\n${narrow.map((t) => `    ${t.name}: ${t.meta!.narrow};`).join('\n')}\n  }\n}\n`
+    : '';
   return `/* metaphr design tokens — tokens.json에서 생성됨. 직접 수정하지 말 것. */
 /* 테마: 기본 라이트, prefers-color-scheme: dark 자동, [data-theme="light"|"dark"] 수동 지정. */
 :root {
@@ -164,7 +168,7 @@ ${decl(dark, '  ')}
 :root[data-theme="light"] {
 ${decl(light, '  ')}
 }
-`;
+${narrowCss}`;
 }
 
 export { tokens };
