@@ -63,17 +63,16 @@ const sample: Record<string, string> = {
     <ul class="swatches" role="list">
       {swatches.map((t) => (
         <li>
-          <div class="chip" style={`--c:var(${t.name})`}></div>
+          <button type="button" class="chip" style={`--c:var(${t.name})`} data-copy-text={`var(${t.name})`} aria-label={`var(${t.name}) 복사`}></button>
           <div class="sw-head">
             <span class="sw-name">{short(t.name)}</span>
-            <span class:list={['badge', { soon: t.status === 'candidate' }]}>{statusLabel(t.status)}</span>
+            {t.status === 'candidate' && <span class="badge soon">{statusLabel(t.status)}</span>}
           </div>
-          <code>{t.name}</code>
           <span class="val">{t.resolved}{t.role ? ` · ${t.role}` : ''}</span>
-          <span class="val">{[t.contrastOnLight !== 1 && `라이트 배경 ${t.contrastOnLight}:1`, t.contrastOnDark !== 1 && `다크 배경 ${t.contrastOnDark}:1`].filter(Boolean).join(' · ')}</span>
         </li>
       ))}
     </ul>
+    <p class="note">색을 누르면 <code>var(--mp-palette-…)</code>가 복사됩니다.</p>
 
     <h3 class="sub-h">라이트와 다크</h3>
     <div class="theme-pair">
@@ -98,65 +97,42 @@ const sample: Record<string, string> = {
     <p class="note">■ 커서가 강조(orange) 한 곳, 현재 위치 표시가 보조(teal) 면입니다. 둘은 떨어져 있습니다.</p>
 
     <h3 class="sub-h">대비</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>색</th><th>색</th><th>대비</th><th>판정</th></tr></thead>
-        <tbody>
-          {pairs.map((p) => (
-            <tr>
-              <td><span class="mini" style={`--c:var(${p.a})`} /> {short(p.a)}</td>
-              <td><span class="mini" style={`--c:var(${p.b})`} /> {short(p.b)}</td>
-              <td>{p.ratio}:1</td>
-              <td>{p.ratio >= 4.5 ? '글자 가능' : p.ratio >= 3 ? '24px(--mp-size-title) 이상 글자만' : p.ratio >= 1.5 ? '면·기호만, 글자 금지' : '맞붙이지 않음'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <ul class="pairs" role="list">
+      {pairs.map((p) => (
+        <li>
+          <div class="pair-tile" style={`--bg:var(${p.b});--fg:var(${p.a})`}>
+            <span class="pt-a">Aa</span><span class="pt-b"></span>
+          </div>
+          <p class="pt-meta"><span>{short(p.a)} / {short(p.b)}</span><span>{p.ratio}:1 · {p.ratio >= 4.5 ? '글자' : p.ratio >= 3 ? '24px 이상 글자' : p.ratio >= 1.5 ? '면·기호만' : '맞붙이지 않음'}</span></p>
+        </li>
+      ))}
+    </ul>
 
-    <h3 class="sub-h">쓰는 법</h3>
-    <div class="usage-grid">
-      <figure>
-        <div class="thumb stage"><span class="u-caret"><span>cursor</span><span class="u-mark" /></span></div>
-        <figcaption><span class="badge">좋은 예</span> 강조는 ■ 마크 한 곳</figcaption>
-      </figure>
-      <figure>
-        <div class="thumb stage"><span class="u-sel"><span class="u-face" />선택됨</span></div>
-        <figcaption><span class="badge">좋은 예</span> 보조는 선택 상태의 작은 면</figcaption>
-      </figure>
-      <figure>
-        <div class="thumb stage bad"><span class="u-text">본문을 강조색 글자로 쓰지 않습니다</span></div>
-        <figcaption><span class="badge soon">나쁜 예</span> 라이트에서 orange·teal 글자</figcaption>
-      </figure>
-      <figure>
-        <div class="thumb stage bad"><span class="u-touch"><span class="t" /><span class="o" /></span></div>
-        <figcaption><span class="badge soon">나쁜 예</span> teal과 orange를 맞붙이기 (1.24:1)</figcaption>
-      </figure>
-    </div>
-
-    <h3 class="sub-h">테마별 값</h3>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>변수</th><th>라이트</th><th>다크</th><th>용도</th></tr></thead>
-        <tbody>
-          {themes.map((t) => (
-            <tr>
-              <td><code>{t.name}</code></td>
-              <td><span class="mini" style={`--c:${t.light.value}`} /> {t.light.value.replace(/^var\(--mp-palette-(.+)\)$/, '$1')}</td>
-              <td><span class="mini" style={`--c:${t.dark.value}`} /> {t.dark.value.replace(/^var\(--mp-palette-(.+)\)$/, '$1')}</td>
-              <td>{t.description}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <details class="values">
+      <summary>값 표 · 테마별 변수</summary>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>변수</th><th>라이트</th><th>다크</th><th>용도</th></tr></thead>
+          <tbody>
+            {themes.map((t) => (
+              <tr>
+                <td><code>{t.name}</code></td>
+                <td><span class="mini" style={`--c:${t.light.value}`} /> {t.light.value.replace(/^var\(--mp-palette-(.+)\)$/, '$1')}</td>
+                <td><span class="mini" style={`--c:${t.dark.value}`} /> {t.dark.value.replace(/^var\(--mp-palette-(.+)\)$/, '$1')}</td>
+                <td>{t.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
   </section>
 
   <!-- 글자 크기 -->
   <section class="section" aria-labelledby="t-size">
     <div class="section-head">
       <h2 id="t-size">글자 크기와 자간</h2>
-      <span>굵기 대신 크기·자간으로. 모두 clamp 유동값</span>
+      <span>굵기 대신 크기·자간으로. 모두 12px 격자의 정수배</span>
     </div>
     <ol class="scale" role="list">
       {sizes.map((t) => (
@@ -221,24 +197,35 @@ const sample: Record<string, string> = {
       <h2 id="t-layout">폭과 여백</h2>
       <span>넉넉하게 비운다</span>
     </div>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>변수</th><th>값</th><th>용도</th></tr></thead>
-        <tbody>
-          {[...layout, ...pixel].map((t) => (
-            <tr><td><code>{t.name}</code></td><td>{t.value}</td><td>{t.description}</td></tr>
-          ))}
-          {font.map((t) => (
-            <tr><td><code>{t.name}</code></td><td>{t.value}</td><td>{t.description}</td></tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
     <div class="widths" aria-hidden="true">
       <div class="bar" style="width:100%"><span>list 1180px</span></div>
       <div class="bar" style={`width:${(760 / 1180 * 100).toFixed(2)}%`}><span>read 760px</span></div>
       <div class="bar" style={`width:${(30 * 16 / 1180 * 100).toFixed(2)}%`}><span>para 30em</span></div>
     </div>
+
+    <h3 class="sub-h">픽셀 배율</h3>
+    <div class="px-scale">
+      {[1, 3, 5].map((n) => (
+        <figure>
+          <div class="thumb px-stage"><img class="pixel" src={url('/v1/icons/rhythm.png')} alt="" width={40 * n} height={40 * n} /></div>
+          <figcaption>{n}× · {40 * n}px{n === 3 ? ' · 카드' : n === 5 ? ' · 상세' : ''}</figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <details class="values">
+      <summary>값 표 · 폭·여백·픽셀·서체</summary>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>변수</th><th>값</th><th>용도</th></tr></thead>
+          <tbody>
+            {[...layout, ...pixel, ...font].map((t) => (
+              <tr><td><code>{t.name}</code></td><td>{t.value}</td><td>{t.description}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
   </section>
 
   <!-- 움직임 -->
@@ -271,18 +258,44 @@ const sample: Record<string, string> = {
       </figure>
     </div>
 
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>변수</th><th>값</th><th>용도</th></tr></thead>
-        <tbody>
-          {motion.map((t) => (
-            <tr><td><code>{t.name}</code></td><td>{t.value}</td><td>{t.description}</td></tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <details class="values">
+      <summary>값 표 · 움직임</summary>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>변수</th><th>값</th><th>용도</th></tr></thead>
+          <tbody>
+            {motion.map((t) => (
+              <tr><td><code>{t.name}</code></td><td>{t.value}</td><td>{t.description}</td></tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </details>
   </section>
 </Base>
+
+<script is:inline>
+  // 누르면 복사 — 색 견본(data-copy-text)과 페이지의 --mp-* 이름(code)
+  (function () {
+    if (!navigator.clipboard) return;
+    function copy(el, text) {
+      navigator.clipboard.writeText(text).then(function () {
+        el.setAttribute('data-copied', '');
+        setTimeout(function () { el.removeAttribute('data-copied'); }, 1200);
+      });
+    }
+    document.querySelectorAll('[data-copy-text]').forEach(function (b) {
+      b.addEventListener('click', function () { copy(b, b.getAttribute('data-copy-text')); });
+    });
+    document.querySelectorAll('main code').forEach(function (c) {
+      var t = c.textContent.trim();
+      if (!/^--mp-[a-z0-9-]+$/.test(t)) return;
+      c.classList.add('copyable');
+      c.title = '눌러서 복사';
+      c.addEventListener('click', function () { copy(c, 'var(' + t + ')'); });
+    });
+  })();
+</script>
 
 <style>
   h3.sub-h {
@@ -305,7 +318,15 @@ const sample: Record<string, string> = {
   }
   .swatches li { display: flex; flex-direction: column; gap: 0.35em; }
   .chip {
-    aspect-ratio: 2 / 1;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    padding: 0;
+    font: inherit;
+    font-size: var(--mp-size-small);
+    color: var(--mp-palette-slate);
+    cursor: copy;
+    aspect-ratio: 3 / 2;
     margin-bottom: 0.5em;
     border: var(--mp-border) solid var(--mp-line);
     background-color: var(--c);
@@ -347,32 +368,64 @@ const sample: Record<string, string> = {
   .tp-btn.on { background: var(--mp-ink); color: var(--mp-bg); border-color: var(--mp-ink); }
   .tp-thumb { height: 64px; font-size: var(--mp-size-heading); }
 
-  .usage-grid {
+  /* 대비 타일 */
+  .pairs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
-    gap: 1.4em 1.2em;
+    grid-template-columns: repeat(auto-fill, minmax(min(160px, 100%), 1fr));
+    gap: 1.5em 1.2em;
   }
-  .usage-grid figure { margin: 0; }
-  .usage-grid .stage { aspect-ratio: 2 / 1; }
-  .usage-grid figcaption {
-    margin-top: 0.7em;
+  .pair-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4em;
+    aspect-ratio: 3 / 2;
+    background: var(--bg);
+    border: var(--mp-border) solid var(--mp-line);
+  }
+  .pt-a { color: var(--fg); font-size: var(--mp-size-title); letter-spacing: var(--mp-tracking-title); }
+  .pt-b { width: 24px; height: 24px; background: var(--fg); }
+  .pt-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    margin: 0.6em 0 0;
     font-size: var(--mp-size-meta);
     letter-spacing: var(--mp-tracking-meta);
-    line-height: 1.9;
+    line-height: 1.8;
   }
-  .usage-grid figcaption .badge { margin-right: 0.4em; opacity: var(--mp-opacity-meta); }
-  .u-caret { font-size: var(--mp-size-lead); }
-  .u-caret > span:first-child { opacity: var(--mp-opacity-body); }
-  .u-mark { display: inline-block; width: 0.7em; height: 0.7em; margin-left: 0.35em; background: var(--mp-accent); animation: caret var(--mp-duration-caret) steps(1, end) infinite; }
-  .u-sel { font-size: var(--mp-size-small); letter-spacing: var(--mp-tracking-small); }
-  .u-face { display: inline-block; width: 0.55em; height: 0.55em; margin-right: 0.45em; background: var(--mp-secondary); }
-  .u-text { padding: 0 1em; font-size: var(--mp-size-meta); line-height: 1.8; text-align: center; color: var(--mp-palette-orange); }
-  .u-touch { display: flex; }
-  .u-touch span { display: block; width: 40px; height: 40px; }
-  .u-touch .t { background: var(--mp-palette-teal); }
-  .u-touch .o { background: var(--mp-palette-orange); }
-  .bad { position: relative; }
-  .bad::after { content: "x"; position: absolute; top: 0.4em; right: 0.6em; font-size: var(--mp-size-small); opacity: var(--mp-opacity-meta); }
+  .pt-meta span + span { opacity: var(--mp-opacity-meta); }
+
+  /* 접힌 값 표 */
+  .values { margin-top: 2em; border-top: var(--mp-border) solid var(--mp-line); border-bottom: var(--mp-border) solid var(--mp-line); }
+  .values summary {
+    padding: 0.9em 0;
+    cursor: pointer;
+    list-style: none;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    opacity: var(--mp-opacity-link);
+  }
+  .values summary::-webkit-details-marker { display: none; }
+  .values summary::before { content: '+ '; }
+  .values[open] summary::before { content: '- '; }
+  .values summary:hover { opacity: 1; }
+  .values .table-wrap { padding-bottom: 1em; }
+
+  /* 픽셀 배율 */
+  .px-scale { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 1.2em; }
+  .px-scale figure { margin: 0; }
+  .px-stage { padding: 1em; }
+  .px-scale figcaption { margin-top: 0.6em; font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); }
+
+  /* 복사 */
+  :global(code.copyable) { cursor: copy; }
+  :global(code.copyable:hover) { background: var(--mp-ink); color: var(--mp-bg); }
+  :global(code.copyable[data-copied])::after { content: ' 복사됨'; }
+  .chip[data-copied]::after { content: '복사됨'; padding: 0.3em 0.6em; background: var(--mp-bg); color: var(--mp-ink); }
 
   /* 크기 */
   .scale { list-style: none; margin: 0; padding: 0; border-top: var(--mp-border) solid var(--mp-line); }
