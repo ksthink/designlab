@@ -287,7 +287,7 @@ export const PILLARS: { id: PillarId; title: string; en: string; summary: string
 
 const PILLAR_TITLE = Object.fromEntries(PILLARS.map((p) => [p.id, p.title])) as Record<PillarId, string>;
 
-const MISTAKES: [PillarId, string, string, string][] = [
+export const MISTAKES: [PillarId, string, string, string][] = [
   ['minimalism', '굵은 글자', '`font-weight: 700`, `<strong>`/`<b>`/`<th>`/`h1`의 브라우저 기본 bold', '모든 요소 `font-weight: 400`. 강조는 크기·자간·투명도'],
   ['minimalism', '기울임', '`font-style: italic`, `<em>` 기본 기울임', '`font-style: normal`'],
   ['minimalism', '회색 글자색', '`color: #888`, `color: rgba(0,0,0,.5)`', '`color: var(--mp-ink)` + `opacity: var(--mp-opacity-*)`'],

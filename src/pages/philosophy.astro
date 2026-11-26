@@ -1,97 +1,294 @@
 ---
 import Base from '../layouts/Base.astro';
+import { marked } from 'marked';
 import { Content, getHeadings } from '../content/philosophy.md';
+import { MISTAKES, PILLARS, url } from '../lib/docs';
 
-// 문서가 길어져도 길을 잃지 않게 — h2는 목차, h3은 그 아래 작은 줄
-const toc: { slug: string; text: string; subs: { slug: string; text: string }[] }[] = [];
-for (const h of getHeadings()) {
-  if (h.depth === 2) toc.push({ slug: h.slug, text: h.text, subs: [] });
-  else if (h.depth === 3 && toc.length) toc[toc.length - 1].subs.push({ slug: h.slug, text: h.text });
+// 사람용 철학 페이지 — 글 대신 "하지 말 것 ✕ / 할 것 ■" 짝 데모로 보여 준다.
+// 글의 원본은 그대로다: 제목·할 것 문장은 docs.ts 의 MISTAKES, 기둥 한 줄은 philosophy.md 의 h2,
+// 만드는 태도는 philosophy.md 의 h3. 전체 글은 아래 접힌 칸과 /philosophy.md 에 있다.
+// 데모 안의 orange 는 견본(specimen)이라 '화면당 강조 하나'의 예외다 — 토큰 페이지의 색 견본과 같다.
+
+const headings = getHeadings();
+const tagline = (title: string) =>
+  headings.find((h) => h.depth === 2 && h.text.startsWith(title))?.text.split(' — ')[1] ?? '';
+
+// 만드는 태도: 그 h2 아래 h3 들
+const attitude: string[] = [];
+{
+  let inside = false;
+  for (const h of headings) {
+    if (h.depth === 2) inside = h.text === '만드는 태도';
+    else if (inside && h.depth === 3) attitude.push(h.text);
+  }
 }
+
+const inline = (s: string) => marked.parseInline(s) as string;
+
+const icon = url('/v1/icons/rhythm.png');
+const para = '여백을 담습니다. 정보는 읽는 순서대로 놓고, 남는 자리는 비워 둡니다.';
+
+// MISTAKES 제목 → [하지 말 것, 할 것] 데모 HTML. 여기 없는 항목은 페이지에 나오지 않는다(전체 목록은 /philosophy.md).
+const DEMOS: Record<string, [string, string]> = {
+  // 미니멀리즘
+  '굵은 글자': ['<span class="pd-word" style="font-weight:700">저장하기</span>', '<span class="pd-word">저장하기</span>'],
+  '둥근 모서리': ['<span class="pd-btn" style="border-radius:9999px">저장</span>', '<span class="pd-btn">저장</span>'],
+  '그림자': ['<span class="pd-box" style="border-color:transparent;box-shadow:0 6px 18px rgba(48,56,65,.28)">카드</span>', '<span class="pd-box">카드</span>'],
+  '두꺼운 선': ['<span class="pd-box" style="border:3px solid var(--mp-ink)">카드</span>', '<span class="pd-box">카드</span>'],
+  '호버 시 색 변경': ['<button type="button" class="pd-btn pd-hover-bad">올려 보기</button>', '<button type="button" class="pd-btn pd-hover-good">올려 보기</button>'],
+  '좁은 여백·빽빽한 행간': [`<p class="pd-para" style="line-height:1.25;padding:0;width:16em">${para}</p>`, `<p class="pd-para">${para}</p>`],
+  '옅은 글자': ['<span class="pd-meta" style="opacity:.35">2026-11-26 · 3분</span>', '<span class="pd-meta">2026-11-26 · 3분</span>'],
+  // 픽셀아트
+  '다른 서체': ['<span class="pd-word" style="font-family:system-ui,sans-serif">여백</span>', '<span class="pd-word">여백</span>'],
+  '격자에서 벗어난 글자 크기': ['<span class="pd-word" style="font-size:42px">여백</span>', '<span class="pd-word">여백</span>'],
+  '정수배가 아닌 픽셀 확대': [`<span class="pd-light"><img class="pd-icon" src="${icon}" alt="" width="100" height="100" style="image-rendering:auto"></span>`, `<span class="pd-light"><img class="pd-icon pixel" src="${icon}" alt="" width="120" height="120"></span>`],
+  '글리프 효과에 부드러운 트윈': ['<span class="pd-cursor">입력<i class="pd-caret-bad">■</i></span>', '<span class="pd-cursor">입력<i class="pd-caret-good">■</i></span>'],
+  // 레트로 컬러
+  '순수 흰색·검정': ['<span class="pd-chip" style="background:#000;color:#fff">Aa</span><span class="pd-chip" style="background:#fff;color:#000">Aa</span>', '<span class="pd-chip" style="background:var(--mp-palette-slate);color:var(--mp-palette-paper)">Aa</span><span class="pd-chip" style="background:var(--mp-palette-paper);color:var(--mp-palette-slate)">Aa</span>'],
+  '등록되지 않은 색': ['<span class="pd-status"><span style="color:#16a34a">● 저장됨</span><span style="color:#dc2626">● 실패</span><span style="color:#2563eb">자세히</span></span>', '<span class="pd-status"><span>[ok] 저장됨</span><span>[!] 실패</span><span class="pd-u">자세히</span></span>'],
+  '강조 남용': ['<span class="pd-row"><span class="pd-btn pd-acc">저장</span><span class="pd-btn pd-acc">공유</span><span class="pd-btn pd-acc">삭제</span></span>', '<span class="pd-row"><span class="pd-btn"><i class="pd-mark">■</i> 저장</span><span class="pd-btn">공유</span><span class="pd-btn">삭제</span></span>'],
+  '라이트에서 강조색 글자': ['<span class="pd-light"><span style="color:var(--mp-palette-orange)">자세히 보기</span></span>', '<span class="pd-light"><span class="pd-u"><i class="pd-mark">■</i> 자세히 보기</span></span>'],
+  'teal과 orange 맞붙이기': ['<span class="pd-face pd-teal"><span class="pd-sq"></span></span>', '<span class="pd-row"><span class="pd-face pd-teal"></span><span class="pd-sq"></span></span>'],
+  '옅은 강조색': ['<span class="pd-face" style="background:var(--mp-palette-orange);opacity:.35"></span>', '<span class="pd-sq pd-sq-lg"></span>'],
+};
+
+const pillars = PILLARS.map((p) => ({
+  ...p,
+  tagline: tagline(p.title),
+  pairs: MISTAKES.filter((m) => m[0] === p.id && DEMOS[m[1]]).map(([, title, , good]) => ({
+    title,
+    good: inline(good),
+    demo: DEMOS[title],
+  })),
+}));
 ---
 
-<Base title="디자인 철학" description="여백을 담습니다 — 미니멀리즘 · 픽셀아트 · 레트로 컬러, 세 기둥과 해야 할 것/하지 말 것" slug="philosophy" width="list">
-  <div class="doc">
-    {toc.length > 1 && (
-      <nav class="toc" aria-label="목차">
-        <p class="toc-title">목차</p>
-        <ol>
-          {toc.map((h) => (
-            <li>
-              <a href={`#${h.slug}`}>{h.text}</a>
-              {h.subs.length > 0 && (
-                <ol>
-                  {h.subs.map((s) => <li><a href={`#${s.slug}`}>{s.text}</a></li>)}
-                </ol>
-              )}
-            </li>
-          ))}
-        </ol>
-      </nav>
-    )}
-    <div class="doc-body">
-      <p class="kicker">philosophy · 세 기둥과 만드는 태도</p>
-      <article class="prose"><Content /></article>
-    </div>
+<Base title="디자인 철학" description="여백을 담습니다 — 미니멀리즘 · 픽셀아트 · 레트로 컬러. 하지 말 것과 할 것을 나란히 봅니다." slug="philosophy" width="list">
+  <div class="intro">
+    <p class="kicker">philosophy</p>
+    <h1>디자인 철학</h1>
+    <p class="legend"><span><i>✕</i> 하지 말 것</span><span><i>■</i> 할 것</span></p>
   </div>
+
+  <nav class="jump" aria-label="기둥으로 이동">
+    {pillars.map((p) => <a href={`#${p.id}`}>{p.title}</a>)}
+    <a href="#attitude">만드는 태도</a>
+  </nav>
+
+  {pillars.map((p) => (
+    <section id={p.id} class="section" aria-labelledby={`${p.id}-title`}>
+      <div class="section-head">
+        <h2 id={`${p.id}-title`}>{p.title}</h2>
+        <span>{p.tagline}</span>
+      </div>
+      <ul class="pairs" role="list">
+        {p.pairs.map((x) => (
+          <li class="pair">
+            <div class="panes">
+              <div class="pane thumb" aria-label="하지 말 것"><i class="tag">✕</i><div class="stage" set:html={x.demo[0]} /></div>
+              <div class="pane thumb" aria-label="할 것"><i class="tag">■</i><div class="stage" set:html={x.demo[1]} /></div>
+            </div>
+            <h3>{x.title}</h3>
+            <p class="do" set:html={x.good} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+
+  <section id="attitude" class="section" aria-labelledby="attitude-title">
+    <div class="section-head">
+      <h2 id="attitude-title">만드는 태도</h2>
+    </div>
+    <ol class="term" role="list">
+      {attitude.map((a, i) => (
+        <li>&gt; {a}{i === attitude.length - 1 && <span class="caret" aria-hidden="true">■</span>}</li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section">
+    <details class="fulltext">
+      <summary>전체 글 읽기</summary>
+      <article class="prose"><Content /></article>
+    </details>
+  </section>
 </Base>
 
 <style>
-  .doc {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0 clamp(2rem, 5vw, 4.5rem);
+  .intro h1 { margin: 0; }
+
+  .legend {
+    display: flex;
+    gap: 1.5em;
+    margin: 1.5em 0 0;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    opacity: var(--mp-opacity-secondary);
   }
+  .legend i { font-style: normal; }
 
-  .doc-body { max-width: var(--mp-width-read); min-width: 0; }
-
-  .toc {
-    order: 0;
-    margin-bottom: var(--mp-section);
-    padding: 1.1em 0 0.4em;
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5em 1.5em;
+    margin-top: 2rem;
+    padding: 1em 0;
     border-top: var(--mp-border) solid var(--mp-line);
     border-bottom: var(--mp-border) solid var(--mp-line);
     font-size: var(--mp-size-small);
     letter-spacing: var(--mp-tracking-small);
   }
+  .jump a { text-decoration: none; opacity: var(--mp-opacity-nav); transition: opacity var(--mp-duration-hover) ease; }
+  .jump a:hover { opacity: 1; }
 
-  .toc-title {
-    margin: 0 0 0.8em;
-    font-size: var(--mp-size-kicker);
-    letter-spacing: var(--mp-tracking-kicker);
-    opacity: var(--mp-opacity-kicker);
+  .section { scroll-margin-top: 1rem; }
+
+  .pairs {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    gap: 3rem 2rem;
   }
 
-  .toc ol { list-style: none; margin: 0; padding: 0; }
-  .toc > ol > li { margin-bottom: 0.7em; }
-  .toc ol ol { display: none; margin-top: 0.35em; padding-left: 1em; }
-  .toc ol ol li { margin-bottom: 0.25em; font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); line-height: 1.8; }
+  .panes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    border: var(--mp-border) solid var(--mp-line);
+    background: var(--mp-line);
+  }
 
-  .toc a {
-    text-decoration: none;
+  .pane {
+    position: relative;
+    height: 168px;
+    overflow: hidden;
+    background-color: var(--mp-grid-bg);
+  }
+
+  .tag {
+    position: absolute;
+    top: 0.5em;
+    left: 0.6em;
+    font-style: normal;
+    font-size: var(--mp-size-meta);
+    opacity: var(--mp-opacity-meta);
+  }
+
+  .stage {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    color: var(--mp-ink);
+  }
+
+  .pair h3 {
+    margin: 1em 0 0.3em;
+    font-size: var(--mp-size-body);
+    letter-spacing: var(--mp-tracking-body);
+  }
+
+  .do {
+    margin: 0;
+    font-size: var(--mp-size-meta);
+    letter-spacing: var(--mp-tracking-meta);
+    line-height: var(--mp-leading-card);
+    opacity: var(--mp-opacity-secondary);
+  }
+
+  /* ---------- 데모 조각 (set:html 로 들어가므로 :global) ---------- */
+  .stage :global(.pd-word) { font-size: var(--mp-size-title); letter-spacing: var(--mp-tracking-title); white-space: nowrap; }
+  .stage :global(.pd-btn) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.6em 1.1em;
+    border: var(--mp-border) solid var(--mp-line-button);
+    background: var(--mp-bg);
+    color: var(--mp-ink);
+    font: inherit;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    cursor: default;
+  }
+  .stage :global(button.pd-btn) { cursor: pointer; transition: background-color var(--mp-duration-hover) ease, color var(--mp-duration-hover) ease; }
+  .stage :global(.pd-hover-bad:hover) { background: var(--mp-palette-orange); color: var(--mp-palette-slate); border-color: var(--mp-palette-orange); }
+  .stage :global(.pd-hover-good:hover),
+  .stage :global(.pd-hover-good:focus-visible) { background: var(--mp-ink); color: var(--mp-bg); }
+  .stage :global(.pd-box) {
+    display: grid;
+    place-items: center;
+    width: 112px;
+    height: 72px;
+    border: var(--mp-border) solid var(--mp-line);
+    background: var(--mp-bg);
+    font-size: var(--mp-size-small);
+  }
+  .stage :global(.pd-para) { margin: 0; width: 13em; font-size: var(--mp-size-meta); line-height: var(--mp-leading-body); opacity: var(--mp-opacity-body); }
+  .stage :global(.pd-meta) { font-size: var(--mp-size-meta); letter-spacing: var(--mp-tracking-meta); opacity: var(--mp-opacity-meta); }
+  .stage :global(.pd-icon) { display: block; opacity: var(--mp-opacity-pixel); }
+  .stage :global(.pd-cursor) { font-size: var(--mp-size-title); }
+  .stage :global(.pd-cursor i) { font-style: normal; margin-left: 0.15em; opacity: var(--mp-opacity-kicker); }
+  .stage :global(.pd-caret-bad) { animation: pd-fade 1.2s ease-in-out infinite alternate; }
+  .stage :global(.pd-caret-good) { animation: pd-blink var(--mp-duration-caret, 1.2s) steps(1, end) infinite; }
+  .stage :global(.pd-chip) { display: grid; place-items: center; width: 56px; height: 56px; font-size: var(--mp-size-title); }
+  .stage :global(.pd-chip + .pd-chip) { margin-left: 8px; }
+  .stage :global(.pd-status) { display: flex; flex-direction: column; gap: 0.5em; font-size: var(--mp-size-small); }
+  .stage :global(.pd-u) { text-decoration: underline; text-underline-offset: 0.3em; }
+  .stage :global(.pd-row) { display: flex; align-items: center; gap: 8px; }
+  .stage :global(.pd-acc) { background: var(--mp-palette-orange); border-color: var(--mp-palette-orange); color: var(--mp-palette-slate); }
+  .stage :global(.pd-mark) { font-style: normal; color: var(--mp-accent); }
+  .stage :global(.pd-light) {
+    display: grid;
+    place-items: center;
+    padding: 1.2em 1.4em;
+    background: var(--mp-palette-paper);
+    color: var(--mp-palette-slate);
+    font-size: var(--mp-size-small);
+  }
+  .stage :global(.pd-face) { display: grid; place-items: center; width: 72px; height: 72px; }
+  .stage :global(.pd-teal) { background: var(--mp-palette-teal); }
+  .stage :global(.pd-sq) { display: block; width: 24px; height: 24px; background: var(--mp-palette-orange); }
+  .stage :global(.pd-sq-lg) { width: 36px; height: 36px; }
+
+  @keyframes pd-fade { from { opacity: 0.7; } to { opacity: 0; } }
+  @keyframes pd-blink { 50% { opacity: 0; } }
+
+  /* ---------- 만드는 태도 ---------- */
+  .term {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: var(--mp-size-subheading);
+    letter-spacing: var(--mp-tracking-subheading);
+    line-height: var(--mp-leading-title);
+  }
+  .term li + li { margin-top: 1em; }
+  .caret { margin-left: 0.2em; opacity: var(--mp-opacity-kicker); animation: pd-blink 1.2s steps(1, end) infinite; }
+
+  /* ---------- 전체 글 ---------- */
+  .fulltext { border-top: var(--mp-border) solid var(--mp-line); border-bottom: var(--mp-border) solid var(--mp-line); }
+  .fulltext summary {
+    padding: 1em 0;
+    cursor: pointer;
+    list-style: none;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
     opacity: var(--mp-opacity-nav);
-    transition: opacity var(--mp-duration-hover) ease;
   }
-  .toc a:hover { opacity: 1; }
+  .fulltext summary::-webkit-details-marker { display: none; }
+  .fulltext summary::before { content: '+ '; }
+  .fulltext[open] summary::before { content: '- '; }
+  .fulltext summary:hover { opacity: 1; }
+  .fulltext .prose { max-width: var(--mp-width-read); padding-bottom: 2rem; }
 
-  /* 넓은 화면 — 왼쪽에 붙어 따라오는 목차, 본문은 읽기 폭 760px 그대로 */
-  @media (min-width: 1100px) {
-    .doc {
-      grid-template-columns: minmax(0, 220px) minmax(0, var(--mp-width-read));
-      justify-content: center;
-    }
-    .toc ol ol { display: block; }
-    .toc {
-      position: sticky;
-      top: 2rem;
-      align-self: start;
-      max-height: calc(100vh - 4rem);
-      overflow-y: auto;
-      margin-bottom: 0;
-      border-bottom: 0;
-    }
+  @media (prefers-reduced-motion: reduce) {
+    .stage :global(.pd-caret-bad),
+    .stage :global(.pd-caret-good),
+    .caret { animation: none; }
   }
-
-  .prose :global(h2),
-  .prose :global(h3) { scroll-margin-top: 2rem; }
 </style>
