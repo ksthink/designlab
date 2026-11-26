@@ -4,7 +4,7 @@ metaphr의 디자인 철학·토큰·폰트·로고·디자인 요소·참고 �
 
 **https://design.metaphr.dev**
 
-디자인의 원본은 [metaphr.dev](https://metaphr.dev)이고, design_lab은 그 디자인을 문서화해 배포합니다.
+design_lab이 metaphr 디자인의 기준입니다. [metaphr.dev](https://metaphr.dev)와 각 앱이 이 규칙을 따릅니다.
 
 ## 디자인의 세 기둥
 
@@ -12,6 +12,7 @@ metaphr의 디자인 철학·토큰·폰트·로고·디자인 요소·참고 �
 
 - 서체: Mulmaru 하나 (굵기 400)
 - 팔레트: paper `#F5F5F5` · slate `#303841` · teal `#76ABAE`(보조) · orange `#FF5722`(강조, 한 화면에 하나)
+- 글자 크기는 12px의 정수배만, 글자 대비 4.5:1 이상, 조작 요소 테두리 3:1
 - 라이트/다크 두 테마, 1px 헤어라인, 직각 모서리, 그림자·그라데이션 없음
 
 ## 쓰는 법
