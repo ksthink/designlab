@@ -65,15 +65,22 @@ const mdPath = `/elements/${el.id}.md`;
     <p class="ai-doc">AI용 문서: <a href={elementMarkdownUrl(el.id)}>{mdPath}</a></p>
   </header>
 
-  <section class="demos" aria-label="예시">
-    <figure class="panel">
-      <figcaption>라이트</figcaption>
-      <DemoFrame mode="panel" theme="light" html={demo.html} css={demo.css} js={demoJs} title={`${el.name} 예시 — 라이트`} />
-    </figure>
-    <figure class="panel">
-      <figcaption>다크</figcaption>
-      <DemoFrame mode="panel" theme="dark" html={demo.html} css={demo.css} js={demoJs} title={`${el.name} 예시 — 다크`} />
-    </figure>
+  <section class="demo" aria-label="예시" data-demo>
+    <div class="toolbar js-only">
+      <div class="seg" role="group" aria-label="테마">
+        <button type="button" data-set-theme="light">라이트</button>
+        <button type="button" data-set-theme="dark">다크</button>
+      </div>
+      <div class="seg" role="group" aria-label="화면 폭">
+        <button type="button" data-set-width="" aria-pressed="true">넓게</button>
+        <button type="button" data-set-width="390">390px</button>
+      </div>
+      <button type="button" class="tool" data-replay>다시</button>
+    </div>
+    <div class="stage" data-stage>
+      <DemoFrame mode="panel" html={demo.html} css={demo.css} js={demoJs} title={`${el.name} 예시`} />
+    </div>
+    <p class="hint">직접 올려 보고, 눌러 보세요.</p>
   </section>
 
   {(effects.length > 0 || related.length > 0) && (
@@ -112,6 +119,41 @@ const mdPath = `/elements/${el.id}.md`;
     {next ? <a class="next" href={elementUrl(next.id)}><span>다음</span>{next.name} &gt;</a> : <span />}
   </nav>
 </Base>
+
+<script is:inline>
+  // 데모 무대 — 테마(사이트 테마에서 시작)·폭(390px 미리보기)·다시 실행
+  (function () {
+    var box = document.querySelector('[data-demo]');
+    if (!box) return;
+    var stage = box.querySelector('[data-stage]');
+    var frame = stage.querySelector('iframe');
+    var root = document.documentElement;
+    var site = root.getAttribute('data-theme');
+    var theme = site === 'light' || site === 'dark' ? site : matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    function press(sel, val, attr) {
+      box.querySelectorAll(sel).forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute(attr) === val)); });
+    }
+    function paint() {
+      try { frame.contentDocument.documentElement.setAttribute('data-theme', theme); } catch (e) {}
+      press('[data-set-theme]', theme, 'data-set-theme');
+    }
+    frame.addEventListener('load', paint);
+    paint();
+    box.querySelectorAll('[data-set-theme]').forEach(function (b) {
+      b.addEventListener('click', function () { theme = b.getAttribute('data-set-theme'); paint(); });
+    });
+    box.querySelectorAll('[data-set-width]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var w = b.getAttribute('data-set-width');
+        if (w) stage.setAttribute('data-width', w); else stage.removeAttribute('data-width');
+        press('[data-set-width]', w, 'data-set-width');
+      });
+    });
+    box.querySelector('[data-replay]').addEventListener('click', function () {
+      frame.setAttribute('srcdoc', frame.getAttribute('srcdoc'));
+    });
+  })();
+</script>
 
 <style>
   .crumb {
@@ -153,23 +195,57 @@ const mdPath = `/elements/${el.id}.md`;
   .ai-doc a { text-decoration: none; border-bottom: var(--mp-border) solid var(--mp-line-strong); }
   .ai-doc a:hover { background: var(--mp-ink); color: var(--mp-bg); }
 
-  /* ---------- 큰 데모: 라이트·다크 나란히 ---------- */
+  /* ---------- 큰 데모: 하나의 무대 + 테마·폭·다시 ---------- */
 
-  .demos {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
-    gap: clamp(0.9rem, 2.2vw, 1.5rem);
-    margin-top: clamp(1.6rem, 5vh, 2.6rem);
+  .demo { margin-top: 2.5rem; }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.5rem;
+    margin-bottom: 0.75rem;
   }
+  .seg { display: inline-flex; }
+  .seg button + button { margin-left: calc(-1 * var(--mp-border)); }
+  .seg button,
+  .tool {
+    padding: 0.5em 1em;
+    border: var(--mp-border) solid var(--mp-line-button);
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    font-size: var(--mp-size-small);
+    letter-spacing: var(--mp-tracking-small);
+    cursor: pointer;
+    transition: background var(--mp-duration-hover) ease, color var(--mp-duration-hover) ease;
+  }
+  .seg button[aria-pressed='true'] { background: var(--mp-ink); color: var(--mp-bg); }
+  @media (hover: hover) {
+    .seg button:hover,
+    .tool:hover { background: var(--mp-ink); color: var(--mp-bg); }
+  }
+  .seg button:focus-visible,
+  .tool:focus-visible { background: var(--mp-ink); color: var(--mp-bg); }
+  .tool { margin-left: auto; }
 
-  .panel {
-    margin: 0;
-    min-width: 0;
+  .stage {
     border: var(--mp-border) solid var(--mp-line);
+    background: var(--mp-grid-bg);
   }
-  .panel figcaption {
-    padding: 0.5em 0.9em;
-    border-bottom: var(--mp-border) solid var(--mp-line);
+  .stage :global(.panel-frame) {
+    margin: 0 auto;
+    transition: max-width var(--mp-duration-hover) ease;
+  }
+  .stage[data-width='390'] :global(.panel-frame) {
+    max-width: 390px;
+    border-left: var(--mp-border) solid var(--mp-line);
+    border-right: var(--mp-border) solid var(--mp-line);
+  }
+
+  .hint {
+    margin: 0.75em 0 0;
     font-size: var(--mp-size-meta);
     letter-spacing: var(--mp-tracking-meta);
     opacity: var(--mp-opacity-meta);
