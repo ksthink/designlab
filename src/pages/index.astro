@@ -95,7 +95,7 @@ const prompt = `이 프로젝트는 metaphr 디자인 시스템(${VERSION})을 �
     <ul class="cards" role="list">
       {PILLARS.map((p, i) => (
         <li class="card-float float" style={floatStyle(i, 41)}>
-          <a class="card" href={url('/philosophy')}>
+          <a class="card" href={`${url('/philosophy')}#${p.id}`}>
             <div class:list={['thumb', 'pillar-thumb', p.id]} aria-hidden="true">
               {p.id === 'minimalism' && <span class="pm-glyph">여백</span>}
               {p.id === 'pixel-art' && <PixelIcon src={url('/v1/icons/rhythm.png')} scale={3} />}
@@ -114,7 +114,7 @@ const prompt = `이 프로젝트는 metaphr 디자인 시스템(${VERSION})을 �
     <div class="section-head">
       <h2 id="ai-title">AI 도구에서 시작하기</h2>
           </div>
-    <pre id="prompt">{prompt}</pre>
+    <pre id="prompt" hidden>{prompt}</pre>
     <div class="actions">
       <button type="button" class="btn" data-copy="prompt">지시문 복사</button>
       <a class="btn" href={url('/ai')}>AI 가이드 &gt;</a>
@@ -236,14 +236,15 @@ const prompt = `이 프로젝트는 metaphr 디자인 시스템(${VERSION})을 �
     list-style: none;
     margin: 0;
     padding: 0.75rem 0 1.25rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(0.9rem, 2.2vw, 1.5rem);
   }
+  @media (max-width: 720px) {
+    .cards { grid-template-columns: minmax(0, 1fr); }
+  }
 
-  /* metaphr.dev 레일 카드와 같은 폭 — 남는 줄도 가운데로 모인다 */
-  .card-float { display: flex; flex: 0 1 360px; min-width: 0; }
+  .card-float { display: flex; min-width: 0; }
   .card-float:hover { animation-play-state: paused; }
 
   .card {
